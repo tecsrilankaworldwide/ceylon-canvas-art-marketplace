@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Clock, Eye, ChevronLeft, ChevronRight, ShoppingCart, Gavel, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Heart, Clock, Eye, ChevronLeft, ChevronRight, ShoppingCart, Gavel, MessageSquare } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { getArtwork, getArtworkBids, placeBid, addToWishlist, removeFromWishlist, getWishlist, createCommission } from '../services/api';
 import { ReviewSection } from '../components/ReviewSection';
+import { ShareButton } from '../components/ShareButton';
 
 const ArtworkDetailPage = () => {
   const { id } = useParams();
@@ -402,14 +403,10 @@ const ArtworkDetailPage = () => {
                 <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-[#B64E33] text-[#B64E33]' : ''}`} />
                 {isWishlisted ? 'Wishlisted' : 'Wishlist'}
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleShare}
-                className="flex items-center justify-center gap-2"
-                data-testid="share-btn"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <ShareButton 
+                title={artwork.title}
+                description={`${artwork.title} by ${artwork.artist_name} - ${artwork.description?.slice(0, 100)}...`}
+              />
               
               {/* Commission Dialog */}
               <Dialog>

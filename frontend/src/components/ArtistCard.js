@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star } from 'lucide-react';
+import { ArtistBadges } from './VerifiedBadge';
 
 export const ArtistCard = ({ artist }) => {
   return (
@@ -30,11 +31,14 @@ export const ArtistCard = ({ artist }) => {
 
         {/* Info */}
         <div className="pt-12">
-          <Link to={`/artist/${artist.id}`}>
-            <h3 className="font-heading text-xl font-medium text-[#1A1D20] hover:text-[#0F3057] transition-colors">
-              {artist.name}
-            </h3>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to={`/artist/${artist.id}`}>
+              <h3 className="font-heading text-xl font-medium text-[#1A1D20] hover:text-[#0F3057] transition-colors">
+                {artist.name}
+              </h3>
+            </Link>
+            <ArtistBadges badges={artist.badges} size="sm" />
+          </div>
           
           {artist.location && (
             <div className="flex items-center gap-1 mt-1">
