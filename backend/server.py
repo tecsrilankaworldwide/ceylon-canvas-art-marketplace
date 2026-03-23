@@ -105,6 +105,7 @@ class ArtistProfile(BaseModel):
     social_links: Dict[str, str] = {}
     total_sales: int = 0
     rating: float = 0.0
+    badges: List[str] = []  # verified, featured, top_seller, trusted
     created_at: str
 
 class ArtistProfileCreate(BaseModel):
