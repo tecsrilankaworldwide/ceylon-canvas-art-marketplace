@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, User, Menu, X, Search, Heart, Palette, Shield } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Search, Heart, Palette, Shield, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
   DropdownMenu,
@@ -11,6 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import { NotificationCenter } from './NotificationCenter';
+import { CurrencySelector } from './CurrencySelector';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout, isArtist, isAdmin } = useAuth();
@@ -64,7 +66,10 @@ export const Navbar = () => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Currency Selector */}
+            <CurrencySelector />
+
             {/* Search */}
             <button 
               onClick={() => setSearchOpen(!searchOpen)} 
@@ -76,6 +81,14 @@ export const Navbar = () => {
 
             {isAuthenticated ? (
               <>
+                {/* Messages */}
+                <Link to="/messages" className="p-2 hover:bg-[#F0F0EA] rounded-sm transition-colors" data-testid="nav-messages">
+                  <MessageCircle className="h-5 w-5 text-[#1A1D20]" />
+                </Link>
+
+                {/* Notifications */}
+                <NotificationCenter />
+
                 {/* Wishlist */}
                 <Link to="/wishlist" className="p-2 hover:bg-[#F0F0EA] rounded-sm transition-colors" data-testid="nav-wishlist">
                   <Heart className="h-5 w-5 text-[#1A1D20]" />
@@ -104,6 +117,9 @@ export const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to="/dashboard" data-testid="nav-dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/messages" data-testid="nav-messages-menu">Messages</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/orders" data-testid="nav-orders">My Orders</Link>
@@ -196,6 +212,9 @@ export const Navbar = () => {
                 <>
                   <Link to="/dashboard" className="block font-body text-base py-2" onClick={() => setMobileMenuOpen(false)}>
                     Dashboard
+                  </Link>
+                  <Link to="/messages" className="block font-body text-base py-2" onClick={() => setMobileMenuOpen(false)}>
+                    Messages
                   </Link>
                   <Link to="/cart" className="block font-body text-base py-2" onClick={() => setMobileMenuOpen(false)}>
                     Cart {itemCount > 0 && `(${itemCount})`}

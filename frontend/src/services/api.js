@@ -344,3 +344,86 @@ export const getRevenueChart = async (days = 30) => {
   });
   return response.data;
 };
+
+// Messaging APIs
+export const getConversations = async () => {
+  const response = await axios.get(`${API}/conversations`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getConversation = async (conversationId) => {
+  const response = await axios.get(`${API}/conversations/${conversationId}`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const createConversation = async (recipientId, artworkId = null) => {
+  const params = { recipient_id: recipientId };
+  if (artworkId) params.artwork_id = artworkId;
+  
+  const response = await axios.post(`${API}/conversations`, null, {
+    params,
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const sendMessage = async (data) => {
+  const response = await axios.post(`${API}/messages`, data, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const markMessageRead = async (messageId) => {
+  const response = await axios.put(`${API}/messages/${messageId}/read`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+// Notification APIs
+export const getNotifications = async (unreadOnly = false) => {
+  const response = await axios.get(`${API}/notifications`, {
+    params: { unread_only: unreadOnly },
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const markNotificationRead = async (notificationId) => {
+  const response = await axios.put(`${API}/notifications/${notificationId}/read`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const markAllNotificationsRead = async () => {
+  const response = await axios.put(`${API}/notifications/read-all`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const deleteNotification = async (notificationId) => {
+  const response = await axios.delete(`${API}/notifications/${notificationId}`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+// Currency APIs
+export const getCurrencyRates = async () => {
+  const response = await axios.get(`${API}/currency/rates`);
+  return response.data;
+};
+
+export const convertCurrency = async (amount, fromCurrency = 'USD', toCurrency = 'LKR') => {
+  const response = await axios.get(`${API}/currency/convert`, {
+    params: { amount, from_currency: fromCurrency, to_currency: toCurrency }
+  });
+  return response.data;
+};

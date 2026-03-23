@@ -275,6 +275,45 @@ class ArtistVerificationUpdate(BaseModel):
     status: str  # pending, verified, rejected
     badges: List[str] = []
 
+# Messaging Models
+class MessageCreate(BaseModel):
+    conversation_id: Optional[str] = None
+    recipient_id: str
+    content: str
+    artwork_id: Optional[str] = None  # Optional reference to artwork being discussed
+
+class MessageResponse(BaseModel):
+    id: str
+    conversation_id: str
+    sender_id: str
+    sender_name: str
+    sender_avatar: Optional[str] = None
+    content: str
+    created_at: str
+    is_read: bool = False
+
+class ConversationResponse(BaseModel):
+    id: str
+    participants: List[Dict[str, Any]]
+    artwork_id: Optional[str] = None
+    artwork_title: Optional[str] = None
+    artwork_image: Optional[str] = None
+    last_message: Optional[str] = None
+    last_message_at: Optional[str] = None
+    unread_count: int = 0
+    created_at: str
+
+# Notification Models
+class NotificationResponse(BaseModel):
+    id: str
+    user_id: str
+    type: str  # bid, outbid, purchase, commission, message, review, verification
+    title: str
+    message: str
+    link: Optional[str] = None
+    is_read: bool = False
+    created_at: str
+
 # ==================== STORAGE HELPERS ====================
 
 def init_storage():
@@ -878,7 +917,6 @@ async def get_artworks(
     
     sort_direction = -1 if sort_order == "desc" else 1
     artworks = await db.artworks.find(query, {"_id": 0}).sort(sort_by, sort_direction).skip(skip).limit(limit).to_list(limit)
-    total = await db.artworks.count_documents(query)
     
     return artworks
 
@@ -909,6 +947,11 @@ async def get_artwork(artwork_id: str, user: dict = Depends(get_optional_user)):
     # Increment view count
     await db.artworks.update_one({"id": artwork_id}, {"$inc": {"views": 1}})
     artwork["views"] = artwork.get("views", 0) + 1
+    
+    # Add artist's user_id for messaging
+    artist = await db.artists.find_one({"id": artwork["artist_id"]}, {"_id": 0})
+    if artist:
+        artwork["artist_user_id"] = artist.get("user_id")
     
     return artwork
 
@@ -989,6 +1032,15 @@ async def place_bid(bid_data: BidCreate, user: dict = Depends(get_current_user))
                 "bid_count": updated_artwork.get("bid_count", 1)
             })
             asyncio.create_task(send_email(artist_user["email"], subject, html))
+            
+            # Create in-app notification for artist
+            await create_notification(
+                user_id=artist["user_id"],
+                notification_type="bid",
+                title="New Bid Received",
+                message=f"{user['name']} placed a ${bid_data.amount} bid on {artwork['title']}",
+                link=f"/artwork/{artwork['id']}"
+            )
     
     # Notify previous highest bidder they've been outbid
     previous_bids = await db.bids.find(
@@ -1005,6 +1057,15 @@ async def place_bid(bid_data: BidCreate, user: dict = Depends(get_current_user))
                 "current_bid": bid_data.amount
             })
             asyncio.create_task(send_email(prev_bidder["email"], subject, html))
+            
+            # Create in-app notification for outbid user
+            await create_notification(
+                user_id=previous_bids[0]["bidder_id"],
+                notification_type="outbid",
+                title="You've Been Outbid",
+                message=f"Someone placed a higher bid on {artwork['title']}. Current bid: ${bid_data.amount}",
+                link=f"/artwork/{artwork['id']}"
+            )
     
     return {k: v for k, v in bid.items() if k != "_id"}
 
@@ -2604,6 +2665,307 @@ async def create_admin_account(user_data: UserCreate, admin: dict = Depends(get_
     await db.users.insert_one(user)
     
     return {"message": "Admin account created", "user_id": user_id}
+
+# ==================== NOTIFICATION HELPERS ====================
+
+async def create_notification(user_id: str, notification_type: str, title: str, message: str, link: Optional[str] = None):
+    """Create a notification for a user."""
+    notification = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "type": notification_type,
+        "title": title,
+        "message": message,
+        "link": link,
+        "is_read": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.notifications.insert_one(notification)
+    # Return without MongoDB _id
+    return {k: v for k, v in notification.items() if k != "_id"}
+
+# ==================== MESSAGING ROUTES ====================
+
+@api_router.get("/conversations")
+async def get_conversations(user: dict = Depends(get_current_user)):
+    """Get all conversations for the current user."""
+    conversations = await db.conversations.find(
+        {"participant_ids": user["id"]},
+        {"_id": 0}
+    ).sort("last_message_at", -1).to_list(50)
+    
+    # Enrich with participant info and unread counts
+    enriched = []
+    for conv in conversations:
+        participants = []
+        for pid in conv.get("participant_ids", []):
+            if pid != user["id"]:
+                p_user = await db.users.find_one({"id": pid}, {"_id": 0, "password": 0})
+                if p_user:
+                    participants.append({
+                        "id": p_user["id"],
+                        "name": p_user["name"],
+                        "avatar_url": p_user.get("avatar_url"),
+                        "is_artist": p_user.get("is_artist", False)
+                    })
+        
+        # Get unread count
+        unread_count = await db.messages.count_documents({
+            "conversation_id": conv["id"],
+            "sender_id": {"$ne": user["id"]},
+            "is_read": False
+        })
+        
+        # Get artwork info if linked
+        artwork_title = None
+        artwork_image = None
+        if conv.get("artwork_id"):
+            artwork = await db.artworks.find_one({"id": conv["artwork_id"]}, {"_id": 0})
+            if artwork:
+                artwork_title = artwork.get("title")
+                artwork_image = artwork.get("images", [None])[0]
+        
+        enriched.append({
+            **conv,
+            "participants": participants,
+            "unread_count": unread_count,
+            "artwork_title": artwork_title,
+            "artwork_image": artwork_image
+        })
+    
+    return enriched
+
+@api_router.get("/conversations/{conversation_id}")
+async def get_conversation(conversation_id: str, user: dict = Depends(get_current_user)):
+    """Get a specific conversation with messages."""
+    conv = await db.conversations.find_one(
+        {"id": conversation_id, "participant_ids": user["id"]},
+        {"_id": 0}
+    )
+    if not conv:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    # Get messages
+    messages = await db.messages.find(
+        {"conversation_id": conversation_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(100)
+    
+    # Mark messages as read
+    await db.messages.update_many(
+        {"conversation_id": conversation_id, "sender_id": {"$ne": user["id"]}, "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    # Get participant info
+    participants = []
+    for pid in conv.get("participant_ids", []):
+        p_user = await db.users.find_one({"id": pid}, {"_id": 0, "password": 0})
+        if p_user:
+            participants.append({
+                "id": p_user["id"],
+                "name": p_user["name"],
+                "avatar_url": p_user.get("avatar_url"),
+                "is_artist": p_user.get("is_artist", False)
+            })
+    
+    return {
+        **conv,
+        "participants": participants,
+        "messages": messages
+    }
+
+@api_router.post("/conversations")
+async def create_or_get_conversation(
+    recipient_id: str,
+    artwork_id: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Create a new conversation or get existing one."""
+    if recipient_id == user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot start conversation with yourself")
+    
+    # Check if recipient exists
+    recipient = await db.users.find_one({"id": recipient_id})
+    if not recipient:
+        raise HTTPException(status_code=404, detail="Recipient not found")
+    
+    # Check for existing conversation between these users
+    existing = await db.conversations.find_one({
+        "participant_ids": {"$all": [user["id"], recipient_id]},
+        "artwork_id": artwork_id
+    }, {"_id": 0})
+    
+    if existing:
+        return existing
+    
+    # Create new conversation
+    conv_id = str(uuid.uuid4())
+    conversation = {
+        "id": conv_id,
+        "participant_ids": [user["id"], recipient_id],
+        "artwork_id": artwork_id,
+        "last_message": None,
+        "last_message_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.conversations.insert_one(conversation)
+    
+    # Return without MongoDB _id
+    return {k: v for k, v in conversation.items() if k != "_id"}
+
+@api_router.post("/messages")
+async def send_message(message_data: MessageCreate, user: dict = Depends(get_current_user)):
+    """Send a message in a conversation."""
+    # Get or create conversation
+    if message_data.conversation_id:
+        conv = await db.conversations.find_one({
+            "id": message_data.conversation_id,
+            "participant_ids": user["id"]
+        })
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+    else:
+        # Create new conversation
+        conv = await create_or_get_conversation(
+            message_data.recipient_id,
+            message_data.artwork_id,
+            user
+        )
+    
+    # Create message
+    message_id = str(uuid.uuid4())
+    message = {
+        "id": message_id,
+        "conversation_id": conv["id"],
+        "sender_id": user["id"],
+        "sender_name": user["name"],
+        "sender_avatar": user.get("avatar_url"),
+        "content": message_data.content,
+        "is_read": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.messages.insert_one(message)
+    
+    # Update conversation last message
+    await db.conversations.update_one(
+        {"id": conv["id"]},
+        {"$set": {
+            "last_message": message_data.content[:100],
+            "last_message_at": message["created_at"]
+        }}
+    )
+    
+    # Get recipient ID
+    recipient_id = [pid for pid in conv["participant_ids"] if pid != user["id"]][0]
+    
+    # Create notification for recipient
+    await create_notification(
+        user_id=recipient_id,
+        notification_type="message",
+        title="New Message",
+        message=f"{user['name']}: {message_data.content[:50]}{'...' if len(message_data.content) > 50 else ''}",
+        link=f"/messages/{conv['id']}"
+    )
+    
+    # Return without MongoDB _id
+    return {k: v for k, v in message.items() if k != "_id"}
+
+@api_router.put("/messages/{message_id}/read")
+async def mark_message_read(message_id: str, user: dict = Depends(get_current_user)):
+    """Mark a message as read."""
+    result = await db.messages.update_one(
+        {"id": message_id},
+        {"$set": {"is_read": True}}
+    )
+    return {"success": result.modified_count > 0}
+
+# ==================== NOTIFICATION ROUTES ====================
+
+@api_router.get("/notifications")
+async def get_notifications(
+    skip: int = 0,
+    limit: int = 20,
+    unread_only: bool = False,
+    user: dict = Depends(get_current_user)
+):
+    """Get notifications for the current user."""
+    query = {"user_id": user["id"]}
+    if unread_only:
+        query["is_read"] = False
+    
+    notifications = await db.notifications.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    unread_count = await db.notifications.count_documents({"user_id": user["id"], "is_read": False})
+    
+    return {
+        "notifications": notifications,
+        "unread_count": unread_count
+    }
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, user: dict = Depends(get_current_user)):
+    """Mark a notification as read."""
+    result = await db.notifications.update_one(
+        {"id": notification_id, "user_id": user["id"]},
+        {"$set": {"is_read": True}}
+    )
+    return {"success": result.modified_count > 0}
+
+@api_router.put("/notifications/read-all")
+async def mark_all_notifications_read(user: dict = Depends(get_current_user)):
+    """Mark all notifications as read."""
+    result = await db.notifications.update_many(
+        {"user_id": user["id"], "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    return {"success": True, "count": result.modified_count}
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(notification_id: str, user: dict = Depends(get_current_user)):
+    """Delete a notification."""
+    result = await db.notifications.delete_one(
+        {"id": notification_id, "user_id": user["id"]}
+    )
+    return {"success": result.deleted_count > 0}
+
+# ==================== CURRENCY CONVERSION ====================
+
+# Exchange rates (in production, use a real API)
+EXCHANGE_RATES = {
+    "USD": 1.0,
+    "LKR": 325.0  # Approximate USD to LKR rate
+}
+
+@api_router.get("/currency/rates")
+async def get_currency_rates():
+    """Get current exchange rates."""
+    return {
+        "base": "USD",
+        "rates": EXCHANGE_RATES,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/currency/convert")
+async def convert_currency(
+    amount: float,
+    from_currency: str = "USD",
+    to_currency: str = "LKR"
+):
+    """Convert amount between currencies."""
+    if from_currency not in EXCHANGE_RATES or to_currency not in EXCHANGE_RATES:
+        raise HTTPException(status_code=400, detail="Invalid currency")
+    
+    # Convert to USD first, then to target currency
+    amount_in_usd = amount / EXCHANGE_RATES[from_currency]
+    converted_amount = amount_in_usd * EXCHANGE_RATES[to_currency]
+    
+    return {
+        "original_amount": amount,
+        "original_currency": from_currency,
+        "converted_amount": round(converted_amount, 2),
+        "target_currency": to_currency,
+        "rate": EXCHANGE_RATES[to_currency] / EXCHANGE_RATES[from_currency]
+    }
 
 # ==================== MAIN ====================
 

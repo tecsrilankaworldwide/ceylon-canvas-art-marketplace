@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import '@/App.css';
 
 // Components
@@ -26,6 +27,7 @@ import AboutPage from './pages/AboutPage';
 import ArtworkFormPage from './pages/ArtworkFormPage';
 import ArtistAnalyticsPage from './pages/ArtistAnalyticsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import MessagesPage from './pages/MessagesPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -112,6 +114,16 @@ function AppRoutes() {
           <Layout><AdminDashboardPage /></Layout>
         </ProtectedRoute>
       } />
+      <Route path="/messages" element={
+        <ProtectedRoute>
+          <Layout showFooter={false}><MessagesPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/messages/:conversationId" element={
+        <ProtectedRoute>
+          <Layout showFooter={false}><MessagesPage /></Layout>
+        </ProtectedRoute>
+      } />
       
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -123,14 +135,16 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <CartProvider>
-          <div className="App">
-            {/* Grain Texture Overlay */}
-            <div className="grain-overlay" />
-            <AppRoutes />
-            <Toaster position="top-right" richColors />
-          </div>
-        </CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <div className="App">
+              {/* Grain Texture Overlay */}
+              <div className="grain-overlay" />
+              <AppRoutes />
+              <Toaster position="top-right" richColors />
+            </div>
+          </CartProvider>
+        </CurrencyProvider>
       </AuthProvider>
     </BrowserRouter>
   );

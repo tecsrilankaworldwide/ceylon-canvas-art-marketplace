@@ -2,16 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Clock, Eye } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
+import { useCurrency } from '../context/CurrencyContext';
 
 export const ArtworkCard = ({ artwork, onWishlistToggle, isWishlisted = false, compact = false }) => {
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
+  const { formatPrice } = useCurrency();
 
   const getTimeRemaining = (endDate) => {
     if (!endDate) return null;

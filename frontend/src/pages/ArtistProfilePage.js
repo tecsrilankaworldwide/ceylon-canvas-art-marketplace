@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { MapPin, Star, Instagram, Globe, Mail, ArrowLeft } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { MapPin, Star, Instagram, Globe, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { ArtworkCard } from '../components/ArtworkCard';
-import { getArtist, getArtistArtworks } from '../services/api';
+import { VerifiedBadge } from '../components/VerifiedBadge';
+import { useAuth } from '../context/AuthContext';
+import { getArtist, getArtistArtworks, createConversation } from '../services/api';
+import { toast } from 'sonner';
 
 const ArtistProfilePage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [artist, setArtist] = useState(null);
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [messagingLoading, setMessagingLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,6 +67,29 @@ const ArtistProfilePage = () => {
   const auctionArtworks = artworks.filter(a => a.is_available && a.is_auction);
   const soldArtworks = artworks.filter(a => !a.is_available);
 
+  const handleMessageArtist = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please sign in to message this artist');
+      navigate('/login');
+      return;
+    }
+    
+    if (user?.id === artist?.user_id) {
+      toast.error("You can't message yourself");
+      return;
+    }
+
+    setMessagingLoading(true);
+    try {
+      const conversation = await createConversation(artist.user_id);
+      navigate(`/messages/${conversation.id}`);
+    } catch (error) {
+      toast.error('Failed to start conversation');
+    } finally {
+      setMessagingLoading(false);
+    }
+  };
+
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid="artist-profile-page">
       {/* Cover Image */}
@@ -98,9 +127,14 @@ const ArtistProfilePage = () => {
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="font-heading text-3xl lg:text-4xl font-medium text-[#0F3057]" data-testid="artist-name">
-                {artist.name}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="font-heading text-3xl lg:text-4xl font-medium text-[#0F3057]" data-testid="artist-name">
+                  {artist.name}
+                </h1>
+                {artist.verification_status === 'verified' && (
+                  <VerifiedBadge badges={artist.badges} />
+                )}
+              </div>
               
               <div className="flex flex-wrap items-center gap-4 mt-2">
                 {artist.location && (
@@ -133,7 +167,7 @@ const ArtistProfilePage = () => {
               )}
             </div>
 
-            {/* Social Links */}
+            {/* Actions */}
             <div className="flex gap-3">
               {artist.social_links?.instagram && (
                 <a 
@@ -155,12 +189,15 @@ const ArtistProfilePage = () => {
                   <Globe className="h-5 w-5 text-[#0F3057]" />
                 </a>
               )}
-              <Link 
-                to={`/artwork/${artworks[0]?.id}`}
-                className="p-3 bg-[#F5F5F0] hover:bg-[#E5E5DF] rounded-sm transition-colors"
+              <Button 
+                onClick={handleMessageArtist}
+                disabled={messagingLoading}
+                className="btn-primary rounded-sm flex items-center gap-2"
+                data-testid="message-artist-btn"
               >
-                <Mail className="h-5 w-5 text-[#0F3057]" />
-              </Link>
+                <MessageCircle className="h-4 w-4" />
+                {messagingLoading ? 'Starting...' : 'Message'}
+              </Button>
             </div>
           </div>
         </div>

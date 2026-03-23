@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Clock, Eye, ChevronLeft, ChevronRight, ShoppingCart, Gavel, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Heart, Clock, Eye, ChevronLeft, ChevronRight, ShoppingCart, Gavel, MessageSquare, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
@@ -9,7 +9,8 @@ import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { getArtwork, getArtworkBids, placeBid, addToWishlist, removeFromWishlist, getWishlist, createCommission } from '../services/api';
+import { useCurrency } from '../context/CurrencyContext';
+import { getArtwork, getArtworkBids, placeBid, addToWishlist, removeFromWishlist, getWishlist, createCommission, createConversation } from '../services/api';
 import { ReviewSection } from '../components/ReviewSection';
 import { ShareButton } from '../components/ShareButton';
 
@@ -18,6 +19,7 @@ const ArtworkDetailPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { addToCart } = useCart();
+  const { formatPrice, currency, getSymbol } = useCurrency();
   
   const [artwork, setArtwork] = useState(null);
   const [bids, setBids] = useState([]);
@@ -27,6 +29,7 @@ const ArtworkDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [bidding, setBidding] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [messagingLoading, setMessagingLoading] = useState(false);
   
   // Commission form state
   const [commissionForm, setCommissionForm] = useState({
@@ -62,15 +65,6 @@ const ArtworkDetailPage = () => {
     };
     loadData();
   }, [id, isAuthenticated]);
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
 
   const getTimeRemaining = (endDate) => {
     if (!endDate) return null;
@@ -190,6 +184,30 @@ const ArtworkDetailPage = () => {
       setCommissionForm({ title: '', description: '', budget_min: '', budget_max: '', deadline: '' });
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to send commission request');
+    }
+  };
+
+  const handleMessageArtist = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please sign in to message this artist');
+      navigate('/login');
+      return;
+    }
+    
+    if (user?.id === artwork?.artist_user_id) {
+      toast.error("You can't message yourself");
+      return;
+    }
+
+    setMessagingLoading(true);
+    try {
+      // Create conversation with reference to this artwork
+      const conversation = await createConversation(artwork.artist_user_id, artwork.id);
+      navigate(`/messages/${conversation.id}`);
+    } catch (error) {
+      toast.error('Failed to start conversation');
+    } finally {
+      setMessagingLoading(false);
     }
   };
 
@@ -407,6 +425,18 @@ const ArtworkDetailPage = () => {
                 title={artwork.title}
                 description={`${artwork.title} by ${artwork.artist_name} - ${artwork.description?.slice(0, 100)}...`}
               />
+              
+              {/* Message Artist Button */}
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={handleMessageArtist}
+                disabled={messagingLoading}
+                data-testid="message-artist-btn"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {messagingLoading ? 'Starting...' : 'Ask Question'}
+              </Button>
               
               {/* Commission Dialog */}
               <Dialog>
