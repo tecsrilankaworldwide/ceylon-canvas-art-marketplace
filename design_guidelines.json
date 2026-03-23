@@ -1,0 +1,131 @@
+{
+  "theme": "Light (Warm Canvas) - A gallery aesthetic to let the art shine.",
+  "typography": {
+    "headings": {
+      "family": "Cormorant Garamond",
+      "weights": ["300", "500", "700"],
+      "styling": "tracking-tight leading-none text-ceylon-sapphire or text-charcoal",
+      "instruction": "NEVER use Inter for headings. Headings must feel like an editorial art exhibition catalog. Use italic variants for sub-headings or artistic flair."
+    },
+    "body": {
+      "family": "Manrope",
+      "weights": ["400", "500"],
+      "styling": "leading-relaxed tracking-normal text-slate-800",
+      "instruction": "Clean, highly readable geometric sans for descriptions, prices, and UI elements."
+    },
+    "labels_and_buttons": {
+      "family": "Manrope",
+      "weights": ["600", "700"],
+      "styling": "uppercase tracking-[0.2em] text-xs or text-sm",
+      "instruction": "Use for overlines, categories, and primary CTAs."
+    }
+  },
+  "colors": {
+    "background": {
+      "base": "#FDFDFB",
+      "alt": "#F5F5F0",
+      "dark_section": "#0A1015"
+    },
+    "brand": {
+      "primary": "#0F3057",
+      "primary_name": "Ceylon Sapphire",
+      "secondary": "#B64E33",
+      "secondary_name": "Cinnamon Terracotta",
+      "accent": "#E5A93C",
+      "accent_name": "Temple Gold"
+    },
+    "text": {
+      "primary": "#1A1D20",
+      "secondary": "#5C636A",
+      "inverse": "#FDFDFB"
+    },
+    "ui": {
+      "border": "#E5E5DF",
+      "hover_bg": "#F0F0EA",
+      "success": "#2D5A43",
+      "error": "#9E2A2B"
+    },
+    "rules": "Avoid large fields of highly saturated color. The UI should remain muted and elegant (like a physical gallery wall), letting the artwork provide the color. Use Cinnamon Terracotta exclusively for primary actions (bids, buy now)."
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing (The Gallery Wall). Art needs breathing room.",
+    "scale": "Use 2x-3x standard spacing. Rely on p-12, p-16, p-24, and p-32 for section padding.",
+    "grids": {
+      "gallery_view": "MODE A (The 'Tetris' Grid). Break symmetry. Mix col-span-4, col-span-8, row-span-2 for artwork. Never make a perfect grid of squares.",
+      "dashboard_view": "MODE B (High Density Grid). For artist dashboards/analytics, use tight gaps (gap-6) and clear hierarchy."
+    },
+    "alignment": "Left-align dense text. Center-align only major section headers. Artwork should often be asymmetrically aligned to create visual tension."
+  },
+  "surface_strategies": {
+    "artwork_cards": "Cardless design. No heavy shadows. Use flat presentation with subtle 1px border-border if needed, or simply rely on image and proximity for structure. On hover, apply an extremely soft, diffuse drop-shadow and a micro-lift (-translate-y-1).",
+    "navigation": "Glassmorphism (Crystal Variant). High blur (backdrop-blur-xl), bg-white/70, with a delicate 1px border-b border-white/40.",
+    "dashboard_panels": "Flat background with 1px border, 0px radius (sharp) or very subtle rounded-sm. No soft muddy UI."
+  },
+  "motion": {
+    "scrolling": "Smooth scrolling is MANDATORY. Use lenis for premium momentum scrolling.",
+    "interactions": "Image zoom on hover for artwork (scale-105 with long transition duration 0.7s ease-out). Fade-in and subtle translation for staggered list entrances.",
+    "page_transitions": "Fade to white/light-grey between pages, not instant harsh jumps."
+  },
+  "components_and_ui": {
+    "buttons": "Sharp edges (rounded-none) or very slight (rounded-sm). Use solid Ceylon Sapphire or Cinnamon Terracotta for primary actions. Hover states must shift text/bg color, not just opacity.",
+    "inputs": "Shadcn standard but customized: border-b only (flair-less minimalist) or sharp rectangular boxes with border-border. Focus state must be a sharp 1px ring of Ceylon Sapphire.",
+    "modals_dialogs": "Use Shadcn Dialog. Backdrop must be heavily blurred (backdrop-blur-md) with a dark tint (bg-black/40). Modal content surface must be pure white (#FFFFFF).",
+    "badges": "For 'Auction', 'Sold', 'Available'. Small, tracking-widest, uppercase. E.g., 'Auction' -> bg-ceylon-sapphire text-white px-2 py-1 text-[10px]."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Colorful abstract acrylic painting (Use for Featured Art/Hero placeholder)",
+      "category": "artwork"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1720945489924-19b707539b3a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHw0fHxzcmklMjBsYW5rYSUyMGFydHxlbnwwfHx8fDE3NzQyNzA3MDB8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Traditional Sri Lankan masks on wall (Use for Traditional category/Cultural context)",
+      "category": "artwork"
+    },
+    {
+      "url": "https://images.pexels.com/photos/2097218/pexels-photo-2097218.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Elegant interior of an art museum gallery (Use for About page or Hero background)",
+      "category": "gallery"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1766801848077-31bd1900efcc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBhcnQlMjBnYWxsZXJ5JTIwaW50ZXJpb3J8ZW58MHx8fHwxNzc0MjcwNzAzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Art gallery with framed works on white walls (Use for Exhibition/Gallery section)",
+      "category": "gallery"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1752649938112-c63668199052?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwzfHxhcnRpc3QlMjBwYWludGluZyUyMGNhbnZhcyUyMHBvcnRyYWl0fGVufDB8fHx8MTc3NDI3MDcwMnww&ixlib=rb-4.1.0&q=85",
+      "description": "Artist by painting (Use for Artist Profile placeholder)",
+      "category": "artist"
+    },
+    {
+      "url": "https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Intricate stone carving of Hindu deity in Sri Lanka (Use for Heritage/Traditional Art collection)",
+      "category": "artwork"
+    }
+  ],
+  "accessibility": {
+    "contrast": "Ensure all body text meets APCA standards against the #FDFDFB background. Never use text lighter than #5C636A on light backgrounds.",
+    "focus": "All interactive elements must have a visible focus ring. Do not rely solely on outline-none.",
+    "motion": "Respect prefers-reduced-motion for the lenis smooth scroll and heavy transitions."
+  },
+  "instructions_to_main_agent": [
+    "You are building a high-end art gallery e-commerce site, not a standard SaaS dashboard. Treat the white space as a canvas.",
+    "Use pure HTML/Tailwind for the marketing/gallery front-end to ensure structural freedom (asymmetric grids).",
+    "Use Shadcn components heavily customized (removed borders, sharper radii) for interactive logic like Cart, Checkout, Auth, and Dashboard panels.",
+    "Do NOT center align the app container. Respect optical alignment.",
+    "Do NOT use placeholder text for logos or missing content. Use the provided image URLs.",
+    "Install and use `@phosphor-icons/react` with `weight='light'` or `weight='thin'` for an elegant, non-intrusive icon set.",
+    "Do NOT use complete transparent backgrounds for the sticky header; apply glassmorphism instead.",
+    "Incorporate subtle grain texture overlay (`mix-blend-multiply`, `opacity-5`) on the main background to make it feel like paper/canvas rather than digital pixels.",
+    "Add `data-testid` to all buttons, links, and forms for testing."
+  ],
+  "universal_guidelines_for_main_agent": [
+    "Do not converge toward generic 'AI slop' aesthetics. No simplistic gradients or universal transitions (`transition: all`).",
+    "Create depth through layered design elements and z-index hierarchy.",
+    "Every interaction needs micro-animations (hover states, custom cursors, etc).",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Use named exports for components, default exports for pages.",
+    "Use `sonner` for toast notifications."
+  ]
+}
