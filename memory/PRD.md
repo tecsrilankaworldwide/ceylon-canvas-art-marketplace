@@ -26,7 +26,7 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ User authentication (register/login/JWT)
 - ✅ Artist profiles CRUD
 - ✅ Artwork listings CRUD with advanced filters
-- ✅ Auction/bidding system with notifications
+- ✅ Auction/bidding system with real-time notifications
 - ✅ Direct purchase with cart
 - ✅ Commission requests
 - ✅ Wishlist functionality
@@ -40,25 +40,21 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Email notifications (Resend)
 - ✅ Reviews & Ratings System
 - ✅ Auction End Handling
-- ✅ Admin Dashboard APIs (March 2026)
-- ✅ **In-app Messaging System** (NEW - March 2026)
-  - Conversations CRUD
-  - Real-time message sending
-  - Message read status
-  - Artwork reference in conversations
-- ✅ **Notification System** (NEW - March 2026)
-  - Create notifications for bids, outbids, messages
-  - Mark as read (single/all)
-  - Unread count tracking
-- ✅ **Multi-currency Support** (NEW - March 2026)
-  - USD/LKR exchange rates
-  - Currency conversion API
-  - Rate: 1 USD = 325 LKR
+- ✅ Admin Dashboard APIs
+- ✅ In-app Messaging System
+- ✅ Notification System
+- ✅ Multi-currency Support (USD/LKR)
+- ✅ **WebSocket Real-time Updates** (NEW - March 2026)
+  - Connection manager for multiple user sessions
+  - Real-time bid updates to all watchers
+  - Instant message delivery
+  - Push notifications to connected users
+  - Auto-reconnect with 5s delay
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
 - ✅ Gallery page with advanced filters
-- ✅ Artwork detail page with bid/buy functionality
+- ✅ Artwork detail page with real-time bid updates
 - ✅ Artist profile pages with portfolio
 - ✅ Artists listing page
 - ✅ Live auctions page
@@ -75,21 +71,15 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Social Sharing Buttons
 - ✅ Verified Artist Badges
 - ✅ Admin Dashboard
-- ✅ **Messages Page** (NEW - March 2026)
-  - Conversation sidebar with search
-  - Chat area with message bubbles
-  - Read receipts (checkmarks)
-  - "Message Artist" button on artist profiles
-  - "Ask Question" button on artwork details
-- ✅ **Notification Center** (NEW - March 2026)
-  - Bell icon in navbar
-  - Notification popover dropdown
-  - Mark as read/delete actions
-  - Auto-poll for new notifications (30s)
-- ✅ **Currency Selector** (NEW - March 2026)
-  - USD/LKR dropdown in navbar
-  - CurrencyContext for app-wide state
-  - Prices update in real-time
+- ✅ Messages Page with real-time delivery
+- ✅ Notification Center with live connection indicator
+- ✅ Currency Selector (USD/LKR)
+- ✅ **WebSocket Integration** (NEW - March 2026)
+  - useWebSocket hook for connection management
+  - WebSocketContext for app-wide real-time state
+  - Toast notifications for new bids/messages
+  - Live "connected" indicator in UI
+  - Auto-refresh bid prices during auctions
 
 ## Test Credentials
 - **Admin User**: admin@ceyloncanvas.com / admin123
@@ -98,12 +88,12 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None - Core MVP + Messaging + Currency complete
+- None - Full feature set complete
 
 ### P1 (Important)
-- Order tracking with shipping updates
+- Order tracking with shipping status updates
 - Real-time exchange rate API (replace static rates)
-- Push notifications (browser/mobile)
+- Browser push notifications
 
 ### P2 (Nice to Have)
 - Advanced search with AI recommendations
@@ -119,7 +109,7 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 /app/backend/
 ├── .env
 ├── requirements.txt
-└── server.py (~3000 lines - recommended for refactoring)
+└── server.py (~3100 lines - includes WebSocket endpoint)
 ```
 
 ### Frontend Structure
@@ -128,18 +118,20 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ├── App.js
 ├── components/
 │   ├── ui/              # Shadcn UI components
-│   ├── Navbar.js        # With NotificationCenter & CurrencySelector
-│   ├── NotificationCenter.js
+│   ├── Navbar.js
+│   ├── NotificationCenter.js (WebSocket-enabled)
 │   ├── CurrencySelector.js
 │   └── ...
 ├── context/
 │   ├── AuthContext.js
 │   ├── CartContext.js
-│   └── CurrencyContext.js  # NEW
+│   ├── CurrencyContext.js
+│   └── WebSocketContext.js  # NEW
+├── hooks/
+│   └── useWebSocket.js      # NEW
 ├── pages/
-│   ├── MessagesPage.js     # NEW
-│   ├── AdminDashboardPage.js
-│   ├── GalleryPage.js
+│   ├── MessagesPage.js (WebSocket-enabled)
+│   ├── ArtworkDetailPage.js (real-time bids)
 │   └── ...
 └── services/
     └── api.js
@@ -147,34 +139,35 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 
 ## Key API Endpoints
 
-### Messaging Routes
-- GET /api/conversations - List user's conversations
-- GET /api/conversations/{id} - Get conversation with messages
-- POST /api/conversations - Create new conversation
-- POST /api/messages - Send message
+### WebSocket
+- WS /ws/{token} - Real-time connection (bids, messages, notifications)
 
-### Notification Routes
-- GET /api/notifications - List notifications with unread count
-- PUT /api/notifications/{id}/read - Mark as read
-- PUT /api/notifications/read-all - Mark all as read
-- DELETE /api/notifications/{id} - Delete notification
+### Messaging Routes
+- GET /api/conversations
+- GET /api/conversations/{id}
+- POST /api/conversations
+- POST /api/messages
 
 ### Currency Routes
-- GET /api/currency/rates - Get exchange rates
-- GET /api/currency/convert - Convert amount
+- GET /api/currency/rates
+- GET /api/currency/convert
 
 ## 3rd Party Integrations
 - Stripe (Payments) - Test key in environment
-- Emergent Object Storage (Image Uploads) - Emergent LLM Key
-- Resend (Email Notifications) - API Key configured
-- GitHub (VCS) - Repository linked
+- Emergent Object Storage (Image Uploads)
+- Resend (Email Notifications)
+- GitHub (VCS) - Repository: tecsrilankaworldwide/ceylon-canvas-art-marketplace
+
+## GitHub Repository
+https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 
 ## Next Tasks
 1. Order tracking with shipping status updates
 2. Real-time exchange rate API integration
-3. Backend code refactoring (split server.py)
+3. Browser push notifications (optional)
 
 ## Technical Notes
-- Currency rates are currently static (1 USD = 325 LKR)
-- Notifications auto-poll every 30 seconds
-- Seed data artists have placeholder user_ids - messaging works with real users
+- WebSocket auto-reconnects after 5 seconds on disconnect
+- Currency rates are static (1 USD = 325 LKR)
+- WebSocket uses JWT token for authentication
+- Notifications poll every 30s as fallback for non-WebSocket clients
