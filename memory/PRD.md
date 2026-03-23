@@ -8,6 +8,7 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 2. **Sri Lankan Diaspora** - People seeking cultural connection through art
 3. **Artists** - Sri Lankan artists wanting to sell their work globally
 4. **Art Enthusiasts** - People interested in discovering new art styles
+5. **Platform Administrators** - Staff managing users, artworks, and platform operations
 
 ## Core Requirements
 - Both digital and physical art marketplace
@@ -17,13 +18,14 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - JWT-based authentication
 - Stripe payment integration
 - Sri Lanka and world market focus
+- Admin dashboard for platform management
 
 ## What's Been Implemented (Jan 2026)
 
 ### Backend (FastAPI + MongoDB)
 - ✅ User authentication (register/login/JWT)
 - ✅ Artist profiles CRUD
-- ✅ Artwork listings CRUD with filters
+- ✅ Artwork listings CRUD with advanced filters
 - ✅ Auction/bidding system
 - ✅ Direct purchase with cart
 - ✅ Commission requests
@@ -36,29 +38,25 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Image upload to object storage
 - ✅ File download/serve API
 - ✅ Email notifications (Resend)
-  - Welcome email on registration
-  - Bid placed notification (to artist)
-  - Outbid notification (to previous bidder)
-  - Purchase confirmation
-  - Commission request notification
-  - Commission status update notification
-  - **Auction won notification** (NEW)
-  - **Auction ended notification to artist** (NEW)
-  - **New review notification** (NEW)
-- ✅ **Reviews & Ratings System** (NEW)
-  - Create reviews for purchased artworks
-  - Star ratings (1-5)
-  - Mark reviews as helpful
-  - Auto-update artist rating
-- ✅ **Auction End Handling** (NEW)
-  - Check ended auctions endpoint
-  - Winner notification
-  - Artist notification
-  - Auction win checkout flow
+- ✅ Reviews & Ratings System
+- ✅ Auction End Handling
+- ✅ **Admin Dashboard APIs** (NEW - March 2026)
+  - Platform statistics (users, artworks, revenue, orders)
+  - User management (list, search, ban/unban, make admin)
+  - Artwork moderation (list, search, flag/unflag, delete)
+  - Artist verification management
+  - Orders overview
+  - Revenue chart data
+- ✅ **Advanced Artwork Filtering** (NEW - March 2026)
+  - Filter by medium (oil, acrylic, watercolor, etc.)
+  - Filter by artist
+  - Filter by year range
+  - Filter by tags
+  - Combined filter support
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
-- ✅ Gallery page with filters (category, price, auction, digital)
+- ✅ Gallery page with advanced filters
 - ✅ Artwork detail page with bid/buy functionality
 - ✅ Artist profile pages with portfolio
 - ✅ Artists listing page
@@ -71,19 +69,27 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ About page
 - ✅ Responsive design
 - ✅ Glassmorphism navigation
-- ✅ Gallery-aesthetic design with Ceylon cultural elements
-- ✅ Artwork creation form with image upload
-- ✅ ImageUpload component with drag & drop
-- ✅ **Artist Analytics Dashboard** (NEW)
-  - Revenue overview with charts
-  - Artwork performance metrics
-  - Recent bids activity feed
-  - Commission summary
-  - Top performing artworks
-- ✅ **Reviews Section on Artwork Pages** (NEW)
-  - Display reviews with star ratings
-  - Write review dialog
-  - Mark as helpful functionality
+- ✅ Artist Analytics Dashboard
+- ✅ Reviews Section on Artwork Pages
+- ✅ Social Sharing Buttons
+- ✅ Verified Artist Badges
+- ✅ **Admin Dashboard** (NEW - March 2026)
+  - Overview tab with platform statistics cards
+  - Users tab with search, role filter, ban/unban actions
+  - Artworks tab with search, status filter, flag/delete actions
+  - Artists tab with verification management
+  - Orders tab
+  - Confirmation dialogs for destructive actions
+- ✅ **Enhanced Gallery Filtering** (NEW - March 2026)
+  - Hero search bar
+  - Collapsible filter sections
+  - Category, Medium, Artist dropdowns
+  - Auction and Digital checkboxes
+  - Price range slider
+  - Active filter badges with remove
+  - Clear all filters
+  - Sort options (Newest, Price, Popular, Name)
+  - Grid view toggle
 
 ### Design Features
 - Cormorant Garamond headings + Manrope body fonts
@@ -93,29 +99,88 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - Artwork hover effects
 - Glassmorphism navigation
 
+## Test Credentials
+- **Admin User**: admin@ceyloncanvas.com / admin123
+- **Regular User**: Can be created via registration
+
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None - Core MVP complete with image upload and email notifications
+- None - Core MVP complete with admin features
 
 ### P1 (Important)
-- Artist verification system
+- In-app Messaging System (buyer-artist communication)
+- Multi-currency Support (LKR/USD)
 - Order tracking with shipping updates
-- Domain verification for production emails
 
 ### P2 (Nice to Have)
 - Advanced search with AI recommendations
 - Virtual gallery view (3D)
-- Artist messaging system
-- Reviews and ratings
-- Social sharing
+- Domain verification for production emails
+- Scheduled job for automatic auction end checking
+
+## Architecture
+
+### Backend Structure
+```
+/app/backend/
+├── .env
+├── requirements.txt
+└── server.py (Contains all routes - recommended for refactoring)
+```
+
+### Frontend Structure
+```
+/app/frontend/src/
+├── App.js
+├── components/
+│   ├── ui/          # Shadcn UI components
+│   ├── Navbar.js
+│   ├── Footer.js
+│   ├── ArtworkCard.js
+│   ├── ReviewSection.js
+│   └── ...
+├── context/
+│   ├── AuthContext.js
+│   └── CartContext.js
+├── pages/
+│   ├── AdminDashboardPage.js (NEW)
+│   ├── GalleryPage.js (Enhanced)
+│   └── ...
+└── services/
+    └── api.js
+```
+
+## Key API Endpoints
+
+### Admin Routes (Requires is_admin: true)
+- GET /api/admin/stats - Platform statistics
+- GET /api/admin/users - User list with search/filter
+- PUT /api/admin/users/{id}/ban - Ban user
+- PUT /api/admin/users/{id}/unban - Unban user
+- PUT /api/admin/users/{id}/make-admin - Grant admin
+- PUT /api/admin/users/{id}/remove-admin - Remove admin
+- GET /api/admin/artworks - Artwork list for moderation
+- PUT /api/admin/artworks/{id}/flag - Flag artwork
+- PUT /api/admin/artworks/{id}/unflag - Unflag artwork
+- DELETE /api/admin/artworks/{id} - Delete artwork
+- GET /api/admin/artists - Artist list with verification
+- PUT /api/admin/artists/{id}/verify - Update verification status
+- GET /api/admin/orders - Orders list
+- GET /api/admin/revenue-chart - Revenue data for charts
+
+### Gallery/Artwork Routes
+- GET /api/artworks - List with filters (category, medium, artist_id, is_auction, is_digital, min_price, max_price, tags, search, sort)
+- GET /api/mediums - List of art mediums
+- GET /api/categories - List of categories
+
+## 3rd Party Integrations
+- Stripe (Payments) - Test key in environment
+- Emergent Object Storage (Image Uploads) - Emergent LLM Key
+- Resend (Email Notifications) - API Key configured
+- GitHub (VCS) - Repository linked
 
 ## Next Tasks
-1. ~~Add image upload functionality using object storage~~ ✅ DONE
-2. ~~Implement email notifications for transactions~~ ✅ DONE
-3. ~~Add artist analytics dashboard~~ ✅ DONE
-4. ~~Improve auction end handling with automated notifications~~ ✅ DONE
-5. ~~Add reviews and ratings system~~ ✅ DONE
-6. Add scheduled job for automatic auction end checking
-7. Social sharing integration
-8. Artist verification badges
+1. In-app Messaging System for buyer-artist communication
+2. Multi-currency support (LKR/USD conversion)
+3. Backend code refactoring (split server.py into routers)
