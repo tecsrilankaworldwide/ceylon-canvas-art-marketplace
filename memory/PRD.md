@@ -35,13 +35,26 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Sample data seeding
 - ✅ Image upload to object storage
 - ✅ File download/serve API
-- ✅ **Email notifications (Resend)** (NEW)
+- ✅ Email notifications (Resend)
   - Welcome email on registration
   - Bid placed notification (to artist)
   - Outbid notification (to previous bidder)
   - Purchase confirmation
   - Commission request notification
   - Commission status update notification
+  - **Auction won notification** (NEW)
+  - **Auction ended notification to artist** (NEW)
+  - **New review notification** (NEW)
+- ✅ **Reviews & Ratings System** (NEW)
+  - Create reviews for purchased artworks
+  - Star ratings (1-5)
+  - Mark reviews as helpful
+  - Auto-update artist rating
+- ✅ **Auction End Handling** (NEW)
+  - Check ended auctions endpoint
+  - Winner notification
+  - Artist notification
+  - Auction win checkout flow
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
@@ -67,6 +80,10 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
   - Recent bids activity feed
   - Commission summary
   - Top performing artworks
+- ✅ **Reviews Section on Artwork Pages** (NEW)
+  - Display reviews with star ratings
+  - Write review dialog
+  - Mark as helpful functionality
 
 ### Design Features
 - Cormorant Garamond headings + Manrope body fonts
@@ -97,5 +114,8 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 1. ~~Add image upload functionality using object storage~~ ✅ DONE
 2. ~~Implement email notifications for transactions~~ ✅ DONE
 3. ~~Add artist analytics dashboard~~ ✅ DONE
-4. Improve auction end handling with automated notifications
-5. Add reviews and ratings system
+4. ~~Improve auction end handling with automated notifications~~ ✅ DONE
+5. ~~Add reviews and ratings system~~ ✅ DONE
+6. Add scheduled job for automatic auction end checking
+7. Social sharing integration
+8. Artist verification badges

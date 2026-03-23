@@ -175,3 +175,62 @@ export const seedData = async () => {
   const response = await axios.post(`${API}/seed`);
   return response.data;
 };
+
+// Reviews
+export const getArtworkReviews = async (artworkId, skip = 0, limit = 20) => {
+  const response = await axios.get(`${API}/artworks/${artworkId}/reviews`, {
+    params: { skip, limit }
+  });
+  return response.data;
+};
+
+export const getArtistReviews = async (artistId, skip = 0, limit = 20) => {
+  const response = await axios.get(`${API}/artists/${artistId}/reviews`, {
+    params: { skip, limit }
+  });
+  return response.data;
+};
+
+export const createReview = async (data) => {
+  const response = await axios.post(`${API}/reviews`, data, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const markReviewHelpful = async (reviewId) => {
+  const response = await axios.post(`${API}/reviews/${reviewId}/helpful`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+// Auction Wins
+export const getAuctionWins = async () => {
+  const response = await axios.get(`${API}/auctions/wins`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const checkoutAuctionWin = async (winId) => {
+  const response = await axios.post(`${API}/auctions/wins/${winId}/checkout`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+// Analytics
+export const getArtistAnalytics = async () => {
+  const response = await axios.get(`${API}/analytics/artist`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getArtistArtworkAnalytics = async () => {
+  const response = await axios.get(`${API}/analytics/artist/artworks`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};

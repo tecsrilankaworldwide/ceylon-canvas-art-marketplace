@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { getArtwork, getArtworkBids, placeBid, addToWishlist, removeFromWishlist, getWishlist, createCommission } from '../services/api';
+import { ReviewSection } from '../components/ReviewSection';
 
 const ArtworkDetailPage = () => {
   const { id } = useParams();
@@ -532,6 +533,11 @@ const ArtworkDetailPage = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <ReviewSection artworkId={artwork.id} artworkTitle={artwork.title} />
         </div>
       </div>
     </main>

@@ -212,6 +212,24 @@ class PaymentStatusResponse(BaseModel):
     amount_total: float
     currency: str
 
+# Review Models
+class ReviewCreate(BaseModel):
+    artwork_id: str
+    rating: int  # 1-5
+    title: str
+    content: str
+
+class ReviewResponse(BaseModel):
+    id: str
+    artwork_id: str
+    user_id: str
+    user_name: str
+    rating: int
+    title: str
+    content: str
+    created_at: str
+    helpful_count: int = 0
+
 # ==================== STORAGE HELPERS ====================
 
 def init_storage():
@@ -460,6 +478,88 @@ def get_email_template(template_type: str, data: dict) -> tuple:
             <div class="footer">
                 <p>Ceylon Canvas Art Marketplace</p>
                 <p>Connecting Sri Lankan Art with the World</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "auction_won":
+        subject = f"Congratulations! You Won: {data['artwork_title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #2D5A43; margin-top: 0;">You Won the Auction!</h2>
+                <p>Congratulations! You are the winning bidder.</p>
+                <p><strong>Artwork:</strong> {data['artwork_title']}</p>
+                <p><strong>Artist:</strong> {data['artist_name']}</p>
+                <p><strong>Your Winning Bid:</strong></p>
+                <p class="price">${data['winning_bid']:,.2f}</p>
+                <p style="margin-top: 20px;">Complete your purchase to claim this beautiful piece!</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "auction_ended_artist":
+        subject = f"Auction Ended: {data['artwork_title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">Your Auction Has Ended!</h2>
+                <p><strong>Artwork:</strong> {data['artwork_title']}</p>
+                {f'''<p><strong>Winner:</strong> {data['winner_name']}</p>
+                <p><strong>Winning Bid:</strong></p>
+                <p class="price">${data['winning_bid']:,.2f}</p>
+                <p style="margin-top: 20px;">The buyer will complete their purchase soon.</p>'''
+                if data.get('has_winner') else 
+                '''<p>Unfortunately, this auction ended without any bids meeting your reserve price.</p>
+                <p style="margin-top: 20px;">Consider relisting with adjusted pricing.</p>'''}
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "new_review":
+        stars = "★" * data['rating'] + "☆" * (5 - data['rating'])
+        subject = f"New Review on Your Artwork: {data['artwork_title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">New Review Received!</h2>
+                <p><strong>Artwork:</strong> {data['artwork_title']}</p>
+                <p><strong>Reviewer:</strong> {data['reviewer_name']}</p>
+                <p style="color: #E5A93C; font-size: 24px;">{stars}</p>
+                <p><strong>"{data['review_title']}"</strong></p>
+                <p style="background: white; padding: 15px; border-radius: 4px; font-style: italic;">
+                    "{data['review_content']}"
+                </p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
             </div>
         </div>
         </body></html>
@@ -1741,6 +1841,326 @@ async def get_artist_artwork_analytics(user: dict = Depends(get_current_user)):
         })
     
     return artwork_analytics
+
+# ==================== REVIEWS ROUTES ====================
+
+@api_router.post("/reviews")
+async def create_review(review_data: ReviewCreate, user: dict = Depends(get_current_user)):
+    """Create a review for an artwork (must have purchased it)."""
+    artwork = await db.artworks.find_one({"id": review_data.artwork_id}, {"_id": 0})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    # Check if user has purchased this artwork
+    user_orders = await db.orders.find({"user_id": user["id"]}).to_list(100)
+    has_purchased = any(review_data.artwork_id in order.get("artwork_ids", []) for order in user_orders)
+    
+    if not has_purchased:
+        raise HTTPException(status_code=403, detail="You can only review artworks you have purchased")
+    
+    # Check if already reviewed
+    existing_review = await db.reviews.find_one({
+        "artwork_id": review_data.artwork_id,
+        "user_id": user["id"]
+    })
+    if existing_review:
+        raise HTTPException(status_code=400, detail="You have already reviewed this artwork")
+    
+    # Validate rating
+    if review_data.rating < 1 or review_data.rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    
+    review_id = str(uuid.uuid4())
+    review = {
+        "id": review_id,
+        "artwork_id": review_data.artwork_id,
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "rating": review_data.rating,
+        "title": review_data.title,
+        "content": review_data.content,
+        "helpful_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.reviews.insert_one(review)
+    
+    # Update artist rating
+    artist = await db.artists.find_one({"id": artwork["artist_id"]})
+    if artist:
+        # Get all reviews for this artist's artworks
+        artist_artworks = await db.artworks.find({"artist_id": artist["id"]}, {"id": 1}).to_list(1000)
+        artwork_ids = [a["id"] for a in artist_artworks]
+        all_reviews = await db.reviews.find({"artwork_id": {"$in": artwork_ids}}).to_list(1000)
+        
+        if all_reviews:
+            avg_rating = sum(r["rating"] for r in all_reviews) / len(all_reviews)
+            await db.artists.update_one(
+                {"id": artist["id"]},
+                {"$set": {"rating": round(avg_rating, 2)}}
+            )
+        
+        # Send email to artist
+        artist_user = await db.users.find_one({"id": artist["user_id"]}, {"_id": 0})
+        if artist_user:
+            subject, html = get_email_template("new_review", {
+                "artwork_title": artwork["title"],
+                "reviewer_name": user["name"],
+                "rating": review_data.rating,
+                "review_title": review_data.title,
+                "review_content": review_data.content
+            })
+            asyncio.create_task(send_email(artist_user["email"], subject, html))
+    
+    return {k: v for k, v in review.items() if k != "_id"}
+
+@api_router.get("/artworks/{artwork_id}/reviews", response_model=List[ReviewResponse])
+async def get_artwork_reviews(artwork_id: str, skip: int = 0, limit: int = 20):
+    """Get reviews for an artwork."""
+    reviews = await db.reviews.find(
+        {"artwork_id": artwork_id},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return reviews
+
+@api_router.get("/artists/{artist_id}/reviews")
+async def get_artist_reviews(artist_id: str, skip: int = 0, limit: int = 20):
+    """Get all reviews for an artist's artworks."""
+    # Get all artworks by this artist
+    artworks = await db.artworks.find({"artist_id": artist_id}, {"id": 1, "title": 1}).to_list(1000)
+    artwork_ids = [a["id"] for a in artworks]
+    artwork_titles = {a["id"]: a["title"] for a in artworks}
+    
+    reviews = await db.reviews.find(
+        {"artwork_id": {"$in": artwork_ids}},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add artwork title to each review
+    for review in reviews:
+        review["artwork_title"] = artwork_titles.get(review["artwork_id"], "Unknown")
+    
+    # Calculate summary
+    total_reviews = await db.reviews.count_documents({"artwork_id": {"$in": artwork_ids}})
+    if reviews:
+        all_ratings = await db.reviews.find({"artwork_id": {"$in": artwork_ids}}, {"rating": 1}).to_list(1000)
+        avg_rating = sum(r["rating"] for r in all_ratings) / len(all_ratings)
+        rating_distribution = {i: 0 for i in range(1, 6)}
+        for r in all_ratings:
+            rating_distribution[r["rating"]] += 1
+    else:
+        avg_rating = 0
+        rating_distribution = {i: 0 for i in range(1, 6)}
+    
+    return {
+        "reviews": reviews,
+        "total": total_reviews,
+        "average_rating": round(avg_rating, 2),
+        "rating_distribution": rating_distribution
+    }
+
+@api_router.post("/reviews/{review_id}/helpful")
+async def mark_review_helpful(review_id: str, user: dict = Depends(get_current_user)):
+    """Mark a review as helpful."""
+    review = await db.reviews.find_one({"id": review_id})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    # Check if user already marked this review
+    existing = await db.review_helpful.find_one({
+        "review_id": review_id,
+        "user_id": user["id"]
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="You already marked this review as helpful")
+    
+    await db.review_helpful.insert_one({
+        "review_id": review_id,
+        "user_id": user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    await db.reviews.update_one(
+        {"id": review_id},
+        {"$inc": {"helpful_count": 1}}
+    )
+    
+    return {"message": "Marked as helpful"}
+
+# ==================== AUCTION END HANDLING ====================
+
+@api_router.post("/auctions/check-ended")
+async def check_ended_auctions():
+    """Check and process ended auctions. Can be called periodically."""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Find auctions that have ended but not yet processed
+    ended_auctions = await db.artworks.find({
+        "is_auction": True,
+        "is_available": True,
+        "auction_end_date": {"$lte": now},
+        "auction_processed": {"$ne": True}
+    }, {"_id": 0}).to_list(100)
+    
+    processed = []
+    
+    for artwork in ended_auctions:
+        # Get highest bid
+        highest_bid = await db.bids.find_one(
+            {"artwork_id": artwork["id"]},
+            {"_id": 0},
+            sort=[("amount", -1)]
+        )
+        
+        # Check if reserve price met
+        reserve_met = True
+        if artwork.get("reserve_price"):
+            if not highest_bid or highest_bid["amount"] < artwork["reserve_price"]:
+                reserve_met = False
+        
+        if highest_bid and reserve_met:
+            # Auction has a winner
+            winner = await db.users.find_one({"id": highest_bid["bidder_id"]}, {"_id": 0})
+            
+            # Create a pending order for the winner
+            order_id = str(uuid.uuid4())
+            await db.auction_wins.insert_one({
+                "id": order_id,
+                "artwork_id": artwork["id"],
+                "winner_id": highest_bid["bidder_id"],
+                "winning_bid": highest_bid["amount"],
+                "status": "pending_payment",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            
+            # Notify winner
+            if winner:
+                subject, html = get_email_template("auction_won", {
+                    "artwork_title": artwork["title"],
+                    "artist_name": artwork["artist_name"],
+                    "winning_bid": highest_bid["amount"]
+                })
+                asyncio.create_task(send_email(winner["email"], subject, html))
+            
+            # Notify artist
+            artist = await db.artists.find_one({"id": artwork["artist_id"]})
+            if artist:
+                artist_user = await db.users.find_one({"id": artist["user_id"]}, {"_id": 0})
+                if artist_user:
+                    subject, html = get_email_template("auction_ended_artist", {
+                        "artwork_title": artwork["title"],
+                        "has_winner": True,
+                        "winner_name": highest_bid["bidder_name"],
+                        "winning_bid": highest_bid["amount"]
+                    })
+                    asyncio.create_task(send_email(artist_user["email"], subject, html))
+            
+            processed.append({
+                "artwork_id": artwork["id"],
+                "title": artwork["title"],
+                "winner": highest_bid["bidder_name"],
+                "winning_bid": highest_bid["amount"]
+            })
+        else:
+            # No winner or reserve not met
+            artist = await db.artists.find_one({"id": artwork["artist_id"]})
+            if artist:
+                artist_user = await db.users.find_one({"id": artist["user_id"]}, {"_id": 0})
+                if artist_user:
+                    subject, html = get_email_template("auction_ended_artist", {
+                        "artwork_title": artwork["title"],
+                        "has_winner": False
+                    })
+                    asyncio.create_task(send_email(artist_user["email"], subject, html))
+            
+            processed.append({
+                "artwork_id": artwork["id"],
+                "title": artwork["title"],
+                "winner": None,
+                "reason": "No bids" if not highest_bid else "Reserve not met"
+            })
+        
+        # Mark auction as processed
+        await db.artworks.update_one(
+            {"id": artwork["id"]},
+            {"$set": {"auction_processed": True}}
+        )
+    
+    return {"processed": len(processed), "auctions": processed}
+
+@api_router.get("/auctions/wins")
+async def get_auction_wins(user: dict = Depends(get_current_user)):
+    """Get auctions won by current user that need payment."""
+    wins = await db.auction_wins.find(
+        {"winner_id": user["id"], "status": "pending_payment"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with artwork details
+    for win in wins:
+        artwork = await db.artworks.find_one({"id": win["artwork_id"]}, {"_id": 0})
+        if artwork:
+            win["artwork"] = {
+                "title": artwork["title"],
+                "artist_name": artwork["artist_name"],
+                "image": artwork["images"][0] if artwork.get("images") else None
+            }
+    
+    return wins
+
+@api_router.post("/auctions/wins/{win_id}/checkout")
+async def checkout_auction_win(win_id: str, request: Request, user: dict = Depends(get_current_user)):
+    """Create checkout session for auction win."""
+    win = await db.auction_wins.find_one({"id": win_id, "winner_id": user["id"]})
+    if not win:
+        raise HTTPException(status_code=404, detail="Auction win not found")
+    
+    if win["status"] != "pending_payment":
+        raise HTTPException(status_code=400, detail="This auction has already been paid")
+    
+    artwork = await db.artworks.find_one({"id": win["artwork_id"]})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    # Setup Stripe
+    host_url = str(request.base_url)
+    webhook_url = f"{host_url}api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    origin = request.headers.get("origin", host_url)
+    success_url = f"{origin}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}&auction_win={win_id}"
+    cancel_url = f"{origin}/dashboard"
+    
+    checkout_request = CheckoutSessionRequest(
+        amount=win["winning_bid"],
+        currency="usd",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "user_id": user["id"],
+            "user_email": user["email"],
+            "artwork_ids": win["artwork_id"],
+            "auction_win_id": win_id
+        }
+    )
+    
+    session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    # Create payment transaction
+    transaction_id = str(uuid.uuid4())
+    await db.payment_transactions.insert_one({
+        "id": transaction_id,
+        "session_id": session.session_id,
+        "user_id": user["id"],
+        "user_email": user["email"],
+        "amount": win["winning_bid"],
+        "currency": "usd",
+        "artwork_ids": [win["artwork_id"]],
+        "auction_win_id": win_id,
+        "payment_status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"url": session.url, "session_id": session.session_id}
 
 # ==================== MAIN ====================
 
