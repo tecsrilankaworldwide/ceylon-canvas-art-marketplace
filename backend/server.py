@@ -82,6 +82,8 @@ class UserProfile(BaseModel):
     email: str
     name: str
     is_artist: bool
+    is_admin: bool = False
+    is_banned: bool = False
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     location: Optional[str] = None
@@ -232,6 +234,46 @@ class ReviewResponse(BaseModel):
     photos: List[str] = []
     created_at: str
     helpful_count: int = 0
+
+# Admin Models
+class AdminUserResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    is_artist: bool
+    is_admin: bool = False
+    is_banned: bool = False
+    avatar_url: Optional[str] = None
+    created_at: str
+    order_count: int = 0
+    total_spent: float = 0.0
+
+class AdminArtworkResponse(BaseModel):
+    id: str
+    title: str
+    artist_id: str
+    artist_name: str
+    price: float
+    category: str
+    is_available: bool
+    is_approved: bool = True
+    is_flagged: bool = False
+    created_at: str
+    views: int = 0
+
+class AdminStatsResponse(BaseModel):
+    total_users: int
+    total_artists: int
+    total_artworks: int
+    total_orders: int
+    total_revenue: float
+    platform_fees: float
+    pending_verifications: int
+    flagged_artworks: int
+
+class ArtistVerificationUpdate(BaseModel):
+    status: str  # pending, verified, rejected
+    badges: List[str] = []
 
 # ==================== STORAGE HELPERS ====================
 
@@ -615,8 +657,20 @@ async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(
         payload = decode_token(credentials.credentials)
         user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
         return user
-    except:
+    except Exception:
         return None
+
+async def get_admin_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current user and verify they are an admin."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    payload = decode_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    if not user.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
 
 # ==================== AUTH ROUTES ====================
 
@@ -633,6 +687,8 @@ async def register(user_data: UserCreate):
         "password": hash_password(user_data.password),
         "name": user_data.name,
         "is_artist": user_data.is_artist,
+        "is_admin": False,
+        "is_banned": False,
         "avatar_url": None,
         "bio": None,
         "location": None,
@@ -671,6 +727,10 @@ async def login(credentials: UserLogin):
     user = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user or not verify_password(credentials.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check if user is banned
+    if user.get("is_banned", False):
+        raise HTTPException(status_code=403, detail="Your account has been suspended")
     
     token = create_token(user["id"], user["email"])
     return {"token": token, "user": {k: v for k, v in user.items() if k != "password"}}
@@ -766,10 +826,15 @@ async def get_artworks(
     skip: int = 0,
     limit: int = 20,
     category: Optional[str] = None,
+    medium: Optional[str] = None,
+    artist_id: Optional[str] = None,
     is_auction: Optional[bool] = None,
     is_digital: Optional[bool] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
+    min_year: Optional[int] = None,
+    max_year: Optional[int] = None,
+    tags: Optional[str] = None,
     search: Optional[str] = None,
     sort_by: str = "created_at",
     sort_order: str = "desc"
@@ -778,6 +843,10 @@ async def get_artworks(
     
     if category:
         query["category"] = category
+    if medium:
+        query["medium"] = {"$regex": medium, "$options": "i"}
+    if artist_id:
+        query["artist_id"] = artist_id
     if is_auction is not None:
         query["is_auction"] = is_auction
     if is_digital is not None:
@@ -789,15 +858,28 @@ async def get_artworks(
             query["price"]["$lte"] = max_price
         else:
             query["price"] = {"$lte": max_price}
+    if min_year is not None:
+        query["year_created"] = {"$gte": min_year}
+    if max_year is not None:
+        if "year_created" in query:
+            query["year_created"]["$lte"] = max_year
+        else:
+            query["year_created"] = {"$lte": max_year}
+    if tags:
+        tag_list = [t.strip().lower() for t in tags.split(",")]
+        query["tags"] = {"$in": tag_list}
     if search:
         query["$or"] = [
             {"title": {"$regex": search, "$options": "i"}},
             {"description": {"$regex": search, "$options": "i"}},
+            {"artist_name": {"$regex": search, "$options": "i"}},
             {"tags": {"$in": [search.lower()]}}
         ]
     
     sort_direction = -1 if sort_order == "desc" else 1
     artworks = await db.artworks.find(query, {"_id": 0}).sort(sort_by, sort_direction).skip(skip).limit(limit).to_list(limit)
+    total = await db.artworks.count_documents(query)
+    
     return artworks
 
 @api_router.get("/artworks/featured", response_model=List[ArtworkResponse])
@@ -1347,6 +1429,29 @@ async def get_categories():
             {"id": "ceramics", "name": "Ceramics", "description": "Pottery and ceramic art"},
             {"id": "mixed-media", "name": "Mixed Media", "description": "Multi-medium artworks"},
             {"id": "traditional", "name": "Traditional Art", "description": "Sri Lankan traditional art forms"}
+        ]
+    }
+
+@api_router.get("/mediums")
+async def get_mediums():
+    """Get list of available art mediums for filtering."""
+    return {
+        "mediums": [
+            {"id": "oil", "name": "Oil"},
+            {"id": "acrylic", "name": "Acrylic"},
+            {"id": "watercolor", "name": "Watercolor"},
+            {"id": "pastel", "name": "Pastel"},
+            {"id": "charcoal", "name": "Charcoal"},
+            {"id": "pencil", "name": "Pencil"},
+            {"id": "ink", "name": "Ink"},
+            {"id": "mixed-media", "name": "Mixed Media"},
+            {"id": "digital", "name": "Digital"},
+            {"id": "photography", "name": "Photography"},
+            {"id": "clay", "name": "Clay"},
+            {"id": "bronze", "name": "Bronze"},
+            {"id": "wood", "name": "Wood"},
+            {"id": "textile", "name": "Textile"},
+            {"id": "batik", "name": "Batik"}
         ]
     }
 
@@ -2171,6 +2276,334 @@ async def checkout_auction_win(win_id: str, request: Request, user: dict = Depen
     })
     
     return {"url": session.url, "session_id": session.session_id}
+
+# ==================== ADMIN ROUTES ====================
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(get_admin_user)):
+    """Get platform statistics for admin dashboard."""
+    total_users = await db.users.count_documents({})
+    total_artists = await db.artists.count_documents({})
+    total_artworks = await db.artworks.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    
+    # Calculate total revenue from completed orders
+    revenue_pipeline = [
+        {"$match": {"status": "completed"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]
+    revenue_result = await db.orders.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0.0
+    
+    # Platform fees (10% of revenue)
+    platform_fees = total_revenue * 0.10
+    
+    # Pending artist verifications
+    pending_verifications = await db.artists.count_documents({"verification_status": "pending"})
+    
+    # Flagged artworks
+    flagged_artworks = await db.artworks.count_documents({"is_flagged": True})
+    
+    return {
+        "total_users": total_users,
+        "total_artists": total_artists,
+        "total_artworks": total_artworks,
+        "total_orders": total_orders,
+        "total_revenue": total_revenue,
+        "platform_fees": platform_fees,
+        "pending_verifications": pending_verifications,
+        "flagged_artworks": flagged_artworks
+    }
+
+@api_router.get("/admin/users")
+async def get_admin_users(
+    skip: int = 0,
+    limit: int = 20,
+    search: Optional[str] = None,
+    role: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all users for admin management."""
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    if role == "artist":
+        query["is_artist"] = True
+    elif role == "admin":
+        query["is_admin"] = True
+    elif role == "banned":
+        query["is_banned"] = True
+    
+    users = await db.users.find(query, {"_id": 0, "password": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.users.count_documents(query)
+    
+    # Enrich with order data
+    enriched_users = []
+    for user in users:
+        order_count = await db.orders.count_documents({"user_id": user["id"]})
+        spent_pipeline = [
+            {"$match": {"user_id": user["id"], "status": "completed"}},
+            {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+        ]
+        spent_result = await db.orders.aggregate(spent_pipeline).to_list(1)
+        total_spent = spent_result[0]["total"] if spent_result else 0.0
+        
+        enriched_users.append({
+            **user,
+            "order_count": order_count,
+            "total_spent": total_spent
+        })
+    
+    return {"users": enriched_users, "total": total}
+
+@api_router.put("/admin/users/{user_id}/ban")
+async def ban_user(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Ban a user."""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("is_admin"):
+        raise HTTPException(status_code=400, detail="Cannot ban an admin")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"is_banned": True}})
+    return {"message": "User banned successfully"}
+
+@api_router.put("/admin/users/{user_id}/unban")
+async def unban_user(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Unban a user."""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"is_banned": False}})
+    return {"message": "User unbanned successfully"}
+
+@api_router.put("/admin/users/{user_id}/make-admin")
+async def make_admin(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Grant admin privileges to a user."""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"is_admin": True}})
+    return {"message": "User is now an admin"}
+
+@api_router.put("/admin/users/{user_id}/remove-admin")
+async def remove_admin(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Remove admin privileges from a user."""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_id == admin["id"]:
+        raise HTTPException(status_code=400, detail="Cannot remove your own admin privileges")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"is_admin": False}})
+    return {"message": "Admin privileges removed"}
+
+@api_router.get("/admin/artworks")
+async def get_admin_artworks(
+    skip: int = 0,
+    limit: int = 20,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all artworks for admin moderation."""
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"title": {"$regex": search, "$options": "i"}},
+            {"artist_name": {"$regex": search, "$options": "i"}}
+        ]
+    
+    if status == "flagged":
+        query["is_flagged"] = True
+    elif status == "unavailable":
+        query["is_available"] = False
+    elif status == "available":
+        query["is_available"] = True
+    
+    artworks = await db.artworks.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.artworks.count_documents(query)
+    
+    return {"artworks": artworks, "total": total}
+
+@api_router.put("/admin/artworks/{artwork_id}/flag")
+async def flag_artwork(artwork_id: str, admin: dict = Depends(get_admin_user)):
+    """Flag an artwork for review."""
+    artwork = await db.artworks.find_one({"id": artwork_id})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    await db.artworks.update_one({"id": artwork_id}, {"$set": {"is_flagged": True}})
+    return {"message": "Artwork flagged"}
+
+@api_router.put("/admin/artworks/{artwork_id}/unflag")
+async def unflag_artwork(artwork_id: str, admin: dict = Depends(get_admin_user)):
+    """Remove flag from an artwork."""
+    artwork = await db.artworks.find_one({"id": artwork_id})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    await db.artworks.update_one({"id": artwork_id}, {"$set": {"is_flagged": False}})
+    return {"message": "Artwork unflagged"}
+
+@api_router.delete("/admin/artworks/{artwork_id}")
+async def admin_delete_artwork(artwork_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete an artwork (admin only)."""
+    artwork = await db.artworks.find_one({"id": artwork_id})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    await db.artworks.delete_one({"id": artwork_id})
+    # Also delete related bids
+    await db.bids.delete_many({"artwork_id": artwork_id})
+    return {"message": "Artwork deleted"}
+
+@api_router.get("/admin/artists")
+async def get_admin_artists(
+    skip: int = 0,
+    limit: int = 20,
+    search: Optional[str] = None,
+    verification_status: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all artists for admin management."""
+    query = {}
+    
+    if search:
+        query["name"] = {"$regex": search, "$options": "i"}
+    
+    if verification_status:
+        query["verification_status"] = verification_status
+    
+    artists = await db.artists.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.artists.count_documents(query)
+    
+    # Enrich with artwork count and sales
+    enriched_artists = []
+    for artist in artists:
+        artwork_count = await db.artworks.count_documents({"artist_id": artist["id"]})
+        
+        enriched_artists.append({
+            **artist,
+            "artwork_count": artwork_count,
+            "verification_status": artist.get("verification_status", "pending"),
+            "badges": artist.get("badges", [])
+        })
+    
+    return {"artists": enriched_artists, "total": total}
+
+@api_router.put("/admin/artists/{artist_id}/verify")
+async def verify_artist(artist_id: str, data: ArtistVerificationUpdate, admin: dict = Depends(get_admin_user)):
+    """Update artist verification status and badges."""
+    artist = await db.artists.find_one({"id": artist_id})
+    if not artist:
+        raise HTTPException(status_code=404, detail="Artist not found")
+    
+    updates = {
+        "verification_status": data.status,
+        "badges": data.badges
+    }
+    
+    await db.artists.update_one({"id": artist_id}, {"$set": updates})
+    
+    # Send notification email to artist
+    user = await db.users.find_one({"id": artist["user_id"]})
+    if user and RESEND_API_KEY:
+        if data.status == "verified":
+            subject = "Congratulations! Your Artist Profile is Verified"
+            html = f"""
+            <html><body>
+            <h2>Welcome to the Verified Artists Community!</h2>
+            <p>Dear {artist['name']},</p>
+            <p>We are pleased to inform you that your artist profile on Ceylon Canvas has been verified!</p>
+            <p>You now have access to the verified artist badge and additional features.</p>
+            <p>Thank you for being part of our community.</p>
+            <p>Best regards,<br>Ceylon Canvas Team</p>
+            </body></html>
+            """
+            asyncio.create_task(send_email(user["email"], subject, html))
+    
+    return {"message": f"Artist verification status updated to {data.status}"}
+
+@api_router.get("/admin/orders")
+async def get_admin_orders(
+    skip: int = 0,
+    limit: int = 20,
+    status: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all orders for admin view."""
+    query = {}
+    
+    if status:
+        query["status"] = status
+    
+    orders = await db.orders.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.orders.count_documents(query)
+    
+    return {"orders": orders, "total": total}
+
+@api_router.get("/admin/revenue-chart")
+async def get_revenue_chart(days: int = 30, admin: dict = Depends(get_admin_user)):
+    """Get revenue data for chart visualization."""
+    from_date = datetime.now(timezone.utc) - timedelta(days=days)
+    
+    pipeline = [
+        {"$match": {
+            "status": "completed",
+            "created_at": {"$gte": from_date.isoformat()}
+        }},
+        {"$group": {
+            "_id": {"$substr": ["$created_at", 0, 10]},
+            "revenue": {"$sum": "$total"},
+            "orders": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    
+    results = await db.orders.aggregate(pipeline).to_list(days)
+    
+    return {
+        "data": [
+            {"date": r["_id"], "revenue": r["revenue"], "orders": r["orders"]}
+            for r in results
+        ]
+    }
+
+@api_router.post("/admin/create-admin")
+async def create_admin_account(user_data: UserCreate, admin: dict = Depends(get_admin_user)):
+    """Create a new admin account."""
+    existing = await db.users.find_one({"email": user_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user_id = str(uuid.uuid4())
+    user = {
+        "id": user_id,
+        "email": user_data.email,
+        "password": hash_password(user_data.password),
+        "name": user_data.name,
+        "is_artist": user_data.is_artist,
+        "is_admin": True,
+        "is_banned": False,
+        "avatar_url": None,
+        "bio": None,
+        "location": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user)
+    
+    return {"message": "Admin account created", "user_id": user_id}
 
 # ==================== MAIN ====================
 

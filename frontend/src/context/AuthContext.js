@@ -85,7 +85,8 @@ export const AuthProvider = ({ children }) => {
       logout,
       updateProfile,
       isAuthenticated: !!user,
-      isArtist: user?.is_artist
+      isArtist: user?.is_artist,
+      isAdmin: user?.is_admin
     }}>
       {children}
     </AuthContext.Provider>

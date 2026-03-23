@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, User, Menu, X, Search, Heart, Palette } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Search, Heart, Palette, Shield } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
 } from '../components/ui/dropdown-menu';
 
 export const Navbar = () => {
-  const { user, isAuthenticated, logout, isArtist } = useAuth();
+  const { user, isAuthenticated, logout, isArtist, isAdmin } = useAuth();
   const { itemCount } = useCart();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -113,6 +113,17 @@ export const Navbar = () => {
                         <Link to="/dashboard/artworks" data-testid="nav-my-artworks">My Artworks</Link>
                       </DropdownMenuItem>
                     )}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="text-[#0F3057] font-medium" data-testid="nav-admin">
+                            <Shield className="h-4 w-4 mr-2" />
+                            Admin Panel
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-[#9E2A2B]" data-testid="nav-logout">
                       Sign Out
@@ -189,6 +200,11 @@ export const Navbar = () => {
                   <Link to="/cart" className="block font-body text-base py-2" onClick={() => setMobileMenuOpen(false)}>
                     Cart {itemCount > 0 && `(${itemCount})`}
                   </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="block font-body text-base py-2 text-[#0F3057] font-medium" onClick={() => setMobileMenuOpen(false)}>
+                      Admin Panel
+                    </Link>
+                  )}
                   <button onClick={handleLogout} className="block font-body text-base py-2 text-[#9E2A2B]">
                     Sign Out
                   </button>

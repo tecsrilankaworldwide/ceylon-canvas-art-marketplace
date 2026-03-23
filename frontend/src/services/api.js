@@ -156,6 +156,12 @@ export const getCategories = async () => {
   return response.data;
 };
 
+// Mediums
+export const getMediums = async () => {
+  const response = await axios.get(`${API}/mediums`);
+  return response.data;
+};
+
 // Stats
 export const getStats = async () => {
   const response = await axios.get(`${API}/stats`);
@@ -230,6 +236,110 @@ export const getArtistAnalytics = async () => {
 
 export const getArtistArtworkAnalytics = async () => {
   const response = await axios.get(`${API}/analytics/artist/artworks`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+// Admin APIs
+export const getAdminStats = async () => {
+  const response = await axios.get(`${API}/admin/stats`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getAdminUsers = async (params = {}) => {
+  const response = await axios.get(`${API}/admin/users`, {
+    params,
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const banUser = async (userId) => {
+  const response = await axios.put(`${API}/admin/users/${userId}/ban`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const unbanUser = async (userId) => {
+  const response = await axios.put(`${API}/admin/users/${userId}/unban`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const makeAdmin = async (userId) => {
+  const response = await axios.put(`${API}/admin/users/${userId}/make-admin`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const removeAdmin = async (userId) => {
+  const response = await axios.put(`${API}/admin/users/${userId}/remove-admin`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getAdminArtworks = async (params = {}) => {
+  const response = await axios.get(`${API}/admin/artworks`, {
+    params,
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const flagArtwork = async (artworkId) => {
+  const response = await axios.put(`${API}/admin/artworks/${artworkId}/flag`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const unflagArtwork = async (artworkId) => {
+  const response = await axios.put(`${API}/admin/artworks/${artworkId}/unflag`, {}, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const adminDeleteArtwork = async (artworkId) => {
+  const response = await axios.delete(`${API}/admin/artworks/${artworkId}`, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getAdminArtists = async (params = {}) => {
+  const response = await axios.get(`${API}/admin/artists`, {
+    params,
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const verifyArtist = async (artistId, data) => {
+  const response = await axios.put(`${API}/admin/artists/${artistId}/verify`, data, {
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getAdminOrders = async (params = {}) => {
+  const response = await axios.get(`${API}/admin/orders`, {
+    params,
+    headers: getAuthHeader()
+  });
+  return response.data;
+};
+
+export const getRevenueChart = async (days = 30) => {
+  const response = await axios.get(`${API}/admin/revenue-chart`, {
+    params: { days },
     headers: getAuthHeader()
   });
   return response.data;

@@ -25,6 +25,7 @@ import WishlistPage from './pages/WishlistPage';
 import AboutPage from './pages/AboutPage';
 import ArtworkFormPage from './pages/ArtworkFormPage';
 import ArtistAnalyticsPage from './pages/ArtistAnalyticsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -104,6 +105,11 @@ function AppRoutes() {
       <Route path="/dashboard/analytics" element={
         <ProtectedRoute>
           <Layout><ArtistAnalyticsPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <Layout><AdminDashboardPage /></Layout>
         </ProtectedRoute>
       } />
       
