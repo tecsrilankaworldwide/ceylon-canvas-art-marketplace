@@ -20,13 +20,13 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - Sri Lanka and world market focus
 - Admin dashboard for platform management
 
-## What's Been Implemented (Jan 2026)
+## What's Been Implemented
 
 ### Backend (FastAPI + MongoDB)
 - ✅ User authentication (register/login/JWT)
 - ✅ Artist profiles CRUD
 - ✅ Artwork listings CRUD with advanced filters
-- ✅ Auction/bidding system
+- ✅ Auction/bidding system with notifications
 - ✅ Direct purchase with cart
 - ✅ Commission requests
 - ✅ Wishlist functionality
@@ -40,19 +40,20 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Email notifications (Resend)
 - ✅ Reviews & Ratings System
 - ✅ Auction End Handling
-- ✅ **Admin Dashboard APIs** (NEW - March 2026)
-  - Platform statistics (users, artworks, revenue, orders)
-  - User management (list, search, ban/unban, make admin)
-  - Artwork moderation (list, search, flag/unflag, delete)
-  - Artist verification management
-  - Orders overview
-  - Revenue chart data
-- ✅ **Advanced Artwork Filtering** (NEW - March 2026)
-  - Filter by medium (oil, acrylic, watercolor, etc.)
-  - Filter by artist
-  - Filter by year range
-  - Filter by tags
-  - Combined filter support
+- ✅ Admin Dashboard APIs (March 2026)
+- ✅ **In-app Messaging System** (NEW - March 2026)
+  - Conversations CRUD
+  - Real-time message sending
+  - Message read status
+  - Artwork reference in conversations
+- ✅ **Notification System** (NEW - March 2026)
+  - Create notifications for bids, outbids, messages
+  - Mark as read (single/all)
+  - Unread count tracking
+- ✅ **Multi-currency Support** (NEW - March 2026)
+  - USD/LKR exchange rates
+  - Currency conversion API
+  - Rate: 1 USD = 325 LKR
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
@@ -73,31 +74,22 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Reviews Section on Artwork Pages
 - ✅ Social Sharing Buttons
 - ✅ Verified Artist Badges
-- ✅ **Admin Dashboard** (NEW - March 2026)
-  - Overview tab with platform statistics cards
-  - Users tab with search, role filter, ban/unban actions
-  - Artworks tab with search, status filter, flag/delete actions
-  - Artists tab with verification management
-  - Orders tab
-  - Confirmation dialogs for destructive actions
-- ✅ **Enhanced Gallery Filtering** (NEW - March 2026)
-  - Hero search bar
-  - Collapsible filter sections
-  - Category, Medium, Artist dropdowns
-  - Auction and Digital checkboxes
-  - Price range slider
-  - Active filter badges with remove
-  - Clear all filters
-  - Sort options (Newest, Price, Popular, Name)
-  - Grid view toggle
-
-### Design Features
-- Cormorant Garamond headings + Manrope body fonts
-- Ceylon Sapphire (#0F3057) + Cinnamon Terracotta (#B64E33) brand colors
-- Warm canvas light theme
-- Gallery-inspired layout
-- Artwork hover effects
-- Glassmorphism navigation
+- ✅ Admin Dashboard
+- ✅ **Messages Page** (NEW - March 2026)
+  - Conversation sidebar with search
+  - Chat area with message bubbles
+  - Read receipts (checkmarks)
+  - "Message Artist" button on artist profiles
+  - "Ask Question" button on artwork details
+- ✅ **Notification Center** (NEW - March 2026)
+  - Bell icon in navbar
+  - Notification popover dropdown
+  - Mark as read/delete actions
+  - Auto-poll for new notifications (30s)
+- ✅ **Currency Selector** (NEW - March 2026)
+  - USD/LKR dropdown in navbar
+  - CurrencyContext for app-wide state
+  - Prices update in real-time
 
 ## Test Credentials
 - **Admin User**: admin@ceyloncanvas.com / admin123
@@ -106,18 +98,19 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None - Core MVP complete with admin features
+- None - Core MVP + Messaging + Currency complete
 
 ### P1 (Important)
-- In-app Messaging System (buyer-artist communication)
-- Multi-currency Support (LKR/USD)
 - Order tracking with shipping updates
+- Real-time exchange rate API (replace static rates)
+- Push notifications (browser/mobile)
 
 ### P2 (Nice to Have)
 - Advanced search with AI recommendations
 - Virtual gallery view (3D)
 - Domain verification for production emails
 - Scheduled job for automatic auction end checking
+- Backend code refactoring (split server.py into routers)
 
 ## Architecture
 
@@ -126,7 +119,7 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 /app/backend/
 ├── .env
 ├── requirements.txt
-└── server.py (Contains all routes - recommended for refactoring)
+└── server.py (~3000 lines - recommended for refactoring)
 ```
 
 ### Frontend Structure
@@ -134,18 +127,19 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 /app/frontend/src/
 ├── App.js
 ├── components/
-│   ├── ui/          # Shadcn UI components
-│   ├── Navbar.js
-│   ├── Footer.js
-│   ├── ArtworkCard.js
-│   ├── ReviewSection.js
+│   ├── ui/              # Shadcn UI components
+│   ├── Navbar.js        # With NotificationCenter & CurrencySelector
+│   ├── NotificationCenter.js
+│   ├── CurrencySelector.js
 │   └── ...
 ├── context/
 │   ├── AuthContext.js
-│   └── CartContext.js
+│   ├── CartContext.js
+│   └── CurrencyContext.js  # NEW
 ├── pages/
-│   ├── AdminDashboardPage.js (NEW)
-│   ├── GalleryPage.js (Enhanced)
+│   ├── MessagesPage.js     # NEW
+│   ├── AdminDashboardPage.js
+│   ├── GalleryPage.js
 │   └── ...
 └── services/
     └── api.js
@@ -153,26 +147,21 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 
 ## Key API Endpoints
 
-### Admin Routes (Requires is_admin: true)
-- GET /api/admin/stats - Platform statistics
-- GET /api/admin/users - User list with search/filter
-- PUT /api/admin/users/{id}/ban - Ban user
-- PUT /api/admin/users/{id}/unban - Unban user
-- PUT /api/admin/users/{id}/make-admin - Grant admin
-- PUT /api/admin/users/{id}/remove-admin - Remove admin
-- GET /api/admin/artworks - Artwork list for moderation
-- PUT /api/admin/artworks/{id}/flag - Flag artwork
-- PUT /api/admin/artworks/{id}/unflag - Unflag artwork
-- DELETE /api/admin/artworks/{id} - Delete artwork
-- GET /api/admin/artists - Artist list with verification
-- PUT /api/admin/artists/{id}/verify - Update verification status
-- GET /api/admin/orders - Orders list
-- GET /api/admin/revenue-chart - Revenue data for charts
+### Messaging Routes
+- GET /api/conversations - List user's conversations
+- GET /api/conversations/{id} - Get conversation with messages
+- POST /api/conversations - Create new conversation
+- POST /api/messages - Send message
 
-### Gallery/Artwork Routes
-- GET /api/artworks - List with filters (category, medium, artist_id, is_auction, is_digital, min_price, max_price, tags, search, sort)
-- GET /api/mediums - List of art mediums
-- GET /api/categories - List of categories
+### Notification Routes
+- GET /api/notifications - List notifications with unread count
+- PUT /api/notifications/{id}/read - Mark as read
+- PUT /api/notifications/read-all - Mark all as read
+- DELETE /api/notifications/{id} - Delete notification
+
+### Currency Routes
+- GET /api/currency/rates - Get exchange rates
+- GET /api/currency/convert - Convert amount
 
 ## 3rd Party Integrations
 - Stripe (Payments) - Test key in environment
@@ -181,6 +170,11 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - GitHub (VCS) - Repository linked
 
 ## Next Tasks
-1. In-app Messaging System for buyer-artist communication
-2. Multi-currency support (LKR/USD conversion)
-3. Backend code refactoring (split server.py into routers)
+1. Order tracking with shipping status updates
+2. Real-time exchange rate API integration
+3. Backend code refactoring (split server.py)
+
+## Technical Notes
+- Currency rates are currently static (1 USD = 325 LKR)
+- Notifications auto-poll every 30 seconds
+- Seed data artists have placeholder user_ids - messaging works with real users
