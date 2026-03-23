@@ -1,34 +1,206 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Ceylon Canvas Art Marketplace - Main App Styles */
+
+/* Hero Section */
+.hero-section {
+  min-height: 90vh;
+  position: relative;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(253, 253, 251, 0.95) 0%, rgba(253, 253, 251, 0.7) 50%, transparent 100%);
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+/* Category Cards */
+.category-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.App-link {
-    color: #61dafb;
+.category-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 16, 21, 0.7) 0%, transparent 60%);
+  z-index: 1;
+  transition: opacity 0.5s ease;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.category-card:hover::before {
+  opacity: 0.9;
+}
+
+.category-card img {
+  transition: transform 0.7s ease-out;
+}
+
+.category-card:hover img {
+  transform: scale(1.1);
+}
+
+/* Auction Timer */
+.auction-timer {
+  font-family: 'Manrope', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Artist Card */
+.artist-card {
+  transition: all 0.4s ease;
+}
+
+.artist-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Price Display */
+.price-display {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Bid Input */
+.bid-input {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  border-bottom: 2px solid var(--ceylon-sapphire);
+  background: transparent;
+  padding: 0.5rem 1rem;
+  width: 100%;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Tab Indicator */
+.tab-indicator {
+  position: relative;
+}
+
+.tab-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--ceylon-sapphire);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tab-indicator.active::after {
+  transform: scaleX(1);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-alt) 25%, var(--bg-base) 50%, var(--bg-alt) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Notification Badge */
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background-color: var(--cinnamon-terracotta);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* Footer */
+.footer-section {
+  background-color: var(--bg-dark);
+  color: var(--text-inverse);
+}
+
+.footer-link {
+  color: rgba(253, 253, 251, 0.7);
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: var(--temple-gold);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+/* Form Label */
+.form-label {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--ui-border), transparent);
+}
+
+/* Image Aspect Ratios */
+.aspect-artwork {
+  aspect-ratio: 4/5;
+}
+
+.aspect-hero {
+  aspect-ratio: 16/9;
+}
+
+.aspect-thumb {
+  aspect-ratio: 1;
+}
+
+/* Toast Customization */
+[data-sonner-toast] {
+  font-family: 'Manrope', sans-serif !important;
+}
+
+/* Focus Visible */
+*:focus-visible {
+  outline: 2px solid var(--ceylon-sapphire);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
