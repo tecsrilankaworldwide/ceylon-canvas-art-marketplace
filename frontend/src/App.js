@@ -23,6 +23,7 @@ import CheckoutSuccessPage from './pages/CheckoutSuccessPage';
 import DashboardPage from './pages/DashboardPage';
 import WishlistPage from './pages/WishlistPage';
 import AboutPage from './pages/AboutPage';
+import ArtworkFormPage from './pages/ArtworkFormPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -87,6 +88,16 @@ function AppRoutes() {
       <Route path="/orders" element={
         <ProtectedRoute>
           <Layout><DashboardPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/artworks/new" element={
+        <ProtectedRoute>
+          <Layout><ArtworkFormPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/artworks/:id/edit" element={
+        <ProtectedRoute>
+          <Layout><ArtworkFormPage /></Layout>
         </ProtectedRoute>
       } />
       

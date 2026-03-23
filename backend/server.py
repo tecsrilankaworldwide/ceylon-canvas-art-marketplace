@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, File, UploadFile, Query, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,6 +13,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import hashlib
 import jwt
+import requests
 from bson import ObjectId
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
@@ -30,6 +32,21 @@ JWT_EXPIRATION_HOURS = 24
 
 # Stripe Settings
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
+
+# Object Storage Settings
+STORAGE_URL = "https://integrations.emergentagent.com/objstore/api/v1/storage"
+EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
+APP_NAME = "ceylon-canvas"
+storage_key = None
+
+# MIME Types for images
+ALLOWED_MIME_TYPES = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/webp": "webp"
+}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 # Create the main app
 app = FastAPI(title="Ceylon Canvas Art Marketplace API")
@@ -186,6 +203,44 @@ class PaymentStatusResponse(BaseModel):
     payment_status: str
     amount_total: float
     currency: str
+
+# ==================== STORAGE HELPERS ====================
+
+def init_storage():
+    """Initialize storage and get session-scoped storage key."""
+    global storage_key
+    if storage_key:
+        return storage_key
+    try:
+        resp = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": EMERGENT_KEY}, timeout=30)
+        resp.raise_for_status()
+        storage_key = resp.json()["storage_key"]
+        logger.info("Object storage initialized successfully")
+        return storage_key
+    except Exception as e:
+        logger.error(f"Failed to initialize storage: {e}")
+        raise HTTPException(status_code=500, detail="Storage initialization failed")
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    """Upload file to object storage."""
+    key = init_storage()
+    resp = requests.put(
+        f"{STORAGE_URL}/objects/{path}",
+        headers={"X-Storage-Key": key, "Content-Type": content_type},
+        data=data, timeout=120
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+def get_object(path: str) -> tuple:
+    """Download file from object storage."""
+    key = init_storage()
+    resp = requests.get(
+        f"{STORAGE_URL}/objects/{path}",
+        headers={"X-Storage-Key": key}, timeout=60
+    )
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
 
 # ==================== AUTH HELPERS ====================
 
@@ -1104,6 +1159,92 @@ async def seed_data():
     
     return {"message": "Sample data seeded successfully", "artists": len(sample_artists), "artworks": len(sample_artworks)}
 
+# ==================== FILE UPLOAD ROUTES ====================
+
+@api_router.post("/upload/image")
+async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Upload an image for artworks or profiles."""
+    # Validate content type
+    if file.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(status_code=400, detail=f"Invalid file type. Allowed: {list(ALLOWED_MIME_TYPES.keys())}")
+    
+    # Read file data
+    data = await file.read()
+    
+    # Validate file size
+    if len(data) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail=f"File too large. Max size: {MAX_FILE_SIZE // (1024*1024)}MB")
+    
+    # Generate storage path
+    ext = ALLOWED_MIME_TYPES[file.content_type]
+    file_id = str(uuid.uuid4())
+    path = f"{APP_NAME}/artworks/{user['id']}/{file_id}.{ext}"
+    
+    try:
+        # Upload to storage
+        result = put_object(path, data, file.content_type)
+        
+        # Store reference in database
+        file_record = {
+            "id": file_id,
+            "user_id": user["id"],
+            "storage_path": result["path"],
+            "original_filename": file.filename,
+            "content_type": file.content_type,
+            "size": result["size"],
+            "is_deleted": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.files.insert_one(file_record)
+        
+        return {
+            "id": file_id,
+            "path": result["path"],
+            "size": result["size"],
+            "url": f"/api/files/{result['path']}"
+        }
+    except Exception as e:
+        logger.error(f"Upload failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to upload file")
+
+@api_router.get("/files/{path:path}")
+async def download_file(path: str, authorization: str = Header(None), auth: str = Query(None)):
+    """Download a file by path. Supports query param auth for img src usage."""
+    # Find file record
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False}, {"_id": 0})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    try:
+        # Get file from storage
+        data, content_type = get_object(path)
+        return Response(content=data, media_type=record.get("content_type", content_type))
+    except Exception as e:
+        logger.error(f"Download failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to download file")
+
+@api_router.delete("/files/{file_id}")
+async def delete_file(file_id: str, user: dict = Depends(get_current_user)):
+    """Soft-delete a file."""
+    record = await db.files.find_one({"id": file_id, "user_id": user["id"]})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    await db.files.update_one(
+        {"id": file_id},
+        {"$set": {"is_deleted": True, "deleted_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "File deleted"}
+
+@api_router.get("/files/user/list")
+async def list_user_files(user: dict = Depends(get_current_user)):
+    """List all files uploaded by user."""
+    files = await db.files.find(
+        {"user_id": user["id"], "is_deleted": False},
+        {"_id": 0}
+    ).to_list(100)
+    return files
+
 # ==================== MAIN ====================
 
 app.include_router(api_router)
@@ -1119,3 +1260,12 @@ app.add_middleware(
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize storage on startup."""
+    try:
+        if EMERGENT_KEY:
+            init_storage()
+    except Exception as e:
+        logger.warning(f"Storage initialization deferred: {e}")

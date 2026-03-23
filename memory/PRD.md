@@ -33,6 +33,8 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Order management
 - ✅ Categories and stats APIs
 - ✅ Sample data seeding
+- ✅ **Image upload to object storage** (NEW)
+- ✅ **File download/serve API** (NEW)
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
@@ -50,6 +52,8 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Responsive design
 - ✅ Glassmorphism navigation
 - ✅ Gallery-aesthetic design with Ceylon cultural elements
+- ✅ **Artwork creation form with image upload** (NEW)
+- ✅ **ImageUpload component with drag & drop** (NEW)
 
 ### Design Features
 - Cormorant Garamond headings + Manrope body fonts
@@ -62,11 +66,10 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None - Core MVP complete
+- None - Core MVP complete with image upload
 
 ### P1 (Important)
 - Email notifications for bids/purchases
-- Image upload for artworks (object storage)
 - Artist verification system
 - Order tracking
 
@@ -78,7 +81,7 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - Social sharing
 
 ## Next Tasks
-1. Add image upload functionality using object storage
+1. ~~Add image upload functionality using object storage~~ ✅ DONE
 2. Implement email notifications for transactions
 3. Add artist analytics dashboard
 4. Improve auction end handling with notifications
