@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useRealTime } from '../context/WebSocketContext';
 import { 
   MessageCircle, Send, ArrowLeft, Image, User, 
-  Search, MoreVertical, Check, CheckCheck
+  Search, MoreVertical, Check, CheckCheck, Wifi, WifiOff
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -20,6 +21,7 @@ const MessagesPage = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { isConnected, subscribe } = useRealTime();
   
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
@@ -28,6 +30,37 @@ const MessagesPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Handle real-time incoming messages
+  const handleNewMessage = useCallback((message) => {
+    // Add to messages if it's for the active conversation
+    if (message.conversation_id === conversationId) {
+      setMessages(prev => {
+        // Check if message already exists
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
+    }
+    
+    // Update conversation list
+    setConversations(prev => 
+      prev.map(c => c.id === message.conversation_id 
+        ? { 
+            ...c, 
+            last_message: message.content, 
+            last_message_at: message.created_at,
+            unread_count: c.id === conversationId ? 0 : (c.unread_count || 0) + 1
+          }
+        : c
+      ).sort((a, b) => new Date(b.last_message_at) - new Date(a.last_message_at))
+    );
+  }, [conversationId]);
+
+  // Subscribe to real-time messages
+  useEffect(() => {
+    const unsubscribe = subscribe('message', handleNewMessage);
+    return unsubscribe;
+  }, [subscribe, handleNewMessage]);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -159,7 +192,19 @@ const MessagesPage = () => {
           <aside className={`w-full md:w-80 border-r border-[#E5E5DF] flex flex-col bg-white ${conversationId ? 'hidden md:flex' : 'flex'}`}>
             {/* Header */}
             <div className="p-4 border-b border-[#E5E5DF]">
-              <h1 className="font-heading text-xl font-medium text-[#0F3057]">Messages</h1>
+              <div className="flex items-center justify-between">
+                <h1 className="font-heading text-xl font-medium text-[#0F3057]">Messages</h1>
+                {isConnected ? (
+                  <span className="flex items-center gap-1 text-xs text-[#2D5A43]">
+                    <Wifi className="h-3 w-3" />
+                    Live
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs text-[#5C636A]">
+                    <WifiOff className="h-3 w-3" />
+                  </span>
+                )}
+              </div>
               <div className="relative mt-3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#5C636A]" />
                 <Input

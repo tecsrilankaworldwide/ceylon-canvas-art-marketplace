@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, File, UploadFile, Query, Header
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, File, UploadFile, Query, Header, WebSocket, WebSocketDisconnect
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response
 from dotenv import load_dotenv
@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import hashlib
 import jwt
+import json
 import requests
 import resend
 from bson import ObjectId
@@ -313,6 +314,56 @@ class NotificationResponse(BaseModel):
     link: Optional[str] = None
     is_read: bool = False
     created_at: str
+
+# ==================== WEBSOCKET CONNECTION MANAGER ====================
+
+class ConnectionManager:
+    """Manages WebSocket connections for real-time updates."""
+    
+    def __init__(self):
+        # Map user_id to list of WebSocket connections (supports multiple tabs/devices)
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+    
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        if user_id not in self.active_connections:
+            self.active_connections[user_id] = []
+        self.active_connections[user_id].append(websocket)
+        logger.info(f"WebSocket connected: user {user_id}")
+    
+    def disconnect(self, websocket: WebSocket, user_id: str):
+        if user_id in self.active_connections:
+            if websocket in self.active_connections[user_id]:
+                self.active_connections[user_id].remove(websocket)
+            if not self.active_connections[user_id]:
+                del self.active_connections[user_id]
+        logger.info(f"WebSocket disconnected: user {user_id}")
+    
+    async def send_personal_message(self, user_id: str, message: dict):
+        """Send message to a specific user across all their connections."""
+        if user_id in self.active_connections:
+            disconnected = []
+            for connection in self.active_connections[user_id]:
+                try:
+                    await connection.send_json(message)
+                except Exception as e:
+                    logger.warning(f"Failed to send message to user {user_id}: {e}")
+                    disconnected.append(connection)
+            # Clean up disconnected connections
+            for conn in disconnected:
+                self.disconnect(conn, user_id)
+    
+    async def broadcast_to_users(self, user_ids: List[str], message: dict):
+        """Send message to multiple users."""
+        for user_id in user_ids:
+            await self.send_personal_message(user_id, message)
+    
+    def is_user_online(self, user_id: str) -> bool:
+        """Check if user has any active connections."""
+        return user_id in self.active_connections and len(self.active_connections[user_id]) > 0
+
+# Global connection manager instance
+ws_manager = ConnectionManager()
 
 # ==================== STORAGE HELPERS ====================
 
@@ -1020,6 +1071,21 @@ async def place_bid(bid_data: BidCreate, user: dict = Depends(get_current_user))
     # Get updated artwork for bid count
     updated_artwork = await db.artworks.find_one({"id": bid_data.artwork_id}, {"_id": 0})
     
+    # Broadcast bid update to all connected users watching this auction
+    bid_update = {
+        "type": "bid_update",
+        "data": {
+            "artwork_id": bid_data.artwork_id,
+            "current_bid": bid_data.amount,
+            "bid_count": updated_artwork.get("bid_count", 1),
+            "bidder_name": user["name"],
+            "created_at": bid["created_at"]
+        }
+    }
+    # Get all users who have bid on this artwork to notify them
+    all_bidders = await db.bids.distinct("bidder_id", {"artwork_id": bid_data.artwork_id})
+    await ws_manager.broadcast_to_users(all_bidders, bid_update)
+    
     # Send email to artist about new bid
     artist = await db.artists.find_one({"id": artwork["artist_id"]})
     if artist:
@@ -1032,6 +1098,9 @@ async def place_bid(bid_data: BidCreate, user: dict = Depends(get_current_user))
                 "bid_count": updated_artwork.get("bid_count", 1)
             })
             asyncio.create_task(send_email(artist_user["email"], subject, html))
+            
+            # Also send bid update to artist
+            await ws_manager.send_personal_message(artist["user_id"], bid_update)
             
             # Create in-app notification for artist
             await create_notification(
@@ -2669,7 +2738,7 @@ async def create_admin_account(user_data: UserCreate, admin: dict = Depends(get_
 # ==================== NOTIFICATION HELPERS ====================
 
 async def create_notification(user_id: str, notification_type: str, title: str, message: str, link: Optional[str] = None):
-    """Create a notification for a user."""
+    """Create a notification for a user and send via WebSocket if online."""
     notification = {
         "id": str(uuid.uuid4()),
         "user_id": user_id,
@@ -2681,8 +2750,15 @@ async def create_notification(user_id: str, notification_type: str, title: str, 
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.notifications.insert_one(notification)
-    # Return without MongoDB _id
-    return {k: v for k, v in notification.items() if k != "_id"}
+    
+    # Send real-time notification via WebSocket
+    ws_notification = {k: v for k, v in notification.items() if k != "_id"}
+    await ws_manager.send_personal_message(user_id, {
+        "type": "notification",
+        "data": ws_notification
+    })
+    
+    return ws_notification
 
 # ==================== MESSAGING ROUTES ====================
 
@@ -2859,6 +2935,13 @@ async def send_message(message_data: MessageCreate, user: dict = Depends(get_cur
     # Get recipient ID
     recipient_id = [pid for pid in conv["participant_ids"] if pid != user["id"]][0]
     
+    # Send real-time message via WebSocket to recipient
+    ws_message = {k: v for k, v in message.items() if k != "_id"}
+    await ws_manager.send_personal_message(recipient_id, {
+        "type": "message",
+        "data": ws_message
+    })
+    
     # Create notification for recipient
     await create_notification(
         user_id=recipient_id,
@@ -2991,3 +3074,53 @@ async def startup_event():
             init_storage()
     except Exception as e:
         logger.warning(f"Storage initialization deferred: {e}")
+
+# ==================== WEBSOCKET ENDPOINT ====================
+
+@app.websocket("/ws/{token}")
+async def websocket_endpoint(websocket: WebSocket, token: str):
+    """WebSocket endpoint for real-time updates."""
+    try:
+        # Verify token and get user
+        payload = decode_token(token)
+        user_id = payload["user_id"]
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        
+        if not user:
+            await websocket.close(code=4001, reason="User not found")
+            return
+        
+        if user.get("is_banned"):
+            await websocket.close(code=4003, reason="User banned")
+            return
+        
+        # Connect user
+        await ws_manager.connect(websocket, user_id)
+        
+        try:
+            while True:
+                # Keep connection alive, handle incoming messages
+                data = await websocket.receive_json()
+                
+                # Handle different message types from client
+                if data.get("type") == "ping":
+                    await websocket.send_json({"type": "pong"})
+                elif data.get("type") == "subscribe_auction":
+                    # Client wants to watch a specific auction
+                    artwork_id = data.get("artwork_id")
+                    if artwork_id:
+                        logger.info(f"User {user_id} subscribed to auction {artwork_id}")
+                        
+        except WebSocketDisconnect:
+            ws_manager.disconnect(websocket, user_id)
+        except Exception as e:
+            logger.error(f"WebSocket error for user {user_id}: {e}")
+            ws_manager.disconnect(websocket, user_id)
+            
+    except jwt.ExpiredSignatureError:
+        await websocket.close(code=4001, reason="Token expired")
+    except jwt.InvalidTokenError:
+        await websocket.close(code=4001, reason="Invalid token")
+    except Exception as e:
+        logger.error(f"WebSocket connection error: {e}")
+        await websocket.close(code=4000, reason="Connection error")

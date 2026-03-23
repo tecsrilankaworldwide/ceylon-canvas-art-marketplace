@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Bell, MessageCircle, Gavel, ShoppingBag, 
-  Star, BadgeCheck, X, Check, Trash2 
+  Star, BadgeCheck, Check, Trash2, Wifi, WifiOff 
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
@@ -11,9 +11,10 @@ import {
   PopoverTrigger,
 } from '../components/ui/popover';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { useRealTime } from '../context/WebSocketContext';
 import {
   getNotifications,
-  markNotificationRead,
+  markNotificationRead as apiMarkNotificationRead,
   markAllNotificationsRead,
   deleteNotification
 } from '../services/api';
@@ -32,18 +33,33 @@ const NotificationIcon = ({ type }) => {
 };
 
 export const NotificationCenter = () => {
+  const { isConnected, notifications: wsNotifications, unreadCount: wsUnreadCount, subscribe, markNotificationRead: wsMarkRead } = useRealTime();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
+  // Load initial notifications
   useEffect(() => {
     loadNotifications();
-    
-    // Poll for new notifications every 30 seconds
-    const interval = setInterval(loadNotifications, 30000);
-    return () => clearInterval(interval);
   }, []);
+
+  // Merge WebSocket notifications with loaded ones
+  useEffect(() => {
+    if (wsNotifications.length > 0) {
+      setNotifications(prev => {
+        // Add new notifications that aren't already in the list
+        const existingIds = new Set(prev.map(n => n.id));
+        const newNotifications = wsNotifications.filter(n => !existingIds.has(n.id));
+        return [...newNotifications, ...prev];
+      });
+    }
+  }, [wsNotifications]);
+
+  // Update unread count from WebSocket
+  useEffect(() => {
+    setUnreadCount(prev => Math.max(prev, wsUnreadCount));
+  }, [wsUnreadCount]);
 
   const loadNotifications = async () => {
     try {
@@ -61,11 +77,12 @@ export const NotificationCenter = () => {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await markNotificationRead(id);
+      await apiMarkNotificationRead(id);
       setNotifications(prev => 
         prev.map(n => n.id === id ? { ...n, is_read: true } : n)
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
+      wsMarkRead(id);
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     }
@@ -126,7 +143,14 @@ export const NotificationCenter = () => {
       <PopoverContent align="end" className="w-80 p-0" data-testid="notification-popover">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#E5E5DF]">
-          <h3 className="font-heading text-lg font-medium text-[#0F3057]">Notifications</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-heading text-lg font-medium text-[#0F3057]">Notifications</h3>
+            {isConnected ? (
+              <Wifi className="h-3 w-3 text-[#2D5A43]" title="Real-time connected" />
+            ) : (
+              <WifiOff className="h-3 w-3 text-[#5C636A]" title="Connecting..." />
+            )}
+          </div>
           {unreadCount > 0 && (
             <Button 
               variant="ghost" 
@@ -152,7 +176,7 @@ export const NotificationCenter = () => {
             </div>
           ) : (
             <div className="divide-y divide-[#E5E5DF]">
-              {notifications.map((notification) => (
+              {notifications.slice(0, 20).map((notification) => (
                 <Link
                   key={notification.id}
                   to={notification.link || '#'}

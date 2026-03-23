@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useRealTime } from '../context/WebSocketContext';
 import { getArtwork, getArtworkBids, placeBid, addToWishlist, removeFromWishlist, getWishlist, createCommission, createConversation } from '../services/api';
 import { ReviewSection } from '../components/ReviewSection';
 import { ShareButton } from '../components/ShareButton';
@@ -30,6 +31,7 @@ const ArtworkDetailPage = () => {
   const [bidding, setBidding] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [messagingLoading, setMessagingLoading] = useState(false);
+  const [liveBidUpdate, setLiveBidUpdate] = useState(null);
   
   // Commission form state
   const [commissionForm, setCommissionForm] = useState({
@@ -39,6 +41,39 @@ const ArtworkDetailPage = () => {
     budget_max: '',
     deadline: ''
   });
+
+  // Real-time bid updates
+  const { subscribe, subscribeToAuction, isConnected } = useRealTime();
+
+  // Subscribe to bid updates for this artwork
+  useEffect(() => {
+    if (artwork?.is_auction) {
+      subscribeToAuction(id);
+      
+      const unsubscribe = subscribe('bid_update', (data) => {
+        if (data.artwork_id === id) {
+          setLiveBidUpdate(data);
+          // Update artwork with new bid
+          setArtwork(prev => prev ? {
+            ...prev,
+            current_bid: data.current_bid,
+            bid_count: data.bid_count
+          } : prev);
+          // Add new bid to list
+          setBids(prev => [{
+            bidder_name: data.bidder_name,
+            amount: data.current_bid,
+            created_at: data.created_at
+          }, ...prev]);
+          
+          // Flash animation for new bid
+          setTimeout(() => setLiveBidUpdate(null), 3000);
+        }
+      });
+      
+      return unsubscribe;
+    }
+  }, [artwork?.is_auction, id, subscribe, subscribeToAuction]);
 
   useEffect(() => {
     const loadData = async () => {

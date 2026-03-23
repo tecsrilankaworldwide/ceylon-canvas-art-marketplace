@@ -4,6 +4,7 @@ import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
+import { WebSocketProvider } from './context/WebSocketContext';
 import '@/App.css';
 
 // Components
@@ -137,12 +138,14 @@ function App() {
       <AuthProvider>
         <CurrencyProvider>
           <CartProvider>
-            <div className="App">
-              {/* Grain Texture Overlay */}
-              <div className="grain-overlay" />
-              <AppRoutes />
-              <Toaster position="top-right" richColors />
-            </div>
+            <WebSocketProvider>
+              <div className="App">
+                {/* Grain Texture Overlay */}
+                <div className="grain-overlay" />
+                <AppRoutes />
+                <Toaster position="top-right" richColors />
+              </div>
+            </WebSocketProvider>
           </CartProvider>
         </CurrencyProvider>
       </AuthProvider>
