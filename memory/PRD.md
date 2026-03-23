@@ -61,6 +61,12 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Gallery-aesthetic design with Ceylon cultural elements
 - ✅ Artwork creation form with image upload
 - ✅ ImageUpload component with drag & drop
+- ✅ **Artist Analytics Dashboard** (NEW)
+  - Revenue overview with charts
+  - Artwork performance metrics
+  - Recent bids activity feed
+  - Commission summary
+  - Top performing artworks
 
 ### Design Features
 - Cormorant Garamond headings + Manrope body fonts
@@ -90,5 +96,6 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ## Next Tasks
 1. ~~Add image upload functionality using object storage~~ ✅ DONE
 2. ~~Implement email notifications for transactions~~ ✅ DONE
-3. Add artist analytics dashboard
-4. Improve auction end handling with notifications
+3. ~~Add artist analytics dashboard~~ ✅ DONE
+4. Improve auction end handling with automated notifications
+5. Add reviews and ratings system

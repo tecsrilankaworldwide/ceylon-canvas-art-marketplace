@@ -1567,6 +1567,181 @@ async def test_email(request: TestEmailRequest, user: dict = Depends(get_current
     else:
         raise HTTPException(status_code=500, detail="Failed to send test email. In test mode, emails can only be sent to verified addresses.")
 
+# ==================== ARTIST ANALYTICS ROUTES ====================
+
+@api_router.get("/analytics/artist")
+async def get_artist_analytics(user: dict = Depends(get_current_user)):
+    """Get comprehensive analytics for artist dashboard."""
+    if not user.get("is_artist"):
+        raise HTTPException(status_code=403, detail="Only artists can access analytics")
+    
+    artist = await db.artists.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not artist:
+        raise HTTPException(status_code=404, detail="Artist profile not found")
+    
+    artist_id = artist["id"]
+    
+    # Get all artworks by this artist
+    artworks = await db.artworks.find({"artist_id": artist_id}, {"_id": 0}).to_list(1000)
+    
+    # Calculate totals
+    total_artworks = len(artworks)
+    available_artworks = len([a for a in artworks if a.get("is_available")])
+    sold_artworks = len([a for a in artworks if not a.get("is_available")])
+    auction_artworks = len([a for a in artworks if a.get("is_auction") and a.get("is_available")])
+    
+    # Total views
+    total_views = sum(a.get("views", 0) for a in artworks)
+    
+    # Revenue calculation (from sold items)
+    total_revenue = sum(a.get("price", 0) for a in artworks if not a.get("is_available"))
+    
+    # Get recent orders containing artist's artworks
+    artwork_ids = [a["id"] for a in artworks]
+    orders = await db.orders.find(
+        {"artwork_ids": {"$in": artwork_ids}},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Calculate monthly revenue (last 6 months)
+    from collections import defaultdict
+    monthly_revenue = defaultdict(float)
+    monthly_sales = defaultdict(int)
+    
+    for order in orders:
+        order_date = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00"))
+        month_key = order_date.strftime("%Y-%m")
+        
+        # Get artworks in this order that belong to this artist
+        for artwork_id in order.get("artwork_ids", []):
+            artwork = next((a for a in artworks if a["id"] == artwork_id), None)
+            if artwork:
+                monthly_revenue[month_key] += artwork.get("price", 0)
+                monthly_sales[month_key] += 1
+    
+    # Get last 6 months
+    revenue_chart = []
+    for i in range(5, -1, -1):
+        month = (datetime.now(timezone.utc) - timedelta(days=i*30)).strftime("%Y-%m")
+        month_name = (datetime.now(timezone.utc) - timedelta(days=i*30)).strftime("%b %Y")
+        revenue_chart.append({
+            "month": month_name,
+            "revenue": monthly_revenue.get(month, 0),
+            "sales": monthly_sales.get(month, 0)
+        })
+    
+    # Get bid activity on artist's auctions
+    bids = await db.bids.find(
+        {"artwork_id": {"$in": artwork_ids}},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    total_bids = len(bids)
+    recent_bids = bids[:10]  # Last 10 bids
+    
+    # Enrich recent bids with artwork info
+    for bid in recent_bids:
+        artwork = next((a for a in artworks if a["id"] == bid["artwork_id"]), None)
+        if artwork:
+            bid["artwork_title"] = artwork["title"]
+            bid["artwork_image"] = artwork["images"][0] if artwork.get("images") else None
+    
+    # Top performing artworks (by views)
+    top_artworks = sorted(artworks, key=lambda x: x.get("views", 0), reverse=True)[:5]
+    
+    # Get commissions
+    commissions = await db.commissions.find(
+        {"artist_id": artist_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    pending_commissions = len([c for c in commissions if c.get("status") == "pending"])
+    active_commissions = len([c for c in commissions if c.get("status") in ["accepted", "in_progress"]])
+    completed_commissions = len([c for c in commissions if c.get("status") == "completed"])
+    
+    # Potential commission revenue
+    commission_pipeline_value = sum(
+        (c.get("budget_min", 0) + c.get("budget_max", 0)) / 2 
+        for c in commissions 
+        if c.get("status") in ["pending", "accepted", "in_progress"]
+    )
+    
+    return {
+        "overview": {
+            "total_artworks": total_artworks,
+            "available_artworks": available_artworks,
+            "sold_artworks": sold_artworks,
+            "auction_artworks": auction_artworks,
+            "total_views": total_views,
+            "total_revenue": total_revenue,
+            "total_bids": total_bids,
+            "rating": artist.get("rating", 0)
+        },
+        "commissions": {
+            "pending": pending_commissions,
+            "active": active_commissions,
+            "completed": completed_commissions,
+            "pipeline_value": commission_pipeline_value
+        },
+        "revenue_chart": revenue_chart,
+        "recent_bids": recent_bids,
+        "top_artworks": [{
+            "id": a["id"],
+            "title": a["title"],
+            "image": a["images"][0] if a.get("images") else None,
+            "views": a.get("views", 0),
+            "price": a.get("price", 0),
+            "is_available": a.get("is_available", True),
+            "is_auction": a.get("is_auction", False),
+            "current_bid": a.get("current_bid"),
+            "bid_count": a.get("bid_count", 0)
+        } for a in top_artworks],
+        "recent_orders": [{
+            "id": o["id"],
+            "amount": o["amount"],
+            "status": o["status"],
+            "created_at": o["created_at"]
+        } for o in orders[:5]]
+    }
+
+@api_router.get("/analytics/artist/artworks")
+async def get_artist_artwork_analytics(user: dict = Depends(get_current_user)):
+    """Get detailed analytics for each artwork."""
+    if not user.get("is_artist"):
+        raise HTTPException(status_code=403, detail="Only artists can access analytics")
+    
+    artist = await db.artists.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not artist:
+        raise HTTPException(status_code=404, detail="Artist profile not found")
+    
+    artworks = await db.artworks.find(
+        {"artist_id": artist["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Get bid counts for each artwork
+    artwork_analytics = []
+    for artwork in artworks:
+        bid_count = await db.bids.count_documents({"artwork_id": artwork["id"]})
+        wishlist_count = await db.wishlists.count_documents({"artwork_ids": artwork["id"]})
+        
+        artwork_analytics.append({
+            "id": artwork["id"],
+            "title": artwork["title"],
+            "image": artwork["images"][0] if artwork.get("images") else None,
+            "category": artwork.get("category"),
+            "price": artwork.get("price", 0),
+            "current_bid": artwork.get("current_bid"),
+            "views": artwork.get("views", 0),
+            "bid_count": bid_count,
+            "wishlist_count": wishlist_count,
+            "is_available": artwork.get("is_available", True),
+            "is_auction": artwork.get("is_auction", False),
+            "created_at": artwork.get("created_at")
+        })
+    
+    return artwork_analytics
+
 # ==================== MAIN ====================
 
 app.include_router(api_router)

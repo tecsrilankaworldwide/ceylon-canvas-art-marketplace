@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Image, Gavel, Package, Heart, Settings, Plus, LogOut } from 'lucide-react';
+import { User, Image, Gavel, Package, Heart, Settings, Plus, LogOut, BarChart3 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
@@ -94,12 +94,20 @@ const DashboardPage = () => {
           
           <div className="flex gap-3">
             {isArtist && (
-              <Link to="/dashboard/artworks/new">
-                <Button className="btn-primary rounded-sm flex items-center gap-2" data-testid="add-artwork">
-                  <Plus className="h-4 w-4" />
-                  Add Artwork
-                </Button>
-              </Link>
+              <>
+                <Link to="/dashboard/analytics">
+                  <Button variant="outline" className="flex items-center gap-2" data-testid="analytics-btn">
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </Button>
+                </Link>
+                <Link to="/dashboard/artworks/new">
+                  <Button className="btn-primary rounded-sm flex items-center gap-2" data-testid="add-artwork">
+                    <Plus className="h-4 w-4" />
+                    Add Artwork
+                  </Button>
+                </Link>
+              </>
             )}
             <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2" data-testid="logout">
               <LogOut className="h-4 w-4" />
