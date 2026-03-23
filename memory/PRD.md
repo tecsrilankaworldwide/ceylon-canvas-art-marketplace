@@ -33,8 +33,15 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Order management
 - ✅ Categories and stats APIs
 - ✅ Sample data seeding
-- ✅ **Image upload to object storage** (NEW)
-- ✅ **File download/serve API** (NEW)
+- ✅ Image upload to object storage
+- ✅ File download/serve API
+- ✅ **Email notifications (Resend)** (NEW)
+  - Welcome email on registration
+  - Bid placed notification (to artist)
+  - Outbid notification (to previous bidder)
+  - Purchase confirmation
+  - Commission request notification
+  - Commission status update notification
 
 ### Frontend (React + Tailwind + Shadcn)
 - ✅ Homepage with hero, featured art, categories, artists
@@ -52,8 +59,8 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ Responsive design
 - ✅ Glassmorphism navigation
 - ✅ Gallery-aesthetic design with Ceylon cultural elements
-- ✅ **Artwork creation form with image upload** (NEW)
-- ✅ **ImageUpload component with drag & drop** (NEW)
+- ✅ Artwork creation form with image upload
+- ✅ ImageUpload component with drag & drop
 
 ### Design Features
 - Cormorant Garamond headings + Manrope body fonts
@@ -66,12 +73,12 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- None - Core MVP complete with image upload
+- None - Core MVP complete with image upload and email notifications
 
 ### P1 (Important)
-- Email notifications for bids/purchases
 - Artist verification system
-- Order tracking
+- Order tracking with shipping updates
+- Domain verification for production emails
 
 ### P2 (Nice to Have)
 - Advanced search with AI recommendations
@@ -82,6 +89,6 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 
 ## Next Tasks
 1. ~~Add image upload functionality using object storage~~ ✅ DONE
-2. Implement email notifications for transactions
+2. ~~Implement email notifications for transactions~~ ✅ DONE
 3. Add artist analytics dashboard
 4. Improve auction end handling with notifications

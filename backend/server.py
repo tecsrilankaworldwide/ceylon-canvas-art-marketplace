@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import asyncio
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict, Any
@@ -14,6 +15,7 @@ from datetime import datetime, timezone, timedelta
 import hashlib
 import jwt
 import requests
+import resend
 from bson import ObjectId
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
@@ -32,6 +34,12 @@ JWT_EXPIRATION_HOURS = 24
 
 # Stripe Settings
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
+
+# Email Settings (Resend)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
 
 # Object Storage Settings
 STORAGE_URL = "https://integrations.emergentagent.com/objstore/api/v1/storage"
@@ -242,6 +250,224 @@ def get_object(path: str) -> tuple:
     resp.raise_for_status()
     return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
 
+# ==================== EMAIL HELPERS ====================
+
+async def send_email(to_email: str, subject: str, html_content: str):
+    """Send email using Resend API (non-blocking)."""
+    if not RESEND_API_KEY:
+        logger.warning(f"Email not sent (no API key): {subject} to {to_email}")
+        return None
+    
+    params = {
+        "from": f"Ceylon Canvas <{SENDER_EMAIL}>",
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content
+    }
+    
+    try:
+        email = await asyncio.to_thread(resend.Emails.send, params)
+        logger.info(f"Email sent to {to_email}: {subject}")
+        return email
+    except Exception as e:
+        logger.error(f"Failed to send email to {to_email}: {e}")
+        return None
+
+def get_email_template(template_type: str, data: dict) -> tuple:
+    """Get email subject and HTML content for different notification types."""
+    
+    base_style = """
+        <style>
+            body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1A1D20; }
+            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .logo { font-size: 24px; font-weight: bold; color: #0F3057; }
+            .logo-sub { font-size: 10px; letter-spacing: 2px; color: #B64E33; text-transform: uppercase; }
+            .content { background: #F5F5F0; padding: 30px; border-radius: 4px; }
+            .highlight { color: #0F3057; font-weight: 600; }
+            .price { font-size: 28px; font-weight: bold; color: #0F3057; }
+            .btn { display: inline-block; background: #0F3057; color: white; padding: 12px 30px; text-decoration: none; border-radius: 2px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #5C636A; }
+        </style>
+    """
+    
+    if template_type == "bid_placed":
+        subject = f"New Bid on Your Artwork: {data['artwork_title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">New Bid Received!</h2>
+                <p>Great news! Someone has placed a bid on your artwork.</p>
+                <p><strong>Artwork:</strong> {data['artwork_title']}</p>
+                <p><strong>Bidder:</strong> {data['bidder_name']}</p>
+                <p><strong>Bid Amount:</strong></p>
+                <p class="price">${data['bid_amount']:,.2f}</p>
+                <p>Total bids: {data['bid_count']}</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+                <p>Connecting Sri Lankan Art with the World</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "outbid":
+        subject = f"You've Been Outbid on: {data['artwork_title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #B64E33; margin-top: 0;">You've Been Outbid!</h2>
+                <p>Someone has placed a higher bid on an artwork you're interested in.</p>
+                <p><strong>Artwork:</strong> {data['artwork_title']}</p>
+                <p><strong>Your Bid:</strong> ${data['your_bid']:,.2f}</p>
+                <p><strong>Current Highest Bid:</strong></p>
+                <p class="price">${data['current_bid']:,.2f}</p>
+                <p>Don't miss out! Place a higher bid to stay in the running.</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "purchase_confirmation":
+        artworks_html = "".join([
+            f"<li>{a['title']} by {a['artist_name']} - ${a['price']:,.2f}</li>"
+            for a in data['artworks']
+        ])
+        subject = f"Order Confirmed - Ceylon Canvas #{data['order_id'][:8]}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #2D5A43; margin-top: 0;">Thank You for Your Purchase!</h2>
+                <p>Your order has been confirmed and is being processed.</p>
+                <p><strong>Order ID:</strong> {data['order_id'][:8]}</p>
+                <p><strong>Items:</strong></p>
+                <ul>{artworks_html}</ul>
+                <hr style="border: none; border-top: 1px solid #E5E5DF; margin: 20px 0;">
+                <p><strong>Total Paid:</strong></p>
+                <p class="price">${data['total']:,.2f}</p>
+                <p style="margin-top: 20px;">We'll notify you when your artwork ships.</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+                <p>Questions? Contact us at support@ceyloncanvas.com</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "commission_request":
+        subject = f"New Commission Request: {data['title']}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">New Commission Request!</h2>
+                <p>You've received a new commission request.</p>
+                <p><strong>From:</strong> {data['client_name']}</p>
+                <p><strong>Project:</strong> {data['title']}</p>
+                <p><strong>Description:</strong></p>
+                <p style="background: white; padding: 15px; border-radius: 4px;">{data['description']}</p>
+                <p><strong>Budget Range:</strong> ${data['budget_min']:,.0f} - ${data['budget_max']:,.0f}</p>
+                {f"<p><strong>Deadline:</strong> {data['deadline']}</p>" if data.get('deadline') else ""}
+                <p style="margin-top: 20px;">Log in to your dashboard to respond to this request.</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "commission_status_update":
+        status_messages = {
+            "accepted": "Your commission request has been accepted! The artist will begin working on your project soon.",
+            "in_progress": "Your commissioned artwork is now in progress!",
+            "completed": "Great news! Your commissioned artwork is complete!",
+            "rejected": "Unfortunately, the artist was unable to accept your commission request at this time."
+        }
+        status_colors = {
+            "accepted": "#2D5A43",
+            "in_progress": "#0F3057", 
+            "completed": "#2D5A43",
+            "rejected": "#9E2A2B"
+        }
+        subject = f"Commission Update: {data['title']} - {data['status'].replace('_', ' ').title()}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: {status_colors.get(data['status'], '#0F3057')}; margin-top: 0;">
+                    Commission {data['status'].replace('_', ' ').title()}
+                </h2>
+                <p><strong>Project:</strong> {data['title']}</p>
+                <p><strong>Artist:</strong> {data['artist_name']}</p>
+                <p style="margin-top: 20px;">{status_messages.get(data['status'], 'Your commission status has been updated.')}</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "welcome":
+        subject = "Welcome to Ceylon Canvas - Art Marketplace"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">Welcome, {data['name']}!</h2>
+                <p>Thank you for joining Ceylon Canvas, the premier marketplace for Sri Lankan art.</p>
+                <p>{'As an artist, you can now showcase and sell your work to collectors worldwide.' if data.get('is_artist') else 'Discover authentic Sri Lankan art from traditional masterpieces to contemporary digital pieces.'}</p>
+                <p style="margin-top: 20px;">Start exploring our gallery and find your next favorite artwork!</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+                <p>Connecting Sri Lankan Art with the World</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    return "Ceylon Canvas Notification", "<p>You have a new notification from Ceylon Canvas.</p>"
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
@@ -326,6 +552,11 @@ async def register(user_data: UserCreate):
         await db.artists.insert_one(artist_profile)
     
     token = create_token(user_id, user_data.email)
+    
+    # Send welcome email (non-blocking)
+    subject, html = get_email_template("welcome", {"name": user_data.name, "is_artist": user_data.is_artist})
+    asyncio.create_task(send_email(user_data.email, subject, html))
+    
     return {"token": token, "user": {k: v for k, v in user.items() if k not in ["password", "_id"]}}
 
 @api_router.post("/auth/login")
@@ -554,6 +785,38 @@ async def place_bid(bid_data: BidCreate, user: dict = Depends(get_current_user))
         {"$set": {"current_bid": bid_data.amount}, "$inc": {"bid_count": 1}}
     )
     
+    # Get updated artwork for bid count
+    updated_artwork = await db.artworks.find_one({"id": bid_data.artwork_id}, {"_id": 0})
+    
+    # Send email to artist about new bid
+    artist = await db.artists.find_one({"id": artwork["artist_id"]})
+    if artist:
+        artist_user = await db.users.find_one({"id": artist["user_id"]}, {"_id": 0})
+        if artist_user:
+            subject, html = get_email_template("bid_placed", {
+                "artwork_title": artwork["title"],
+                "bidder_name": user["name"],
+                "bid_amount": bid_data.amount,
+                "bid_count": updated_artwork.get("bid_count", 1)
+            })
+            asyncio.create_task(send_email(artist_user["email"], subject, html))
+    
+    # Notify previous highest bidder they've been outbid
+    previous_bids = await db.bids.find(
+        {"artwork_id": bid_data.artwork_id, "bidder_id": {"$ne": user["id"]}},
+        {"_id": 0}
+    ).sort("amount", -1).limit(1).to_list(1)
+    
+    if previous_bids:
+        prev_bidder = await db.users.find_one({"id": previous_bids[0]["bidder_id"]}, {"_id": 0})
+        if prev_bidder:
+            subject, html = get_email_template("outbid", {
+                "artwork_title": artwork["title"],
+                "your_bid": previous_bids[0]["amount"],
+                "current_bid": bid_data.amount
+            })
+            asyncio.create_task(send_email(prev_bidder["email"], subject, html))
+    
     return {k: v for k, v in bid.items() if k != "_id"}
 
 @api_router.get("/artworks/{artwork_id}/bids", response_model=List[BidResponse])
@@ -588,6 +851,19 @@ async def create_commission(commission_data: CommissionRequestCreate, user: dict
         "updated_at": now
     }
     await db.commissions.insert_one(commission)
+    
+    # Send email to artist about new commission request
+    artist_user = await db.users.find_one({"id": artist["user_id"]}, {"_id": 0})
+    if artist_user:
+        subject, html = get_email_template("commission_request", {
+            "title": commission_data.title,
+            "client_name": user["name"],
+            "description": commission_data.description,
+            "budget_min": commission_data.budget_min,
+            "budget_max": commission_data.budget_max,
+            "deadline": commission_data.deadline
+        })
+        asyncio.create_task(send_email(artist_user["email"], subject, html))
     
     return {k: v for k, v in commission.items() if k != "_id"}
 
@@ -624,6 +900,17 @@ async def update_commission_status(commission_id: str, status: str, user: dict =
     )
     
     updated = await db.commissions.find_one({"id": commission_id}, {"_id": 0})
+    
+    # Send email to client about status update
+    client = await db.users.find_one({"id": commission["client_id"]}, {"_id": 0})
+    if client:
+        subject, html = get_email_template("commission_status_update", {
+            "title": commission["title"],
+            "status": status,
+            "artist_name": artist["name"]
+        })
+        asyncio.create_task(send_email(client["email"], subject, html))
+    
     return updated
 
 # ==================== CART ROUTES ====================
@@ -795,11 +1082,27 @@ async def get_checkout_status(session_id: str, request: Request, user: dict = De
             })
             
             # Mark artworks as sold
+            artworks_for_email = []
             for artwork_id in transaction["artwork_ids"]:
                 await db.artworks.update_one({"id": artwork_id}, {"$set": {"is_available": False}})
+                artwork = await db.artworks.find_one({"id": artwork_id}, {"_id": 0})
+                if artwork:
+                    artworks_for_email.append({
+                        "title": artwork["title"],
+                        "artist_name": artwork["artist_name"],
+                        "price": artwork["price"]
+                    })
             
             # Clear user's cart
             await db.carts.update_one({"user_id": transaction["user_id"]}, {"$set": {"items": []}})
+            
+            # Send purchase confirmation email
+            subject, html = get_email_template("purchase_confirmation", {
+                "order_id": order_id,
+                "artworks": artworks_for_email,
+                "total": transaction["amount"]
+            })
+            asyncio.create_task(send_email(transaction["user_email"], subject, html))
     
     return {
         "status": checkout_status.status,
@@ -1244,6 +1547,25 @@ async def list_user_files(user: dict = Depends(get_current_user)):
         {"_id": 0}
     ).to_list(100)
     return files
+
+# ==================== EMAIL TEST ROUTE ====================
+
+class TestEmailRequest(BaseModel):
+    email: EmailStr
+
+@api_router.post("/email/test")
+async def test_email(request: TestEmailRequest, user: dict = Depends(get_current_user)):
+    """Send a test email to verify email configuration."""
+    if not RESEND_API_KEY:
+        raise HTTPException(status_code=400, detail="Email service not configured")
+    
+    subject, html = get_email_template("welcome", {"name": user["name"], "is_artist": user.get("is_artist", False)})
+    result = await send_email(request.email, subject, html)
+    
+    if result:
+        return {"message": f"Test email sent to {request.email}", "email_id": result.get("id")}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to send test email. In test mode, emails can only be sent to verified addresses.")
 
 # ==================== MAIN ====================
 
