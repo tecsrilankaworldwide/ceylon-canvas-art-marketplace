@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ThumbsUp, User } from 'lucide-react';
+import { Star, ThumbsUp, Camera, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
 import { Input } from '../components/ui/input';
@@ -7,19 +7,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { getArtworkReviews, createReview, markReviewHelpful } from '../services/api';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 export const ReviewSection = ({ artworkId, artworkTitle }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, token } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
   
   const [form, setForm] = useState({
     rating: 5,
     title: '',
-    content: ''
+    content: '',
+    photos: []
   });
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadReviews();
@@ -37,6 +44,67 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
     }
   };
 
+  const uploadPhoto = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post(`${API}/upload/image`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return `${API}/files/${response.data.path}`;
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload photo');
+      return null;
+    }
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (form.photos.length + files.length > 5) {
+      toast.error('Maximum 5 photos allowed per review');
+      return;
+    }
+
+    setUploading(true);
+    const uploadedUrls = [];
+
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 10MB)`);
+        continue;
+      }
+
+      const url = await uploadPhoto(file);
+      if (url) {
+        uploadedUrls.push(url);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setForm(prev => ({ ...prev, photos: [...prev.photos, ...uploadedUrls] }));
+      toast.success(`${uploadedUrls.length} photo(s) uploaded`);
+    }
+    setUploading(false);
+  };
+
+  const removePhoto = (index) => {
+    setForm(prev => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!form.title || !form.content) {
       toast.error('Please fill in all fields');
@@ -49,10 +117,11 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
         artwork_id: artworkId,
         rating: form.rating,
         title: form.title,
-        content: form.content
+        content: form.content,
+        photos: form.photos
       });
       toast.success('Review submitted successfully!');
-      setForm({ rating: 5, title: '', content: '' });
+      setForm({ rating: 5, title: '', content: '', photos: [] });
       setShowForm(false);
       loadReviews();
     } catch (error) {
@@ -82,6 +151,8 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
   const averageRating = reviews.length > 0 
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
+
+  const reviewsWithPhotos = reviews.filter(r => r.photos && r.photos.length > 0).length;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -122,15 +193,26 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
   return (
     <div className="mt-12 pt-8 border-t border-[#E5E5DF]" data-testid="review-section">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h3 className="font-heading text-2xl font-medium text-[#0F3057]">Reviews</h3>
+          <h3 className="font-heading text-2xl font-medium text-[#0F3057]">Customer Reviews</h3>
           {reviews.length > 0 && (
-            <div className="flex items-center gap-2 mt-1">
-              <StarRating rating={Math.round(parseFloat(averageRating))} />
+            <div className="flex items-center gap-3 mt-1">
+              <div className="flex items-center gap-2">
+                <StarRating rating={Math.round(parseFloat(averageRating))} />
+                <span className="font-body text-sm font-medium text-[#0F3057]">
+                  {averageRating}
+                </span>
+              </div>
               <span className="font-body text-sm text-[#5C636A]">
-                {averageRating} ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
+                {reviews.length} review{reviews.length !== 1 ? 's' : ''}
               </span>
+              {reviewsWithPhotos > 0 && (
+                <span className="flex items-center gap-1 font-body text-sm text-[#2D5A43]">
+                  <Camera className="h-4 w-4" />
+                  {reviewsWithPhotos} with photos
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -142,9 +224,9 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
                 Write a Review
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="font-heading text-xl">Write a Review</DialogTitle>
+                <DialogTitle className="font-heading text-xl">Share Your Experience</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
@@ -176,6 +258,67 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
                     data-testid="review-content-input"
                   />
                 </div>
+                
+                {/* Photo Upload Section */}
+                <div>
+                  <label className="form-label mb-2 block">
+                    Add Photos <span className="text-[#5C636A] font-normal">(optional)</span>
+                  </label>
+                  <p className="font-body text-xs text-[#5C636A] mb-3">
+                    Share how the artwork looks in your home! This helps other buyers visualize the piece.
+                  </p>
+                  
+                  {/* Uploaded Photos */}
+                  {form.photos.length > 0 && (
+                    <div className="flex flex-wrap gap-3 mb-3">
+                      {form.photos.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Review photo ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded-sm border border-[#E5E5DF]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removePhoto(index)}
+                            className="absolute -top-2 -right-2 p-1 bg-white border border-[#E5E5DF] rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3 text-[#9E2A2B]" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Upload Button */}
+                  {form.photos.length < 5 && (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handlePhotoUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={uploading}
+                        data-testid="photo-upload-input"
+                      />
+                      <div className={`border-2 border-dashed border-[#E5E5DF] rounded-sm p-4 text-center hover:border-[#0F3057] transition-colors ${uploading ? 'opacity-50' : ''}`}>
+                        {uploading ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-5 w-5 animate-spin text-[#0F3057]" />
+                            <span className="font-body text-sm text-[#5C636A]">Uploading...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2">
+                            <Camera className="h-5 w-5 text-[#0F3057]" />
+                            <span className="font-body text-sm text-[#0F3057]">Add Photos</span>
+                            <span className="font-body text-xs text-[#5C636A]">({form.photos.length}/5)</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
@@ -183,7 +326,7 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
                 </DialogClose>
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={submitting}
+                  disabled={submitting || uploading}
                   className="btn-primary rounded-sm"
                   data-testid="submit-review-btn"
                 >
@@ -244,6 +387,31 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
                 {review.content}
               </p>
               
+              {/* Review Photos */}
+              {review.photos && review.photos.length > 0 && (
+                <div className="mt-4">
+                  <p className="font-body text-xs text-[#5C636A] mb-2 flex items-center gap-1">
+                    <Camera className="h-3 w-3" />
+                    Photos from {review.user_name}'s home
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {review.photos.map((photo, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedPhoto(photo)}
+                        className="relative overflow-hidden rounded-sm border border-[#E5E5DF] hover:border-[#0F3057] transition-colors"
+                      >
+                        <img
+                          src={photo}
+                          alt={`Review photo ${index + 1}`}
+                          className="w-24 h-24 object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[#E5E5DF]">
                 <button
                   onClick={() => handleHelpful(review.id)}
@@ -253,10 +421,37 @@ export const ReviewSection = ({ artworkId, artworkTitle }) => {
                   <ThumbsUp className="h-4 w-4" />
                   Helpful ({review.helpful_count})
                 </button>
+                {review.photos && review.photos.length > 0 && (
+                  <span className="flex items-center gap-1 font-body text-xs text-[#2D5A43]">
+                    <ImageIcon className="h-4 w-4" />
+                    {review.photos.length} photo{review.photos.length !== 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Photo Lightbox */}
+      {selectedPhoto && (
+        <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+          <DialogContent className="sm:max-w-3xl p-0">
+            <div className="relative">
+              <img
+                src={selectedPhoto}
+                alt="Review photo"
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full shadow-md"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

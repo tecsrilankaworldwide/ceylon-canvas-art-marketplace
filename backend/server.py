@@ -218,6 +218,7 @@ class ReviewCreate(BaseModel):
     rating: int  # 1-5
     title: str
     content: str
+    photos: List[str] = []  # URLs of uploaded photos
 
 class ReviewResponse(BaseModel):
     id: str
@@ -227,6 +228,7 @@ class ReviewResponse(BaseModel):
     rating: int
     title: str
     content: str
+    photos: List[str] = []
     created_at: str
     helpful_count: int = 0
 
@@ -540,6 +542,9 @@ def get_email_template(template_type: str, data: dict) -> tuple:
     
     elif template_type == "new_review":
         stars = "★" * data['rating'] + "☆" * (5 - data['rating'])
+        photos_html = ""
+        if data.get('has_photos'):
+            photos_html = f"<p style='color: #2D5A43; font-weight: bold;'>📷 This review includes {data['photo_count']} photo(s) of the artwork in the buyer's home!</p>"
         subject = f"New Review on Your Artwork: {data['artwork_title']}"
         html = f"""
         <html><head>{base_style}</head><body>
@@ -557,6 +562,7 @@ def get_email_template(template_type: str, data: dict) -> tuple:
                 <p style="background: white; padding: 15px; border-radius: 4px; font-style: italic;">
                     "{data['review_content']}"
                 </p>
+                {photos_html}
             </div>
             <div class="footer">
                 <p>Ceylon Canvas Art Marketplace</p>
@@ -1879,6 +1885,7 @@ async def create_review(review_data: ReviewCreate, user: dict = Depends(get_curr
         "rating": review_data.rating,
         "title": review_data.title,
         "content": review_data.content,
+        "photos": review_data.photos or [],
         "helpful_count": 0,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -1907,7 +1914,9 @@ async def create_review(review_data: ReviewCreate, user: dict = Depends(get_curr
                 "reviewer_name": user["name"],
                 "rating": review_data.rating,
                 "review_title": review_data.title,
-                "review_content": review_data.content
+                "review_content": review_data.content,
+                "has_photos": len(review_data.photos or []) > 0,
+                "photo_count": len(review_data.photos or [])
             })
             asyncio.create_task(send_email(artist_user["email"], subject, html))
     
