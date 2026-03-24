@@ -46,6 +46,8 @@ import LegalIndexPage from './pages/LegalIndexPage';
 import LegalPage from './pages/LegalPage';
 import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
 import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
+import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfilePage, GalleryPartnerPage, ArtMaterialPage, CareerResourcePage } from './pages/DynamicPages';
+import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -127,6 +129,38 @@ function AppRoutes() {
       {/* Artist Spotlights - 25 pages */}
       <Route path="/spotlights" element={<Layout><ArtistSpotlightsIndexPage /></Layout>} />
       <Route path="/spotlights/:slug" element={<Layout><ArtistSpotlightPage /></Layout>} />
+      
+      {/* Events & Exhibitions - 30 pages */}
+      <Route path="/events" element={<Layout><EventsIndexPage /></Layout>} />
+      <Route path="/events/:slug" element={<Layout><EventPage /></Layout>} />
+      
+      {/* Techniques & Tutorials - 30 pages */}
+      <Route path="/techniques" element={<Layout><TechniquesIndexPage /></Layout>} />
+      <Route path="/techniques/:slug" element={<Layout><TechniquePage /></Layout>} />
+      
+      {/* Art History & Periods - 25 pages */}
+      <Route path="/art-history" element={<Layout><ArtPeriodsIndexPage /></Layout>} />
+      <Route path="/art-history/:slug" element={<Layout><ArtPeriodPage /></Layout>} />
+      
+      {/* Price Guides - 20 pages */}
+      <Route path="/price-guides" element={<Layout><PriceGuidesIndexPage /></Layout>} />
+      <Route path="/price-guides/:slug" element={<Layout><PriceGuidePage /></Layout>} />
+      
+      {/* Collector Guides - 25 pages */}
+      <Route path="/collector-guides" element={<Layout><CollectorProfilesIndexPage /></Layout>} />
+      <Route path="/collector-guides/:slug" element={<Layout><CollectorProfilePage /></Layout>} />
+      
+      {/* Gallery Partners - 30 pages */}
+      <Route path="/galleries" element={<Layout><GalleryPartnersIndexPage /></Layout>} />
+      <Route path="/galleries/:slug" element={<Layout><GalleryPartnerPage /></Layout>} />
+      
+      {/* Art Materials - 20 pages */}
+      <Route path="/materials" element={<Layout><ArtMaterialsIndexPage /></Layout>} />
+      <Route path="/materials/:slug" element={<Layout><ArtMaterialPage /></Layout>} />
+      
+      {/* Artist Career Resources - 20 pages */}
+      <Route path="/artist-resources" element={<Layout><CareerResourcesIndexPage /></Layout>} />
+      <Route path="/artist-resources/:slug" element={<Layout><CareerResourcePage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
