@@ -85,19 +85,32 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - **Admin User**: admin@ceyloncanvas.com / admin123
 - **Regular User**: Can be created via registration
 
+## Premium Collector Pages (Completed - Dec 2025)
+- ✅ Investment Guide Page - Art as alternative asset, portfolio diversification, Sri Lanka opportunity
+- ✅ Private Services Page - White-glove services, membership tiers (Collector Circle, Private Client, Institutional), consultation form
+- ✅ Referral Program Page - Share & earn rewards, tier system (Ambassador, Patron, Connoisseur), FAQ
+- ✅ Order Tracking Page - Track shipments with timeline, mock tracking demo, shipping features
+- ✅ How It Works Page - Collector journey (Discover, Curate, Acquire, Receive), Artist onboarding steps, FAQ
+- ✅ Press Page - Featured coverage, press releases, awards, media kit downloads
+- ✅ Navbar Services Dropdown - Links to all premium pages
+- ✅ Footer Collectors Section - Links to all premium pages + Track Order + Press
+
 ## Prioritized Backlog
 
 ### P0 (Critical)
 - None - Full feature set complete
 
 ### P1 (Important)
-- Order tracking with shipping status updates
+- Referral Program Backend (generate unique links, track rewards)
+- Order Tracking Backend (shipping timeline/status integration)
+- Email Automation Backend (welcome sequences, cart abandonment, post-purchase nurture)
 - Real-time exchange rate API (replace static rates)
 - Browser push notifications
 
 ### P2 (Nice to Have)
 - Advanced search with AI recommendations
 - Virtual gallery view (3D)
+- Refactor server.py (~3077 lines) into modular routers
 - Domain verification for production emails
 - Scheduled job for automatic auction end checking
 - Backend code refactoring (split server.py into routers)
