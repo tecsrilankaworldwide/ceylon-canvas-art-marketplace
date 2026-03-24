@@ -56,19 +56,16 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Collectors */}
           <div>
-            <h4 className="font-body font-semibold text-xs tracking-[0.2em] uppercase text-white mb-6">Support</h4>
+            <h4 className="font-body font-semibold text-xs tracking-[0.2em] uppercase text-white mb-6">Collectors</h4>
             <ul className="space-y-3">
-              <li><Link to="/about" className="footer-link text-sm">About Us</Link></li>
-              <li><Link to="/about" className="footer-link text-sm">FAQs</Link></li>
-              <li><Link to="/about" className="footer-link text-sm">Shipping Info</Link></li>
-              <li><Link to="/about" className="footer-link text-sm">Returns Policy</Link></li>
-              <li>
-                <a href="mailto:hello@ceyloncanvas.com" className="footer-link text-sm flex items-center gap-2">
-                  <Mail className="h-4 w-4" /> Contact Us
-                </a>
-              </li>
+              <li><Link to="/investment-guide" className="footer-link text-sm">Investment Guide</Link></li>
+              <li><Link to="/private-services" className="footer-link text-sm">Private Services</Link></li>
+              <li><Link to="/how-it-works" className="footer-link text-sm">How It Works</Link></li>
+              <li><Link to="/referral-program" className="footer-link text-sm">Referral Program</Link></li>
+              <li><Link to="/track-order" className="footer-link text-sm">Track Order</Link></li>
+              <li><Link to="/press" className="footer-link text-sm">Press</Link></li>
             </ul>
           </div>
         </div>

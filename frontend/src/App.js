@@ -29,6 +29,12 @@ import ArtworkFormPage from './pages/ArtworkFormPage';
 import ArtistAnalyticsPage from './pages/ArtistAnalyticsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import MessagesPage from './pages/MessagesPage';
+import InvestmentGuidePage from './pages/InvestmentGuidePage';
+import PrivateServicesPage from './pages/PrivateServicesPage';
+import ReferralProgramPage from './pages/ReferralProgramPage';
+import OrderTrackingPage from './pages/OrderTrackingPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import PressPage from './pages/PressPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -76,6 +82,12 @@ function AppRoutes() {
       <Route path="/artists" element={<Layout><ArtistsPage /></Layout>} />
       <Route path="/auctions" element={<Layout><AuctionsPage /></Layout>} />
       <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+      <Route path="/investment-guide" element={<Layout><InvestmentGuidePage /></Layout>} />
+      <Route path="/private-services" element={<Layout><PrivateServicesPage /></Layout>} />
+      <Route path="/referral-program" element={<Layout><ReferralProgramPage /></Layout>} />
+      <Route path="/track-order" element={<Layout><OrderTrackingPage /></Layout>} />
+      <Route path="/how-it-works" element={<Layout><HowItWorksPage /></Layout>} />
+      <Route path="/press" element={<Layout><PressPage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

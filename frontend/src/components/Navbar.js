@@ -63,6 +63,26 @@ export const Navbar = () => {
             <Link to="/about" className="font-body text-sm font-medium text-[#1A1D20] link-underline" data-testid="nav-about">
               About
             </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="font-body text-sm font-medium text-[#1A1D20] link-underline cursor-pointer">
+                Services
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/investment-guide">Investment Guide</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/private-services">Private Services</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/how-it-works">How It Works</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/referral-program">Referral Program</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Desktop Actions */}
