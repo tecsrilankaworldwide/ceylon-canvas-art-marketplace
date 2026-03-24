@@ -35,6 +35,17 @@ import ReferralProgramPage from './pages/ReferralProgramPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import PressPage from './pages/PressPage';
+import StylePage from './pages/StylePage';
+import RegionPage from './pages/RegionPage';
+import CollectionPage from './pages/CollectionPage';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
+import HelpCenterPage from './pages/HelpCenterPage';
+import HelpTopicPage from './pages/HelpTopicPage';
+import LegalIndexPage from './pages/LegalIndexPage';
+import LegalPage from './pages/LegalPage';
+import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
+import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -88,6 +99,34 @@ function AppRoutes() {
       <Route path="/track-order" element={<Layout><OrderTrackingPage /></Layout>} />
       <Route path="/how-it-works" element={<Layout><HowItWorksPage /></Layout>} />
       <Route path="/press" element={<Layout><PressPage /></Layout>} />
+      
+      {/* Art Styles - 50 pages */}
+      <Route path="/styles" element={<Layout><StylesIndexPage /></Layout>} />
+      <Route path="/styles/:slug" element={<Layout><StylePage /></Layout>} />
+      
+      {/* Regions & Destinations - 40 pages */}
+      <Route path="/regions" element={<Layout><RegionsIndexPage /></Layout>} />
+      <Route path="/regions/:slug" element={<Layout><RegionPage /></Layout>} />
+      
+      {/* Collections & Themes - 40 pages */}
+      <Route path="/collections" element={<Layout><CollectionsIndexPage /></Layout>} />
+      <Route path="/collections/:slug" element={<Layout><CollectionPage /></Layout>} />
+      
+      {/* Blog & Articles - 50 pages */}
+      <Route path="/blog" element={<Layout><BlogPage /></Layout>} />
+      <Route path="/blog/:slug" element={<Layout><BlogPostPage /></Layout>} />
+      
+      {/* Help Center - 30 pages */}
+      <Route path="/help" element={<Layout><HelpCenterPage /></Layout>} />
+      <Route path="/help/:slug" element={<Layout><HelpTopicPage /></Layout>} />
+      
+      {/* Legal Pages - 15 pages */}
+      <Route path="/legal" element={<Layout><LegalIndexPage /></Layout>} />
+      <Route path="/legal/:slug" element={<Layout><LegalPage /></Layout>} />
+      
+      {/* Artist Spotlights - 25 pages */}
+      <Route path="/spotlights" element={<Layout><ArtistSpotlightsIndexPage /></Layout>} />
+      <Route path="/spotlights/:slug" element={<Layout><ArtistSpotlightPage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

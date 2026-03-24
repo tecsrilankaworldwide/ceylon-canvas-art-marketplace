@@ -63,8 +63,21 @@ export const Footer = () => {
               <li><Link to="/investment-guide" className="footer-link text-sm">Investment Guide</Link></li>
               <li><Link to="/private-services" className="footer-link text-sm">Private Services</Link></li>
               <li><Link to="/how-it-works" className="footer-link text-sm">How It Works</Link></li>
+              <li><Link to="/collections" className="footer-link text-sm">Collections</Link></li>
+              <li><Link to="/styles" className="footer-link text-sm">Art Styles</Link></li>
+              <li><Link to="/regions" className="footer-link text-sm">Art Destinations</Link></li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="font-body font-semibold text-xs tracking-[0.2em] uppercase text-white mb-6">Resources</h4>
+            <ul className="space-y-3">
+              <li><Link to="/blog" className="footer-link text-sm">Blog & Guides</Link></li>
+              <li><Link to="/spotlights" className="footer-link text-sm">Artist Spotlights</Link></li>
               <li><Link to="/referral-program" className="footer-link text-sm">Referral Program</Link></li>
               <li><Link to="/track-order" className="footer-link text-sm">Track Order</Link></li>
+              <li><Link to="/help" className="footer-link text-sm">Help Center</Link></li>
               <li><Link to="/press" className="footer-link text-sm">Press</Link></li>
             </ul>
           </div>
@@ -77,12 +90,9 @@ export const Footer = () => {
               © {new Date().getFullYear()} Ceylon Canvas Art Marketplace. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link to="/about" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/about" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">
-                Terms of Service
-              </Link>
+              <Link to="/legal/terms-of-service" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Terms</Link>
+              <Link to="/legal/privacy-policy" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Privacy</Link>
+              <Link to="/legal" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Legal</Link>
             </div>
           </div>
         </div>
