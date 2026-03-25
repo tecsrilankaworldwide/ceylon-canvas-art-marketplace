@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb, BookMarked, Grid3X3, Library, FileText, Eye, Heart } from 'lucide-react';
+import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb, BookMarked, Grid3X3, Library, FileText, Eye, Heart, Compass, ArrowRight } from 'lucide-react';
 import { artFundamentals, masterpieceAnalysis, artHistoryComprehensive, artTheoryDeep, artistsDeepStudy, museumStudies, artAppreciationCourses, artVocabulary, compositionStudies, famousCollections, artManifestos } from '../data/educationData';
 import { simpleArtGuides, artistIntentions, fiveQuestions, emotionsInArt, commonSymbols, artHistorySimple, famousPaintingsSimple } from '../data/beginnerGuides';
 import { masterpieceImages, artistImages, artImages } from '../data/artImages';
+import { Button } from '../components/ui/button';
 
 // Main Education Hub
 export const EducationHubPage = () => {
@@ -35,6 +36,27 @@ export const EducationHubPage = () => {
           </p>
           <div className="mt-10 p-6 bg-white/5 border border-white/10 max-w-2xl">
             <p className="text-white/80 italic">"The more you know about art, the more you see. Education transforms passive viewing into active understanding."</p>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Learning Paths Featured Banner */}
+      <section className="py-8 bg-[#E5A93C]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <Compass className="h-10 w-10 text-[#0A1015]" />
+              <div>
+                <p className="text-[#0A1015] font-heading text-xl">Not sure where to start?</p>
+                <p className="text-[#0A1015]/70">Follow our curated Learning Paths — from beginner to collector</p>
+              </div>
+            </div>
+            <Link to="/education/paths">
+              <Button className="bg-[#0A1015] text-white rounded-none hover:bg-[#0A1015]/90 px-6 py-3">
+                Explore Learning Paths
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

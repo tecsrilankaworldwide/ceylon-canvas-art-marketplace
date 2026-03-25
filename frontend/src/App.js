@@ -68,6 +68,9 @@ import {
 import {
   CollectorHubPage, CollectorGuidePage, QuickReferencePage
 } from './pages/CollectorPages';
+import {
+  LearningPathsHubPage, LearningPathPage
+} from './pages/LearningPathPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -289,6 +292,10 @@ function AppRoutes() {
       
       {/* Quick Reference Cards - 6 cards */}
       <Route path="/education/reference/:slug" element={<Layout><QuickReferencePage /></Layout>} />
+      
+      {/* LEARNING PATHS - Guided Journeys */}
+      <Route path="/education/paths" element={<Layout><LearningPathsHubPage /></Layout>} />
+      <Route path="/education/paths/:slug" element={<Layout><LearningPathPage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

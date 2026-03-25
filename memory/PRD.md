@@ -200,6 +200,42 @@ Data Files: `/src/data/collectorGuides.js`, `/src/pages/CollectorPages.js`
 
 **UPDATED GRAND TOTAL: ~1,075+ PAGES**
 
+### NEW: Learning Paths System (Dec 2025)
+**Purpose**: Guided, curated journeys through art education based on experience level.
+
+**3 Complete Learning Paths:**
+1. ✅ **The Curious Beginner** (2-3 weeks, 18 lessons)
+   - From "I like art" to "I understand art"
+   - 3 modules: Learning to See, Understanding Artists, Gallery Ready
+   - Final Project: Your First Gallery Visit
+
+2. ✅ **The Active Learner** (4-6 weeks, 22 lessons)
+   - From appreciation to deep understanding
+   - 4 modules: Mastering Composition, Technical Eye, Art History Journey, Masterpiece Deep Dives
+   - Final Project: Comparative Analysis Essay
+
+3. ✅ **The Aspiring Collector** (6-8 weeks, 16 lessons)
+   - From admirer to informed collector
+   - 4 modules: Collector Foundations, The Art World, Finding Your Artists, Care and Curation
+   - Final Project: Create Your Collection Plan
+
+**Features:**
+- Expandable module accordions with lesson lists
+- Lesson type indicators (Guide, Exercise, Reference)
+- Time estimates per lesson
+- Learning outcomes checklist
+- Final project prompts
+- Progress navigation between paths
+
+Data Files: `/src/data/learningPaths.js`, `/src/pages/LearningPathPages.js`
+
+**Key Stats:**
+- 78 total curated lessons across all paths
+- 12-16 hours total learning time
+- Each lesson links to existing content (reuses all prior pages)
+
+**FINAL GRAND TOTAL: ~1,080+ PAGES** (including Learning Paths system)
+
 Data Files:
 - `/src/data/pagesData.js` - Core page data (278 pages)
 - `/src/data/educationData.js` - Education section data (327 pages)
