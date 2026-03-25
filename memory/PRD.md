@@ -388,6 +388,44 @@ https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 2. Browser push notifications  
 3. Refactor server.py into modular routers (~3700 lines)
 
+## Production Deployment (Completed - March 2026)
+
+### Live Site
+- **URL**: https://ceyloncanvas.live
+- **SSL**: Let's Encrypt (expires 2026-06-23, auto-renews)
+- **Host**: DigitalOcean Droplet (2GB RAM, 2GB Swap)
+
+### Docker Setup
+- **MongoDB**: mongo:6.0
+- **Backend**: Python 3.11-slim + FastAPI
+- **Frontend**: Node 20-alpine + React build + Nginx
+- **Reverse Proxy**: Nginx with SSL termination
+
+### Key Files
+- `/docker-compose.yml` - Container orchestration
+- `/backend/Dockerfile` - Backend container (includes gcc for native packages)
+- `/frontend/Dockerfile` - Multi-stage React build
+- `/nginx/nginx.conf` - SSL config for ceyloncanvas.live
+- `/.env.example` - Environment template
+
+### Deployment Commands (on Droplet)
+```bash
+cd /var/www/ceylon-canvas
+docker compose build --no-cache
+docker compose up -d
+docker logs ceylon-backend --tail 20  # Check backend
+docker logs ceylon-nginx --tail 20    # Check nginx
+```
+
+### SSL Renewal
+Certbot auto-renews. Manual renewal:
+```bash
+certbot renew
+cp /etc/letsencrypt/live/ceyloncanvas.live/fullchain.pem nginx/ssl/
+cp /etc/letsencrypt/live/ceyloncanvas.live/privkey.pem nginx/ssl/
+docker compose restart nginx
+```
+
 ## Technical Notes
 - WebSocket auto-reconnects after 5 seconds on disconnect
 - Currency rates are static (1 USD = 325 LKR)
