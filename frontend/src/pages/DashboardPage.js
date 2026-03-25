@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Image, Gavel, Package, Heart, Settings, Plus, LogOut, BarChart3 } from 'lucide-react';
+import { User, Image, Gavel, Package, Heart, Settings, Plus, LogOut, BarChart3, Gift, Truck, Bell, BellOff, Copy, Check } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
+import { Switch } from '../components/ui/switch';
 import { useAuth } from '../context/AuthContext';
 import { getOrders, getMyBids, getMyCommissions, getWishlist } from '../services/api';
 import { ArtworkCard } from '../components/ArtworkCard';
+import { toast } from 'sonner';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -17,11 +21,21 @@ const DashboardPage = () => {
   const [commissions, setCommissions] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [referralData, setReferralData] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [emailPrefs, setEmailPrefs] = useState({
+    marketing: true,
+    order_updates: true,
+    cart_reminders: true,
+    welcome_series: true
+  });
+  const [savingPrefs, setSavingPrefs] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
+        const token = localStorage.getItem('token');
         const [ordersData, bidsData, commissionsData, wishlistData] = await Promise.all([
           getOrders(),
           getMyBids(),
@@ -33,6 +47,27 @@ const DashboardPage = () => {
         setBids(bidsData);
         setCommissions(commissionsData);
         setWishlist(wishlistData.items || []);
+
+        // Fetch referral data
+        if (token) {
+          try {
+            const refResponse = await fetch(`${API_URL}/api/referral/my-code`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (refResponse.ok) {
+              const refData = await refResponse.json();
+              setReferralData(refData);
+            }
+          } catch (e) {
+            console.error('Error fetching referral data:', e);
+          }
+
+          // Load saved email preferences from user data or localStorage
+          const savedPrefs = localStorage.getItem('emailPrefs');
+          if (savedPrefs) {
+            setEmailPrefs(JSON.parse(savedPrefs));
+          }
+        }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
       } finally {
@@ -41,6 +76,22 @@ const DashboardPage = () => {
     };
     loadData();
   }, []);
+
+  const copyReferralCode = async () => {
+    if (referralData?.code) {
+      await navigator.clipboard.writeText(referralData.code);
+      setCopiedCode(true);
+      toast.success('Referral code copied!');
+      setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
+
+  const handleEmailPrefChange = async (key, value) => {
+    const newPrefs = { ...emailPrefs, [key]: value };
+    setEmailPrefs(newPrefs);
+    localStorage.setItem('emailPrefs', JSON.stringify(newPrefs));
+    toast.success('Email preferences updated');
+  };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -92,7 +143,7 @@ const DashboardPage = () => {
             </div>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {isArtist && (
               <>
                 <Link to="/dashboard/analytics">
@@ -115,6 +166,45 @@ const DashboardPage = () => {
             </Button>
           </div>
         </div>
+
+        {/* Referral Quick Card */}
+        {referralData && (
+          <div className="bg-gradient-to-r from-[#0F3057] to-[#1A4A7A] p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4" data-testid="referral-quick-card">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-[#E5A93C] rounded-full">
+                <Gift className="h-6 w-6 text-[#0A1015]" />
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">Your Referral Code</p>
+                <div className="flex items-center gap-2">
+                  <span className="font-heading text-xl text-white">{referralData.code}</span>
+                  <button 
+                    onClick={copyReferralCode}
+                    className="p-1 hover:bg-white/10 rounded"
+                    data-testid="copy-referral-btn"
+                  >
+                    {copiedCode ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4 text-white/60" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="font-heading text-2xl text-[#E5A93C]">{referralData.successful_referrals || 0}</p>
+                <p className="text-white/60 text-xs">Referrals</p>
+              </div>
+              <div className="text-center">
+                <p className="font-heading text-2xl text-[#7CB798]">${referralData.available_credits?.toFixed(2) || '0.00'}</p>
+                <p className="text-white/60 text-xs">Credits</p>
+              </div>
+              <Link to="/my-referrals">
+                <Button className="bg-[#E5A93C] hover:bg-[#D49A2E] text-[#0A1015] rounded-sm">
+                  View Dashboard
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Dashboard Content */}
         <Tabs defaultValue="orders" className="w-full">
@@ -167,9 +257,17 @@ const DashboardPage = () => {
                         <p className="font-body text-xs text-[#5C636A]">Order #{order.id.slice(0, 8)}</p>
                         <p className="font-body text-sm">{formatDate(order.created_at)}</p>
                       </div>
-                      <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
-                        {order.status}
-                      </Badge>
+                      <div className="flex items-center gap-3">
+                        <Badge variant={order.status === 'completed' || order.status === 'delivered' ? 'default' : 'secondary'}>
+                          {order.status}
+                        </Badge>
+                        <Link to={`/track-order?id=${order.id}`}>
+                          <Button variant="outline" size="sm" className="flex items-center gap-1" data-testid={`track-order-${order.id.slice(0, 8)}`}>
+                            <Truck className="h-3 w-3" />
+                            Track
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-4">
                       {order.artworks?.map((artwork) => (
@@ -305,8 +403,9 @@ const DashboardPage = () => {
 
           {/* Settings */}
           <TabsContent value="settings">
-            <div className="max-w-2xl">
-              <div className="bg-white border border-[#E5E5DF] rounded-sm p-6 mb-6">
+            <div className="max-w-2xl space-y-6">
+              {/* Profile Information */}
+              <div className="bg-white border border-[#E5E5DF] rounded-sm p-6">
                 <h3 className="font-heading text-xl font-medium text-[#0F3057] mb-4">Profile Information</h3>
                 <div className="space-y-4">
                   <div>
@@ -325,6 +424,84 @@ const DashboardPage = () => {
                     <label className="form-label">Member Since</label>
                     <p className="font-body">{formatDate(user?.created_at)}</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Email Notification Preferences */}
+              <div className="bg-white border border-[#E5E5DF] rounded-sm p-6" data-testid="email-preferences">
+                <div className="flex items-center gap-3 mb-6">
+                  <Bell className="h-5 w-5 text-[#0F3057]" />
+                  <h3 className="font-heading text-xl font-medium text-[#0F3057]">Email Preferences</h3>
+                </div>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-[#0F3057]">Order Updates</p>
+                      <p className="font-body text-sm text-[#5C636A]">Shipping notifications and delivery updates</p>
+                    </div>
+                    <Switch 
+                      checked={emailPrefs.order_updates}
+                      onCheckedChange={(checked) => handleEmailPrefChange('order_updates', checked)}
+                      data-testid="pref-order-updates"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-[#0F3057]">Cart Reminders</p>
+                      <p className="font-body text-sm text-[#5C636A]">Reminders about items left in your cart</p>
+                    </div>
+                    <Switch 
+                      checked={emailPrefs.cart_reminders}
+                      onCheckedChange={(checked) => handleEmailPrefChange('cart_reminders', checked)}
+                      data-testid="pref-cart-reminders"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-[#0F3057]">Educational Content</p>
+                      <p className="font-body text-sm text-[#5C636A]">Tips on collecting art and artist spotlights</p>
+                    </div>
+                    <Switch 
+                      checked={emailPrefs.welcome_series}
+                      onCheckedChange={(checked) => handleEmailPrefChange('welcome_series', checked)}
+                      data-testid="pref-welcome-series"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-[#0F3057]">Marketing & Promotions</p>
+                      <p className="font-body text-sm text-[#5C636A]">New arrivals, sales, and special offers</p>
+                    </div>
+                    <Switch 
+                      checked={emailPrefs.marketing}
+                      onCheckedChange={(checked) => handleEmailPrefChange('marketing', checked)}
+                      data-testid="pref-marketing"
+                    />
+                  </div>
+                </div>
+                <p className="mt-6 text-xs text-[#5C636A] flex items-center gap-1">
+                  <BellOff className="h-3 w-3" />
+                  You can update your preferences at any time. Transactional emails (receipts, password resets) cannot be disabled.
+                </p>
+              </div>
+
+              {/* Referral Program Quick Link */}
+              <div className="bg-[#F5F5F0] border border-[#E5E5DF] rounded-sm p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Gift className="h-5 w-5 text-[#E5A93C]" />
+                    <div>
+                      <p className="font-body font-medium text-[#0F3057]">Referral Program</p>
+                      <p className="font-body text-sm text-[#5C636A]">
+                        {referralData ? `Code: ${referralData.code} • ${referralData.successful_referrals || 0} referrals` : 'Earn rewards by inviting friends'}
+                      </p>
+                    </div>
+                  </div>
+                  <Link to="/my-referrals">
+                    <Button variant="outline" className="rounded-sm">
+                      View Details
+                    </Button>
+                  </Link>
                 </div>
               </div>
               

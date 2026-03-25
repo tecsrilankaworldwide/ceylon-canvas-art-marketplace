@@ -369,21 +369,23 @@ https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 
 ### COMPLETED (Dec 2025)
 - ✅ **6 New Curated Content Sections** - World Art Guides, Art Stories, Art for Space, Gift Guides (~72 additional pages)
-- ✅ **Referral Program Backend** - Complete with tier system (Bronze to Ambassador), unique codes, rewards tracking
+- ✅ **Referral Program Backend** - Tier system (Bronze to Ambassador), unique codes, rewards tracking
 - ✅ **Order Tracking Backend** - Timeline-based tracking, carrier integration, status update emails
-- ✅ **Email Automation Backend** - Welcome series (Day 2 & 5), cart abandonment reminders, automation stats
-- ✅ **Referral Dashboard UI** (`/my-referrals`) - Stats, sharing options, tier progress, social sharing
-- ✅ **Order Tracking Page** (`/track-order`) - Real-time order search, visual timeline, carrier tracking links
-- ✅ **Admin Automation Panel** - Email stats, manual trigger buttons for automation tasks, referral stats
+- ✅ **Email Automation Backend** - Welcome series (Day 2 & 5), cart abandonment reminders
+- ✅ **Referral Dashboard UI** (`/my-referrals`) - Stats, sharing options, tier progress
+- ✅ **Order Tracking Page** (`/track-order`) - Real-time order search, visual timeline
+- ✅ **Admin Automation Panel** - Email stats, manual triggers, referral stats
+- ✅ **User Dashboard Enhancement** - Referral quick card, Track Order buttons on orders
+- ✅ **Email Notification Preferences** - User opt-in/opt-out toggles in Settings tab
 
 ### P1 (Ready to Start)
-1. User profile page enhancement (link to referral dashboard, order history with tracking)
-2. Email notification preferences (user opt-in/opt-out for automation emails)
-3. Scheduled automation (cron-style automatic email triggers)
+1. Backend API for persisting email preferences per user
+2. Scheduled automation (cron-style automatic email triggers instead of manual)
+3. WhatsApp sharing integration for referrals (huge in Sri Lanka market)
 
 ### P2 (Future)
 1. Real-time exchange rate API integration
-2. Browser push notifications
+2. Browser push notifications  
 3. Refactor server.py into modular routers (~3700 lines)
 
 ## Technical Notes
