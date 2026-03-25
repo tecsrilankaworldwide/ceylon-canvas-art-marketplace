@@ -73,12 +73,12 @@ export const Footer = () => {
           <div>
             <h4 className="font-body font-semibold text-xs tracking-[0.2em] uppercase text-white mb-6">Resources</h4>
             <ul className="space-y-3">
+              <li><Link to="/education" className="footer-link text-sm">Art Education</Link></li>
               <li><Link to="/blog" className="footer-link text-sm">Blog & Guides</Link></li>
               <li><Link to="/spotlights" className="footer-link text-sm">Artist Spotlights</Link></li>
               <li><Link to="/referral-program" className="footer-link text-sm">Referral Program</Link></li>
               <li><Link to="/track-order" className="footer-link text-sm">Track Order</Link></li>
               <li><Link to="/help" className="footer-link text-sm">Help Center</Link></li>
-              <li><Link to="/press" className="footer-link text-sm">Press</Link></li>
             </ul>
           </div>
         </div>

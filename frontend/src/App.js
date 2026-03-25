@@ -48,6 +48,8 @@ import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
 import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
 import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfilePage, GalleryPartnerPage, ArtMaterialPage, CareerResourcePage } from './pages/DynamicPages';
 import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
+import { FundamentalPage, MasterpiecePage, ArtHistoryPage, ArtTheoryPage, ArtistStudyPage, MuseumStudyPage, ArtCoursePage } from './pages/EducationPages';
+import { EducationHubPage, FundamentalsIndexPage, MasterpiecesIndexPage, ArtHistoryIndexPage, TheoryIndexPage, ArtistsStudyIndexPage, MuseumsIndexPage, CoursesIndexPage } from './pages/EducationIndexPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -161,6 +163,37 @@ function AppRoutes() {
       {/* Artist Career Resources - 20 pages */}
       <Route path="/artist-resources" element={<Layout><CareerResourcesIndexPage /></Layout>} />
       <Route path="/artist-resources/:slug" element={<Layout><CareerResourcePage /></Layout>} />
+      
+      {/* ===== ART EDUCATION SECTION - 200+ pages ===== */}
+      <Route path="/education" element={<Layout><EducationHubPage /></Layout>} />
+      
+      {/* Art Fundamentals - 25 pages */}
+      <Route path="/education/fundamentals" element={<Layout><FundamentalsIndexPage /></Layout>} />
+      <Route path="/education/fundamentals/:slug" element={<Layout><FundamentalPage /></Layout>} />
+      
+      {/* Masterpiece Analysis - 40 pages */}
+      <Route path="/education/masterpieces" element={<Layout><MasterpiecesIndexPage /></Layout>} />
+      <Route path="/education/masterpieces/:slug" element={<Layout><MasterpiecePage /></Layout>} />
+      
+      {/* Art History Comprehensive - 30 pages */}
+      <Route path="/education/art-history" element={<Layout><ArtHistoryIndexPage /></Layout>} />
+      <Route path="/education/art-history/:slug" element={<Layout><ArtHistoryPage /></Layout>} />
+      
+      {/* Art Theory - 25 pages */}
+      <Route path="/education/theory" element={<Layout><TheoryIndexPage /></Layout>} />
+      <Route path="/education/theory/:slug" element={<Layout><ArtTheoryPage /></Layout>} />
+      
+      {/* Artist Deep Studies - 35 pages */}
+      <Route path="/education/artists" element={<Layout><ArtistsStudyIndexPage /></Layout>} />
+      <Route path="/education/artists/:slug" element={<Layout><ArtistStudyPage /></Layout>} />
+      
+      {/* Museum Studies - 20 pages */}
+      <Route path="/education/museums" element={<Layout><MuseumsIndexPage /></Layout>} />
+      <Route path="/education/museums/:slug" element={<Layout><MuseumStudyPage /></Layout>} />
+      
+      {/* Art Appreciation Courses - 25 pages */}
+      <Route path="/education/courses" element={<Layout><CoursesIndexPage /></Layout>} />
+      <Route path="/education/courses/:slug" element={<Layout><ArtCoursePage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
