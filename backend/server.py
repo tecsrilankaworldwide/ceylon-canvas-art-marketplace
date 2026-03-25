@@ -315,6 +315,63 @@ class NotificationResponse(BaseModel):
     is_read: bool = False
     created_at: str
 
+# ==================== REFERRAL PROGRAM MODELS ====================
+
+class ReferralCodeResponse(BaseModel):
+    code: str
+    user_id: str
+    referral_link: str
+    total_referrals: int
+    total_rewards_earned: float
+    created_at: str
+
+class ReferralStatsResponse(BaseModel):
+    code: str
+    referral_link: str
+    total_referrals: int
+    successful_referrals: int
+    pending_referrals: int
+    total_rewards_earned: float
+    available_credits: float
+    referral_tier: str
+    next_tier_threshold: int
+    recent_referrals: List[dict]
+
+class ApplyReferralRequest(BaseModel):
+    referral_code: str
+
+# ==================== ORDER TRACKING MODELS ====================
+
+class OrderStatusUpdate(BaseModel):
+    status: str  # confirmed, processing, shipped, out_for_delivery, delivered, cancelled
+    tracking_number: Optional[str] = None
+    carrier: Optional[str] = None
+    estimated_delivery: Optional[str] = None
+    notes: Optional[str] = None
+
+class OrderTrackingResponse(BaseModel):
+    order_id: str
+    user_id: str
+    status: str
+    tracking_number: Optional[str] = None
+    carrier: Optional[str] = None
+    estimated_delivery: Optional[str] = None
+    tracking_url: Optional[str] = None
+    timeline: List[dict]
+    artworks: List[dict]
+    shipping_address: Optional[dict] = None
+    created_at: str
+    updated_at: str
+
+# ==================== EMAIL AUTOMATION MODELS ====================
+
+class EmailAutomationTrigger(BaseModel):
+    trigger_type: str  # welcome_series, cart_abandonment, post_purchase, reengagement
+    delay_hours: int = 0
+    
+class CartAbandonmentCheck(BaseModel):
+    hours_threshold: int = 24
+
 # ==================== WEBSOCKET CONNECTION MANAGER ====================
 
 class ConnectionManager:
@@ -696,6 +753,167 @@ def get_email_template(template_type: str, data: dict) -> tuple:
                     "{data['review_content']}"
                 </p>
                 {photos_html}
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "order_status_update":
+        status_messages = {
+            "confirmed": "Your order has been confirmed and is being prepared for shipping.",
+            "processing": "Your order is being carefully packaged by the artist.",
+            "shipped": f"Your artwork is on its way! Tracking: {data.get('tracking_number', 'N/A')}",
+            "out_for_delivery": "Exciting news! Your artwork is out for delivery today.",
+            "delivered": "Your artwork has been delivered. We hope you love it!",
+            "cancelled": "Your order has been cancelled."
+        }
+        status_colors = {
+            "confirmed": "#0F3057",
+            "processing": "#E5A93C",
+            "shipped": "#2D5A43",
+            "out_for_delivery": "#0F3057",
+            "delivered": "#2D5A43",
+            "cancelled": "#9E2A2B"
+        }
+        subject = f"Order Update - {data['status'].replace('_', ' ').title()}"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: {status_colors.get(data['status'], '#0F3057')}; margin-top: 0;">
+                    Order {data['status'].replace('_', ' ').title()}
+                </h2>
+                <p><strong>Order ID:</strong> {data['order_id'][:8]}</p>
+                <p style="margin: 20px 0; padding: 15px; background: white; border-radius: 4px;">
+                    {status_messages.get(data['status'], 'Your order status has been updated.')}
+                </p>
+                {f"<p><strong>Tracking Number:</strong> {data['tracking_number']}</p>" if data.get('tracking_number') else ""}
+                {f"<p><strong>Carrier:</strong> {data['carrier']}</p>" if data.get('carrier') else ""}
+                <a href="{data.get('tracking_url', '#')}" class="btn" style="color: white;">Track Your Order</a>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "cart_abandonment":
+        items_html = "".join([
+            f"<li style='margin: 10px 0;'>{item['title']} - ${item['price']:,.2f}</li>"
+            for item in data.get('items', [])[:3]
+        ])
+        subject = "You left something beautiful behind..."
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">Still thinking about it?</h2>
+                <p>Hi {data['name']},</p>
+                <p>You have {data['item_count']} beautiful piece(s) waiting in your cart:</p>
+                <ul style="list-style: none; padding: 0;">{items_html}</ul>
+                <p style="font-weight: bold; font-size: 18px;">Cart Total: ${data['total']:,.2f}</p>
+                <p style="margin-top: 20px;">These unique artworks may not be available for long. Complete your purchase before they're gone!</p>
+                <a href="{data.get('cart_url', '#')}" class="btn" style="color: white;">Complete Your Purchase</a>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+                <p style="font-size: 10px;">If you no longer wish to receive these emails, you can unsubscribe in your account settings.</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "referral_reward":
+        subject = "You've Earned a Referral Reward!"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #2D5A43; margin-top: 0;">Congratulations!</h2>
+                <p>Your friend <strong>{data['referred_name']}</strong> just made their first purchase!</p>
+                <p>As a thank you for spreading the word, you've earned:</p>
+                <p class="price">${data['reward_amount']:,.2f} Credit</p>
+                <p style="margin-top: 20px;">Your credit has been added to your account and will be automatically applied to your next purchase.</p>
+                <p><strong>Total Referral Credits:</strong> ${data['total_credits']:,.2f}</p>
+                <p><strong>Friends Referred:</strong> {data['total_referrals']}</p>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "welcome_series_day2":
+        subject = "Discover Sri Lankan Art: A Journey Through Culture"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">The Rich Heritage of Sri Lankan Art</h2>
+                <p>Hi {data['name']},</p>
+                <p>Sri Lankan art spans over 2,000 years, from ancient temple frescoes to contemporary masterpieces. Our artists continue this tradition while pushing creative boundaries.</p>
+                <h3 style="color: #B64E33;">What Makes Our Art Special:</h3>
+                <ul>
+                    <li><strong>Traditional Batik</strong> - Intricate wax-resist dyeing techniques</li>
+                    <li><strong>Kandyan Art</strong> - Royal temple painting traditions</li>
+                    <li><strong>Contemporary Fusion</strong> - Modern artists reimagining heritage</li>
+                </ul>
+                <a href="#" class="btn" style="color: white;">Explore Our Gallery</a>
+            </div>
+            <div class="footer">
+                <p>Ceylon Canvas Art Marketplace</p>
+            </div>
+        </div>
+        </body></html>
+        """
+        return subject, html
+    
+    elif template_type == "welcome_series_day5":
+        subject = "Tips for Starting Your Art Collection"
+        html = f"""
+        <html><head>{base_style}</head><body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ceylon Canvas</div>
+                <div class="logo-sub">Art Marketplace</div>
+            </div>
+            <div class="content">
+                <h2 style="color: #0F3057; margin-top: 0;">Begin Your Collection Journey</h2>
+                <p>Hi {data['name']},</p>
+                <p>Starting an art collection is one of the most rewarding investments you can make. Here are our tips:</p>
+                <ol>
+                    <li><strong>Buy What You Love</strong> - Art should speak to you personally</li>
+                    <li><strong>Research the Artist</strong> - Understand their journey and vision</li>
+                    <li><strong>Consider the Space</strong> - Visualize where the piece will live</li>
+                    <li><strong>Start with Originals</strong> - Even small originals hold lasting value</li>
+                    <li><strong>Ask Questions</strong> - Our artists love connecting with collectors</li>
+                </ol>
+                <a href="#" class="btn" style="color: white;">Start Exploring</a>
             </div>
             <div class="footer">
                 <p>Ceylon Canvas Art Marketplace</p>
@@ -3048,6 +3266,462 @@ async def convert_currency(
         "converted_amount": round(converted_amount, 2),
         "target_currency": to_currency,
         "rate": EXCHANGE_RATES[to_currency] / EXCHANGE_RATES[from_currency]
+    }
+
+# ==================== REFERRAL PROGRAM ROUTES ====================
+
+def generate_referral_code(user_id: str) -> str:
+    """Generate a unique referral code based on user_id."""
+    import random
+    import string
+    hash_part = hashlib.md5(user_id.encode()).hexdigest()[:4].upper()
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+    return f"CC{hash_part}{random_part}"
+
+def get_referral_tier(total_referrals: int) -> tuple:
+    """Get referral tier based on total successful referrals."""
+    tiers = [
+        (0, "Bronze", 10),
+        (5, "Silver", 15),
+        (15, "Gold", 20),
+        (30, "Platinum", 25),
+        (50, "Ambassador", 30)
+    ]
+    current_tier = tiers[0]
+    next_threshold = tiers[1][0] if len(tiers) > 1 else 999
+    
+    for i, (threshold, name, reward) in enumerate(tiers):
+        if total_referrals >= threshold:
+            current_tier = (threshold, name, reward)
+            next_threshold = tiers[i + 1][0] if i + 1 < len(tiers) else 999
+    
+    return current_tier[1], current_tier[2], next_threshold
+
+@api_router.get("/referral/my-code")
+async def get_my_referral_code(user: dict = Depends(get_current_user)):
+    """Get or create user's referral code."""
+    referral = await db.referrals.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not referral:
+        code = generate_referral_code(user["id"])
+        referral = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "code": code,
+            "total_referrals": 0,
+            "successful_referrals": 0,
+            "total_rewards_earned": 0.0,
+            "available_credits": 0.0,
+            "referred_users": [],
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.referrals.insert_one(referral)
+    
+    referral_link = f"https://ceylon-canvas.com/register?ref={referral['code']}"
+    
+    return {
+        "code": referral["code"],
+        "referral_link": referral_link,
+        "total_referrals": referral["total_referrals"],
+        "successful_referrals": referral.get("successful_referrals", 0),
+        "total_rewards_earned": referral["total_rewards_earned"],
+        "available_credits": referral.get("available_credits", 0.0)
+    }
+
+@api_router.get("/referral/stats")
+async def get_referral_stats(user: dict = Depends(get_current_user)):
+    """Get detailed referral statistics."""
+    referral = await db.referrals.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not referral:
+        return {
+            "code": None,
+            "referral_link": None,
+            "total_referrals": 0,
+            "successful_referrals": 0,
+            "pending_referrals": 0,
+            "total_rewards_earned": 0.0,
+            "available_credits": 0.0,
+            "referral_tier": "Bronze",
+            "next_tier_threshold": 5,
+            "recent_referrals": []
+        }
+    
+    tier_name, reward_amount, next_threshold = get_referral_tier(referral.get("successful_referrals", 0))
+    
+    recent_referrals = []
+    for ref in referral.get("referred_users", [])[-10:]:
+        referred_user = await db.users.find_one({"id": ref["user_id"]}, {"_id": 0, "name": 1})
+        recent_referrals.append({
+            "name": referred_user["name"][:1] + "***" if referred_user else "Anonymous",
+            "status": ref.get("status", "pending"),
+            "reward_earned": ref.get("reward_earned", 0),
+            "joined_at": ref.get("joined_at")
+        })
+    
+    referral_link = f"https://ceylon-canvas.com/register?ref={referral['code']}"
+    
+    return {
+        "code": referral["code"],
+        "referral_link": referral_link,
+        "total_referrals": referral["total_referrals"],
+        "successful_referrals": referral.get("successful_referrals", 0),
+        "pending_referrals": referral["total_referrals"] - referral.get("successful_referrals", 0),
+        "total_rewards_earned": referral["total_rewards_earned"],
+        "available_credits": referral.get("available_credits", 0.0),
+        "referral_tier": tier_name,
+        "next_tier_threshold": next_threshold,
+        "recent_referrals": list(reversed(recent_referrals))
+    }
+
+@api_router.post("/referral/apply")
+async def apply_referral_code(data: ApplyReferralRequest, user: dict = Depends(get_current_user)):
+    """Apply a referral code (for new users)."""
+    if user.get("referred_by"):
+        raise HTTPException(status_code=400, detail="You have already used a referral code")
+    
+    referral = await db.referrals.find_one({"code": data.referral_code.upper()}, {"_id": 0})
+    if not referral:
+        raise HTTPException(status_code=404, detail="Invalid referral code")
+    
+    if referral["user_id"] == user["id"]:
+        raise HTTPException(status_code=400, detail="You cannot use your own referral code")
+    
+    await db.referrals.update_one(
+        {"code": data.referral_code.upper()},
+        {
+            "$inc": {"total_referrals": 1},
+            "$push": {
+                "referred_users": {
+                    "user_id": user["id"],
+                    "status": "pending",
+                    "joined_at": datetime.now(timezone.utc).isoformat(),
+                    "reward_earned": 0
+                }
+            }
+        }
+    )
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"referred_by": referral["user_id"], "referral_code_used": data.referral_code.upper()}}
+    )
+    
+    return {"message": "Referral code applied successfully!", "referrer_id": referral["user_id"]}
+
+# ==================== ORDER TRACKING ROUTES ====================
+
+@api_router.get("/orders/{order_id}/tracking")
+async def get_order_tracking(order_id: str, user: dict = Depends(get_current_user)):
+    """Get detailed order tracking information."""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order["user_id"] != user["id"] and not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Not authorized to view this order")
+    
+    tracking = await db.order_tracking.find_one({"order_id": order_id}, {"_id": 0})
+    
+    timeline = []
+    if tracking:
+        timeline = tracking.get("timeline", [])
+    else:
+        timeline = [
+            {
+                "status": "placed",
+                "title": "Order Placed",
+                "description": "Your order has been received",
+                "timestamp": order["created_at"]
+            }
+        ]
+        if order.get("status") == "completed":
+            timeline.append({
+                "status": "confirmed",
+                "title": "Payment Confirmed",
+                "description": "Payment has been verified",
+                "timestamp": order["created_at"]
+            })
+    
+    artworks = []
+    for artwork_id in order.get("artwork_ids", []):
+        artwork = await db.artworks.find_one({"id": artwork_id}, {"_id": 0})
+        if artwork:
+            artworks.append({
+                "id": artwork["id"],
+                "title": artwork["title"],
+                "image": artwork["images"][0] if artwork.get("images") else "",
+                "artist_name": artwork["artist_name"]
+            })
+    
+    tracking_url = None
+    if tracking and tracking.get("tracking_number"):
+        carrier = tracking.get("carrier", "").lower()
+        tracking_num = tracking["tracking_number"]
+        carrier_urls = {
+            "fedex": f"https://www.fedex.com/fedextrack/?trknbr={tracking_num}",
+            "ups": f"https://www.ups.com/track?tracknum={tracking_num}",
+            "usps": f"https://tools.usps.com/go/TrackConfirmAction?tLabels={tracking_num}",
+            "dhl": f"https://www.dhl.com/en/express/tracking.html?AWB={tracking_num}",
+            "aramex": f"https://www.aramex.com/track/results?ShipmentNumber={tracking_num}"
+        }
+        tracking_url = carrier_urls.get(carrier)
+    
+    return {
+        "order_id": order_id,
+        "user_id": order["user_id"],
+        "status": tracking.get("current_status", order.get("status", "pending")) if tracking else order.get("status", "pending"),
+        "tracking_number": tracking.get("tracking_number") if tracking else None,
+        "carrier": tracking.get("carrier") if tracking else None,
+        "estimated_delivery": tracking.get("estimated_delivery") if tracking else None,
+        "tracking_url": tracking_url,
+        "timeline": timeline,
+        "artworks": artworks,
+        "shipping_address": tracking.get("shipping_address") if tracking else None,
+        "created_at": order["created_at"],
+        "updated_at": tracking.get("updated_at", order["created_at"]) if tracking else order["created_at"]
+    }
+
+@api_router.put("/admin/orders/{order_id}/status")
+async def update_order_status(order_id: str, status_update: OrderStatusUpdate, admin: dict = Depends(get_admin_user)):
+    """Update order status and tracking info - Admin only."""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    valid_statuses = ["confirmed", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"]
+    if status_update.status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    tracking = await db.order_tracking.find_one({"order_id": order_id}, {"_id": 0})
+    
+    status_titles = {
+        "confirmed": "Order Confirmed",
+        "processing": "Being Prepared",
+        "shipped": "Shipped",
+        "out_for_delivery": "Out for Delivery",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+    }
+    
+    status_descriptions = {
+        "confirmed": "Your order has been confirmed and is being processed",
+        "processing": "The artist is carefully preparing your artwork",
+        "shipped": f"Your artwork has been shipped via {status_update.carrier or 'carrier'}",
+        "out_for_delivery": "Your artwork is out for delivery today",
+        "delivered": "Your artwork has been delivered",
+        "cancelled": status_update.notes or "Order has been cancelled"
+    }
+    
+    new_event = {
+        "status": status_update.status,
+        "title": status_titles.get(status_update.status, status_update.status.title()),
+        "description": status_descriptions.get(status_update.status, "Status updated"),
+        "timestamp": now
+    }
+    
+    if tracking:
+        await db.order_tracking.update_one(
+            {"order_id": order_id},
+            {
+                "$set": {
+                    "current_status": status_update.status,
+                    "tracking_number": status_update.tracking_number or tracking.get("tracking_number"),
+                    "carrier": status_update.carrier or tracking.get("carrier"),
+                    "estimated_delivery": status_update.estimated_delivery or tracking.get("estimated_delivery"),
+                    "updated_at": now
+                },
+                "$push": {"timeline": new_event}
+            }
+        )
+    else:
+        tracking_doc = {
+            "id": str(uuid.uuid4()),
+            "order_id": order_id,
+            "current_status": status_update.status,
+            "tracking_number": status_update.tracking_number,
+            "carrier": status_update.carrier,
+            "estimated_delivery": status_update.estimated_delivery,
+            "timeline": [
+                {"status": "placed", "title": "Order Placed", "description": "Your order has been received", "timestamp": order["created_at"]},
+                new_event
+            ],
+            "created_at": now,
+            "updated_at": now
+        }
+        await db.order_tracking.insert_one(tracking_doc)
+    
+    await db.orders.update_one({"id": order_id}, {"$set": {"status": status_update.status, "updated_at": now}})
+    
+    buyer = await db.users.find_one({"id": order["user_id"]}, {"_id": 0})
+    if buyer:
+        subject, html = get_email_template("order_status_update", {
+            "order_id": order_id,
+            "status": status_update.status,
+            "tracking_number": status_update.tracking_number,
+            "carrier": status_update.carrier,
+            "tracking_url": f"https://ceylon-canvas.com/track-order?id={order_id}"
+        })
+        asyncio.create_task(send_email(buyer["email"], subject, html))
+    
+    return {"message": f"Order status updated to {status_update.status}"}
+
+# ==================== EMAIL AUTOMATION ROUTES ====================
+
+@api_router.post("/automation/check-abandoned-carts")
+async def check_abandoned_carts(data: CartAbandonmentCheck, admin: dict = Depends(get_admin_user)):
+    """Check for abandoned carts and send reminder emails - Admin only."""
+    threshold = datetime.now(timezone.utc) - timedelta(hours=data.hours_threshold)
+    
+    carts = await db.carts.find({
+        "items": {"$exists": True, "$ne": []},
+        "updated_at": {"$lt": threshold.isoformat()}
+    }, {"_id": 0}).to_list(100)
+    
+    emails_sent = 0
+    for cart in carts:
+        user = await db.users.find_one({"id": cart["user_id"]}, {"_id": 0})
+        if not user:
+            continue
+        
+        items = []
+        total = 0
+        for item in cart.get("items", []):
+            artwork = await db.artworks.find_one({"id": item["artwork_id"]}, {"_id": 0})
+            if artwork:
+                items.append({"title": artwork["title"], "price": artwork["price"]})
+                total += artwork["price"]
+        
+        if not items:
+            continue
+        
+        last_reminder = await db.email_automation.find_one({
+            "user_id": user["id"],
+            "type": "cart_abandonment",
+            "sent_at": {"$gt": (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()}
+        })
+        
+        if last_reminder:
+            continue
+        
+        subject, html = get_email_template("cart_abandonment", {
+            "name": user["name"],
+            "items": items,
+            "item_count": len(items),
+            "total": total,
+            "cart_url": "https://ceylon-canvas.com/cart"
+        })
+        
+        await send_email(user["email"], subject, html)
+        
+        await db.email_automation.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "type": "cart_abandonment",
+            "sent_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        emails_sent += 1
+    
+    return {"message": f"Cart abandonment check complete. {emails_sent} emails sent."}
+
+@api_router.post("/automation/send-welcome-series")
+async def send_welcome_series(admin: dict = Depends(get_admin_user)):
+    """Send welcome series emails to new users - Admin only."""
+    now = datetime.now(timezone.utc)
+    emails_sent = {"day2": 0, "day5": 0}
+    
+    day2_start = now - timedelta(days=2, hours=1)
+    day2_end = now - timedelta(days=2)
+    
+    users_day2 = await db.users.find({
+        "created_at": {"$gte": day2_start.isoformat(), "$lt": day2_end.isoformat()}
+    }, {"_id": 0}).to_list(100)
+    
+    for user in users_day2:
+        already_sent = await db.email_automation.find_one({"user_id": user["id"], "type": "welcome_series_day2"})
+        if already_sent:
+            continue
+        
+        subject, html = get_email_template("welcome_series_day2", {"name": user["name"]})
+        await send_email(user["email"], subject, html)
+        
+        await db.email_automation.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "type": "welcome_series_day2",
+            "sent_at": now.isoformat()
+        })
+        emails_sent["day2"] += 1
+    
+    day5_start = now - timedelta(days=5, hours=1)
+    day5_end = now - timedelta(days=5)
+    
+    users_day5 = await db.users.find({
+        "created_at": {"$gte": day5_start.isoformat(), "$lt": day5_end.isoformat()}
+    }, {"_id": 0}).to_list(100)
+    
+    for user in users_day5:
+        already_sent = await db.email_automation.find_one({"user_id": user["id"], "type": "welcome_series_day5"})
+        if already_sent:
+            continue
+        
+        subject, html = get_email_template("welcome_series_day5", {"name": user["name"]})
+        await send_email(user["email"], subject, html)
+        
+        await db.email_automation.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "type": "welcome_series_day5",
+            "sent_at": now.isoformat()
+        })
+        emails_sent["day5"] += 1
+    
+    return {
+        "message": "Welcome series check complete",
+        "day2_emails_sent": emails_sent["day2"],
+        "day5_emails_sent": emails_sent["day5"]
+    }
+
+@api_router.get("/automation/stats")
+async def get_automation_stats(admin: dict = Depends(get_admin_user)):
+    """Get email automation statistics - Admin only."""
+    now = datetime.now(timezone.utc)
+    last_30_days = (now - timedelta(days=30)).isoformat()
+    
+    pipeline = [
+        {"$match": {"sent_at": {"$gte": last_30_days}}},
+        {"$group": {"_id": "$type", "count": {"$sum": 1}}}
+    ]
+    
+    results = await db.email_automation.aggregate(pipeline).to_list(100)
+    
+    stats = {"welcome_series_day2": 0, "welcome_series_day5": 0, "cart_abandonment": 0}
+    for r in results:
+        if r["_id"] in stats:
+            stats[r["_id"]] = r["count"]
+    
+    threshold = now - timedelta(hours=24)
+    abandoned_carts = await db.carts.count_documents({
+        "items": {"$exists": True, "$ne": []},
+        "updated_at": {"$lt": threshold.isoformat()}
+    })
+    
+    total_referrals = await db.referrals.aggregate([
+        {"$group": {"_id": None, "total": {"$sum": "$total_referrals"}, "successful": {"$sum": "$successful_referrals"}}}
+    ]).to_list(1)
+    
+    referral_stats = total_referrals[0] if total_referrals else {"total": 0, "successful": 0}
+    
+    return {
+        "email_stats_30d": stats,
+        "abandoned_carts_pending": abandoned_carts,
+        "referral_stats": {
+            "total_referrals": referral_stats.get("total", 0),
+            "successful_referrals": referral_stats.get("successful", 0)
+        }
     }
 
 # ==================== MAIN ====================
