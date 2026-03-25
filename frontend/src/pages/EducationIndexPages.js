@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb } from 'lucide-react';
-import { artFundamentals, masterpieceAnalysis, artHistoryComprehensive, artTheoryDeep, artistsDeepStudy, museumStudies, artAppreciationCourses } from '../data/educationData';
+import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb, BookMarked, Grid3X3, Library, FileText } from 'lucide-react';
+import { artFundamentals, masterpieceAnalysis, artHistoryComprehensive, artTheoryDeep, artistsDeepStudy, museumStudies, artAppreciationCourses, artVocabulary, compositionStudies, famousCollections, artManifestos } from '../data/educationData';
+import { masterpieceImages, artistImages, artImages } from '../data/artImages';
 
 // Main Education Hub
 export const EducationHubPage = () => {
@@ -13,6 +14,10 @@ export const EducationHubPage = () => {
     { name: 'Artist Studies', count: artistsDeepStudy.length, path: '/education/artists', icon: Palette, desc: 'Learn from the masters' },
     { name: 'Museum Guides', count: museumStudies.length, path: '/education/museums', icon: Building2, desc: 'Navigate world collections' },
     { name: 'Courses', count: artAppreciationCourses.length, path: '/education/courses', icon: GraduationCap, desc: 'Structured learning paths' },
+    { name: 'Art Vocabulary', count: artVocabulary.length, path: '/education/vocabulary', icon: BookMarked, desc: '50 essential art terms' },
+    { name: 'Composition Studies', count: compositionStudies.length, path: '/education/composition', icon: Grid3X3, desc: 'Master visual arrangement' },
+    { name: 'Famous Collections', count: famousCollections.length, path: '/education/famous-collections', icon: Library, desc: 'World\'s greatest collections' },
+    { name: 'Art Manifestos', count: artManifestos.length, path: '/education/manifestos', icon: FileText, desc: 'Revolutionary art writings' },
   ];
 
   return (
@@ -92,7 +97,7 @@ export const FundamentalsIndexPage = () => (
 export const MasterpiecesIndexPage = () => (
   <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid="masterpieces-index">
     <section className="bg-[#0A1015] py-16"><div className="max-w-7xl mx-auto px-6"><Link to="/education" className="text-[#E5A93C] text-sm hover:underline">← Education Hub</Link><h1 className="font-heading text-4xl text-white mt-4">Masterpiece Analysis</h1><p className="text-white/70 mt-2">Decode {masterpieceAnalysis.length} of history's greatest artworks</p></div></section>
-    <section className="py-16"><div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">{masterpieceAnalysis.map(m => (<Link key={m.slug} to={`/education/masterpieces/${m.slug}`} className="group"><div className="aspect-[4/3] bg-[#F5F5F0] flex items-center justify-center mb-4"><Image className="h-12 w-12 text-[#E5E5DF]" /></div><h2 className="font-heading text-lg text-[#0F3057] group-hover:text-[#B64E33]">{m.name}</h2><p className="text-sm text-[#5C636A]">{m.artist} • {m.year}</p></Link>))}</div></section>
+    <section className="py-16"><div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">{masterpieceAnalysis.map(m => (<Link key={m.slug} to={`/education/masterpieces/${m.slug}`} className="group"><div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden mb-4"><img src={masterpieceImages[m.slug] || masterpieceImages['default']} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div><h2 className="font-heading text-lg text-[#0F3057] group-hover:text-[#B64E33]">{m.name}</h2><p className="text-sm text-[#5C636A]">{m.artist} • {m.year}</p></Link>))}</div></section>
   </main>
 );
 
@@ -116,7 +121,7 @@ export const TheoryIndexPage = () => (
 export const ArtistsStudyIndexPage = () => (
   <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid="artists-study-index">
     <section className="bg-[#0A1015] py-16"><div className="max-w-7xl mx-auto px-6"><Link to="/education" className="text-[#E5A93C] text-sm hover:underline">← Education Hub</Link><h1 className="font-heading text-4xl text-white mt-4">Artist Deep Studies</h1><p className="text-white/70 mt-2">Learn from {artistsDeepStudy.length} master artists</p></div></section>
-    <section className="py-16"><div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">{artistsDeepStudy.map(a => (<Link key={a.slug} to={`/education/artists/${a.slug}`} className="group text-center"><div className="aspect-square bg-[#F5F5F0] flex items-center justify-center mb-4 group-hover:bg-[#0F3057]/10 transition-colors"><Palette className="h-12 w-12 text-[#E5E5DF] group-hover:text-[#0F3057]" /></div><h2 className="font-heading text-lg text-[#0F3057] group-hover:text-[#B64E33]">{a.name}</h2><p className="text-xs text-[#5C636A]">{a.era}</p></Link>))}</div></section>
+    <section className="py-16"><div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">{artistsDeepStudy.map(a => (<Link key={a.slug} to={`/education/artists/${a.slug}`} className="group text-center"><div className="aspect-square bg-[#F5F5F0] overflow-hidden mb-4 group-hover:bg-[#0F3057]/10 transition-colors"><img src={artistImages[a.slug] || artistImages['default']} alt={a.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /></div><h2 className="font-heading text-lg text-[#0F3057] group-hover:text-[#B64E33]">{a.name}</h2><p className="text-xs text-[#5C636A]">{a.era}</p></Link>))}</div></section>
   </main>
 );
 

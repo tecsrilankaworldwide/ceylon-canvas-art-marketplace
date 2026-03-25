@@ -50,6 +50,7 @@ import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfi
 import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
 import { FundamentalPage, MasterpiecePage, ArtHistoryPage, ArtTheoryPage, ArtistStudyPage, MuseumStudyPage, ArtCoursePage } from './pages/EducationPages';
 import { EducationHubPage, FundamentalsIndexPage, MasterpiecesIndexPage, ArtHistoryIndexPage, TheoryIndexPage, ArtistsStudyIndexPage, MuseumsIndexPage, CoursesIndexPage } from './pages/EducationIndexPages';
+import { VocabularyPage, CompositionStudyPage, CollectionStudyPage, ManifestoPage, VocabularyIndexPage, CompositionIndexPage, FamousCollectionsIndexPage, ManifestosIndexPage } from './pages/MoreEducationPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -194,6 +195,22 @@ function AppRoutes() {
       {/* Art Appreciation Courses - 25 pages */}
       <Route path="/education/courses" element={<Layout><CoursesIndexPage /></Layout>} />
       <Route path="/education/courses/:slug" element={<Layout><ArtCoursePage /></Layout>} />
+      
+      {/* Art Vocabulary - 50 pages */}
+      <Route path="/education/vocabulary" element={<Layout><VocabularyIndexPage /></Layout>} />
+      <Route path="/education/vocabulary/:slug" element={<Layout><VocabularyPage /></Layout>} />
+      
+      {/* Composition Studies - 30 pages */}
+      <Route path="/education/composition" element={<Layout><CompositionIndexPage /></Layout>} />
+      <Route path="/education/composition/:slug" element={<Layout><CompositionStudyPage /></Layout>} />
+      
+      {/* Famous Collections - 20 pages */}
+      <Route path="/education/famous-collections" element={<Layout><FamousCollectionsIndexPage /></Layout>} />
+      <Route path="/education/famous-collections/:slug" element={<Layout><CollectionStudyPage /></Layout>} />
+      
+      {/* Art Manifestos - 15 pages */}
+      <Route path="/education/manifestos" element={<Layout><ManifestosIndexPage /></Layout>} />
+      <Route path="/education/manifestos/:slug" element={<Layout><ManifestoPage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

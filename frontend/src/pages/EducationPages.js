@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Clock, Award, Image, ChevronLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { artFundamentals, masterpieceAnalysis, artHistoryComprehensive, artTheoryDeep, artistsDeepStudy, museumStudies, artAppreciationCourses } from '../data/educationData';
+import { masterpieceImages, museumImages, artistImages, periodImages, artImages } from '../data/artImages';
 
 // Art Fundamentals Page
 export const FundamentalPage = () => {
@@ -61,6 +62,8 @@ export const FundamentalPage = () => {
 export const MasterpiecePage = () => {
   const { slug } = useParams();
   const work = masterpieceAnalysis.find(m => m.slug === slug) || masterpieceAnalysis[0];
+  const imageUrl = masterpieceImages[slug] || masterpieceImages['default'];
+  
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`masterpiece-${slug}`}>
       <section className="bg-[#0A1015] py-20 lg:py-28">
@@ -74,7 +77,9 @@ export const MasterpiecePage = () => {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12">
-            <div className="aspect-[3/4] bg-[#F5F5F0] flex items-center justify-center"><Image className="h-24 w-24 text-[#E5E5DF]" /></div>
+            <div className="aspect-[3/4] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={work.name} className="w-full h-full object-cover" />
+            </div>
             <div>
               <h2 className="font-heading text-2xl text-[#0F3057] mb-6">Understanding This Masterpiece</h2>
               <p className="text-[#5C636A] leading-relaxed">This work by {work.artist} represents far more than meets the eye. Created in {work.year}, it embodies centuries of artistic development and introduces innovations that would influence generations of artists.</p>
@@ -163,6 +168,8 @@ export const ArtTheoryPage = () => {
 export const ArtistStudyPage = () => {
   const { slug } = useParams();
   const artist = artistsDeepStudy.find(a => a.slug === slug) || artistsDeepStudy[0];
+  const imageUrl = artistImages[slug] || artistImages['default'];
+  
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`artist-study-${slug}`}>
       <section className="bg-[#0A1015] py-20 lg:py-28">
@@ -173,7 +180,9 @@ export const ArtistStudyPage = () => {
             <h1 className="font-heading text-4xl lg:text-5xl font-medium text-white">{artist.name}</h1>
             <p className="font-body text-lg text-white/70 mt-6">{artist.known}</p>
           </div>
-          <div className="aspect-square bg-[#1A1D20] flex items-center justify-center"><Image className="h-24 w-24 text-[#5C636A]" /></div>
+          <div className="aspect-square bg-[#1A1D20] overflow-hidden">
+            <img src={imageUrl} alt={artist.name} className="w-full h-full object-cover opacity-90" />
+          </div>
         </div>
       </section>
       <section className="py-16 lg:py-24">
