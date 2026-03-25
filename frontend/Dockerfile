@@ -1,12 +1,13 @@
-# Build stage
-FROM node:18-alpine as build
+# Build stage - Node 20+ required for react-router-dom v7
+FROM node:20-alpine as build
 
 WORKDIR /app
 
 # Copy package files
 COPY package.json yarn.lock ./
 
-# Install dependencies
+# Install dependencies with increased memory limit for large app
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN yarn install --frozen-lockfile
 
 # Copy source code
