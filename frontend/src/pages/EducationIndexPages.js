@@ -145,6 +145,36 @@ export const EducationHubPage = () => {
 
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <h2 className="font-heading text-3xl text-[#0F3057] mb-4">Explore More</h2>
+          <p className="text-[#5C636A] max-w-3xl mb-12">Beyond education: discover art cities, fascinating stories, decorating guides, and gift ideas.</p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Link to="/world-art" className="group p-6 bg-[#2D5A43] text-white hover:bg-[#234935] transition-colors">
+              <span className="text-3xl mb-4 block">🌍</span>
+              <h3 className="font-heading text-xl mb-2">World Art Guide</h3>
+              <p className="text-white/70 text-sm">City-by-city guides for art travelers. 26 destinations.</p>
+            </Link>
+            <Link to="/art-stories" className="group p-6 bg-[#B64E33] text-white hover:bg-[#9D4330] transition-colors">
+              <span className="text-3xl mb-4 block">📖</span>
+              <h3 className="font-heading text-xl mb-2">Art Stories</h3>
+              <p className="text-white/70 text-sm">Heists, forgeries, mysteries & scandals. 21 stories.</p>
+            </Link>
+            <Link to="/art-for-space" className="group p-6 bg-[#7C3A5A] text-white hover:bg-[#6A3250] transition-colors">
+              <span className="text-3xl mb-4 block">🏠</span>
+              <h3 className="font-heading text-xl mb-2">Art for Your Space</h3>
+              <p className="text-white/70 text-sm">Room-by-room decorating guides. 14 guides.</p>
+            </Link>
+            <Link to="/gift-guides" className="group p-6 bg-[#E5A93C] text-[#0A1015] hover:bg-[#D49A2E] transition-colors">
+              <span className="text-3xl mb-4 block">🎁</span>
+              <h3 className="font-heading text-xl mb-2">Gift Guides</h3>
+              <p className="text-[#0A1015]/70 text-sm">Perfect art gifts for every budget & occasion. 11 guides.</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <h2 className="font-heading text-3xl text-[#0F3057] mb-12">Start Your Journey</h2>
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="p-8 bg-[#0F3057] text-white">

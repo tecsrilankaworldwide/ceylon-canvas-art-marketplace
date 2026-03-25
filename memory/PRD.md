@@ -234,7 +234,51 @@ Data Files: `/src/data/learningPaths.js`, `/src/pages/LearningPathPages.js`
 - 12-16 hours total learning time
 - Each lesson links to existing content (reuses all prior pages)
 
-**FINAL GRAND TOTAL: ~1,080+ PAGES** (including Learning Paths system)
+### NEW: Curated Content Sections (Dec 2025) - 72 additional pages
+
+**World Art Guide (26 city guides):**
+- City-by-city guides for art travelers across 6 continents
+- Europe (10): Paris, London, Florence, Amsterdam, Berlin, Madrid, Vienna, Rome, Barcelona, Venice
+- North America (5): New York, Los Angeles, Chicago, Mexico City, Toronto
+- Asia (5): Tokyo, Hong Kong, Singapore, Seoul, Beijing
+- Middle East (2): Dubai, Tel Aviv
+- Oceania (2): Sydney, Melbourne
+- South America (2): Buenos Aires, São Paulo
+- Each guide includes: Must-see museums, hidden gems, gallery neighborhoods, best times, insider tips
+
+Data Files: `/src/data/worldArtGuides.js`, `/src/pages/WorldArtPages.js`
+Routes: `/world-art`, `/world-art/:slug`
+
+**Art Stories & Mysteries (21 stories):**
+- Stolen Masterpieces (5): Mona Lisa theft, Gardner heist, The Scream, Nazi looting, Picasso ransom
+- Famous Forgeries (3): Van Meegeren, Beltracchi, Elmyr de Hory
+- Lost & Found (3): Caravaggio attic, Klimt hidden wall, Michelangelo drawing
+- Artist Rivalries (3): Picasso vs Matisse, Michelangelo vs Raphael, Caravaggio vs Baglione
+- Art Mysteries (4): Girl with Pearl Earring, Mona Lisa smile, Van Gogh ear, Nighthawks diner
+- Art Scandals (3): Whistler's Mother, Duchamp urinal, Manet Olympia
+
+Data Files: `/src/data/artStories.js`, `/src/pages/ArtStoriesPages.js`
+Routes: `/art-stories`, `/art-stories/:slug`
+
+**Art for Your Space (14 decorating guides):**
+- By Room (7): Living room, bedroom, home office, dining room, entryway, bathroom, kitchen
+- By Space Type (4): Small spaces, open floor plans, rental apartments, high ceilings
+- By Style (3): Modern/minimalist, traditional, eclectic
+- Each guide includes: Multiple sections, pro tips, practical advice
+
+Data Files: `/src/data/artForSpace.js`, `/src/pages/ArtForSpacePages.js`
+Routes: `/art-for-space`, `/art-for-space/:slug`
+
+**Gift Guides (11 curated guides):**
+- By Budget (3): Under $100, under $500, under $2,000
+- By Occasion (5): Weddings, housewarming, retirement, corporate, milestone birthdays
+- By Recipient (3): Minimalists, maximalists, travelers
+- Each guide includes: Detailed sections, gift ideas, etiquette tips
+
+Data Files: `/src/data/giftGuides.js`, `/src/pages/GiftGuidesPages.js`
+Routes: `/gift-guides`, `/gift-guides/:slug`
+
+**UPDATED GRAND TOTAL: ~1,150+ PAGES** (1,080 + 72 new curated content)
 
 Data Files:
 - `/src/data/pagesData.js` - Core page data (278 pages)
@@ -323,10 +367,12 @@ https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 
 ## Next Tasks (Updated Dec 2025)
 
-### IN PROGRESS
-- **6 New Curated Content Sections** - World Art Guides, Art Stories, Art for Space, Gift Guides, etc. (~200 additional pages)
-  - Data files started: `/src/data/worldArtGuides.js`, `artStories.js`, `artForSpace.js`, `giftGuides.js`
-  - Status: Data files created but not populated, UI components not yet built
+### COMPLETED (Dec 2025)
+- ✅ **6 New Curated Content Sections** - World Art Guides, Art Stories, Art for Space, Gift Guides (~72 additional pages)
+  - Data files: `/src/data/worldArtGuides.js`, `artStories.js`, `artForSpace.js`, `giftGuides.js`
+  - Page components: `/src/pages/WorldArtPages.js`, `ArtStoriesPages.js`, `ArtForSpacePages.js`, `GiftGuidesPages.js`
+  - Routes added to App.js
+  - Linked in Education Hub "Explore More" section
 
 ### P1 (Ready to Start)
 1. Referral Program Backend (generate unique links, track rewards)

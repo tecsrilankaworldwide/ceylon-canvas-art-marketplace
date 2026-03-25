@@ -71,6 +71,18 @@ import {
 import {
   LearningPathsHubPage, LearningPathPage
 } from './pages/LearningPathPages';
+import {
+  WorldArtHubPage, WorldArtCityPage
+} from './pages/WorldArtPages';
+import {
+  ArtStoriesHubPage, ArtStoryPage
+} from './pages/ArtStoriesPages';
+import {
+  ArtForSpaceHubPage, ArtForSpacePage
+} from './pages/ArtForSpacePages';
+import {
+  GiftGuidesHubPage, GiftGuidePage
+} from './pages/GiftGuidesPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -296,6 +308,24 @@ function AppRoutes() {
       {/* LEARNING PATHS - Guided Journeys */}
       <Route path="/education/paths" element={<Layout><LearningPathsHubPage /></Layout>} />
       <Route path="/education/paths/:slug" element={<Layout><LearningPathPage /></Layout>} />
+      
+      {/* ===== NEW CURATED CONTENT SECTIONS ===== */}
+      
+      {/* WORLD ART GUIDE - 26 city guides */}
+      <Route path="/world-art" element={<Layout><WorldArtHubPage /></Layout>} />
+      <Route path="/world-art/:slug" element={<Layout><WorldArtCityPage /></Layout>} />
+      
+      {/* ART STORIES & MYSTERIES - 21 stories */}
+      <Route path="/art-stories" element={<Layout><ArtStoriesHubPage /></Layout>} />
+      <Route path="/art-stories/:slug" element={<Layout><ArtStoryPage /></Layout>} />
+      
+      {/* ART FOR YOUR SPACE - 14 decorating guides */}
+      <Route path="/art-for-space" element={<Layout><ArtForSpaceHubPage /></Layout>} />
+      <Route path="/art-for-space/:slug" element={<Layout><ArtForSpacePage /></Layout>} />
+      
+      {/* GIFT GUIDES - 11 curated gift guides */}
+      <Route path="/gift-guides" element={<Layout><GiftGuidesHubPage /></Layout>} />
+      <Route path="/gift-guides/:slug" element={<Layout><GiftGuidePage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
