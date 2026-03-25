@@ -120,9 +120,17 @@ const ReferralProgramPage = () => {
                     {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
                   </Button>
                 </div>
-                <p className="font-body text-xs text-white/40 mt-3">
-                  Share this link via email, social media, or direct message
-                </p>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="font-body text-xs text-white/40">
+                    Share this link via email, social media, or direct message
+                  </p>
+                  <Link to="/my-referrals">
+                    <Button variant="outline" className="border-[#E5A93C] text-[#E5A93C] hover:bg-[#E5A93C]/10 rounded-none text-sm">
+                      View My Dashboard
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="flex flex-wrap gap-4 mt-10">

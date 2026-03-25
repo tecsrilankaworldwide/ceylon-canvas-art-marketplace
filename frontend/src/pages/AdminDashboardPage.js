@@ -5,7 +5,7 @@ import {
   Users, Image, BarChart3, Shield, Search, 
   Ban, CheckCircle, XCircle, Flag, Trash2, 
   TrendingUp, DollarSign, Package, AlertTriangle,
-  ChevronLeft, ChevronRight, BadgeCheck, Eye
+  ChevronLeft, ChevronRight, BadgeCheck, Eye, Mail
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
+import AdminAutomationPanel from '../components/AdminAutomationPanel';
 import {
   getAdminStats,
   getAdminUsers,
@@ -342,6 +343,10 @@ const AdminDashboardPage = () => {
             <TabsTrigger value="orders" className="data-[state=active]:bg-white" data-testid="tab-orders">
               <Package className="h-4 w-4 mr-2" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger value="automation" className="data-[state=active]:bg-white" data-testid="tab-automation">
+              <Mail className="h-4 w-4 mr-2" />
+              Automation
             </TabsTrigger>
           </TabsList>
 
@@ -929,6 +934,11 @@ const AdminDashboardPage = () => {
                 </tbody>
               </table>
             </div>
+          </TabsContent>
+
+          {/* Automation Tab */}
+          <TabsContent value="automation">
+            <AdminAutomationPanel />
           </TabsContent>
         </Tabs>
       </div>

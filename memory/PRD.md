@@ -372,16 +372,19 @@ https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 - ✅ **Referral Program Backend** - Complete with tier system (Bronze to Ambassador), unique codes, rewards tracking
 - ✅ **Order Tracking Backend** - Timeline-based tracking, carrier integration, status update emails
 - ✅ **Email Automation Backend** - Welcome series (Day 2 & 5), cart abandonment reminders, automation stats
+- ✅ **Referral Dashboard UI** (`/my-referrals`) - Stats, sharing options, tier progress, social sharing
+- ✅ **Order Tracking Page** (`/track-order`) - Real-time order search, visual timeline, carrier tracking links
+- ✅ **Admin Automation Panel** - Email stats, manual trigger buttons for automation tasks, referral stats
 
 ### P1 (Ready to Start)
-1. Frontend UI for Referral Dashboard (display user's code, stats, sharing options)
-2. Frontend UI for Order Tracking Page (visual timeline, tracking link)
-3. Admin Dashboard Enhancement (email automation controls, referral stats visualization)
+1. User profile page enhancement (link to referral dashboard, order history with tracking)
+2. Email notification preferences (user opt-in/opt-out for automation emails)
+3. Scheduled automation (cron-style automatic email triggers)
 
 ### P2 (Future)
 1. Real-time exchange rate API integration
 2. Browser push notifications
-3. Refactor server.py into modular routers
+3. Refactor server.py into modular routers (~3700 lines)
 
 ## Technical Notes
 - WebSocket auto-reconnects after 5 seconds on disconnect

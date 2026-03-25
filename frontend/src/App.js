@@ -83,6 +83,7 @@ import {
 import {
   GiftGuidesHubPage, GiftGuidePage
 } from './pages/GiftGuidesPages';
+import ReferralDashboardPage from './pages/ReferralDashboardPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -133,6 +134,7 @@ function AppRoutes() {
       <Route path="/investment-guide" element={<Layout><InvestmentGuidePage /></Layout>} />
       <Route path="/private-services" element={<Layout><PrivateServicesPage /></Layout>} />
       <Route path="/referral-program" element={<Layout><ReferralProgramPage /></Layout>} />
+      <Route path="/my-referrals" element={<Layout><ReferralDashboardPage /></Layout>} />
       <Route path="/track-order" element={<Layout><OrderTrackingPage /></Layout>} />
       <Route path="/how-it-works" element={<Layout><HowItWorksPage /></Layout>} />
       <Route path="/press" element={<Layout><PressPage /></Layout>} />
