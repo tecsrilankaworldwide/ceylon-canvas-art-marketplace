@@ -321,10 +321,22 @@ Data Files:
 ## GitHub Repository
 https://github.com/tecsrilankaworldwide/ceylon-canvas-art-marketplace
 
-## Next Tasks
-1. Order tracking with shipping status updates
-2. Real-time exchange rate API integration
-3. Browser push notifications (optional)
+## Next Tasks (Updated Dec 2025)
+
+### IN PROGRESS
+- **6 New Curated Content Sections** - World Art Guides, Art Stories, Art for Space, Gift Guides, etc. (~200 additional pages)
+  - Data files started: `/src/data/worldArtGuides.js`, `artStories.js`, `artForSpace.js`, `giftGuides.js`
+  - Status: Data files created but not populated, UI components not yet built
+
+### P1 (Ready to Start)
+1. Referral Program Backend (generate unique links, track rewards)
+2. Order Tracking Backend (shipping timeline/status integration)
+3. Email Automation Backend (welcome sequences, cart abandonment, post-purchase nurture)
+
+### P2 (Future)
+1. Real-time exchange rate API integration
+2. Browser push notifications
+3. Refactor server.py into modular routers
 
 ## Technical Notes
 - WebSocket auto-reconnects after 5 seconds on disconnect
