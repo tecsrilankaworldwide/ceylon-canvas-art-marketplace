@@ -203,6 +203,30 @@ export const BeginnerGuidesHubPage = () => {
           </Link>
         </div>
       </section>
+
+      {/* Advanced Learning Paths */}
+      <section className="py-16 lg:py-24 bg-[#F5F5F0]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <h2 className="font-heading text-3xl text-[#0F3057] mb-4">Ready for More?</h2>
+          <p className="text-[#5C636A] max-w-2xl mb-12">
+            Once you have the basics, take your art appreciation to the next level with interactive exercises and collector knowledge.
+          </p>
+          <div className="grid md:grid-cols-2 gap-8">
+            <Link to="/education/practice" className="p-8 bg-gradient-to-br from-[#B64E33] to-[#8B3A28] hover:shadow-xl transition-all group">
+              <Eye className="h-12 w-12 text-white mb-6" />
+              <h3 className="font-heading text-2xl text-white">Practice Your Art Eye</h3>
+              <p className="text-white/80 mt-3">Interactive exercises: guided analyses, artwork comparisons, technique challenges, and step-by-step walkthroughs.</p>
+              <p className="text-[#FCD9B4] font-medium mt-6 group-hover:underline">63+ exercises →</p>
+            </Link>
+            <Link to="/education/collector" className="p-8 bg-gradient-to-br from-[#0F3057] to-[#1A365D] hover:shadow-xl transition-all group">
+              <BookOpen className="h-12 w-12 text-white mb-6" />
+              <h3 className="font-heading text-2xl text-white">The Collectors Handbook</h3>
+              <p className="text-white/80 mt-3">Practical wisdom: how to talk about art, questions before buying, understanding pricing, building your first collection.</p>
+              <p className="text-[#E5A93C] font-medium mt-6 group-hover:underline">16 guides + 6 quick references →</p>
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 };

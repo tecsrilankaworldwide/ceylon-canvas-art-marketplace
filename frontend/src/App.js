@@ -58,6 +58,16 @@ import {
   SimpleArtGuidePage, ArtistIntentionsPage, FiveQuestionsPage, 
   EmotionsPage, SymbolsPage, ArtHistorySimplePage, FamousPaintingsSimplePage 
 } from './pages/BeginnerGuidePages';
+import {
+  PracticeHubPage, LookAtPaintingIndexPage, LookAtPaintingPage, 
+  CompareArtworksIndexPage, CompareArtworksPage,
+  SpotTechniqueIndexPage, SpotTechniquePage,
+  WalkthroughsIndexPage, WalkthroughPage,
+  ArtByMoodIndexPage, ArtByMoodPage
+} from './pages/PracticePages';
+import {
+  CollectorHubPage, CollectorGuidePage, QuickReferencePage
+} from './pages/CollectorPages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -249,6 +259,36 @@ function AppRoutes() {
       {/* Famous Paintings Explained Simply - 25 pages */}
       <Route path="/education/beginner/famous-simple" element={<Layout><FamousPaintingsSimpleIndexPage /></Layout>} />
       <Route path="/education/beginner/famous-simple/:slug" element={<Layout><FamousPaintingsSimplePage /></Layout>} />
+      
+      {/* PRACTICE & INTERACTIVE GUIDES (~80 pages) */}
+      <Route path="/education/practice" element={<Layout><PracticeHubPage /></Layout>} />
+      
+      {/* Look at This Painting - 20 exercises */}
+      <Route path="/education/practice/look-at" element={<Layout><LookAtPaintingIndexPage /></Layout>} />
+      <Route path="/education/practice/look-at/:slug" element={<Layout><LookAtPaintingPage /></Layout>} />
+      
+      {/* Compare Two Artworks - 15 comparisons */}
+      <Route path="/education/practice/compare" element={<Layout><CompareArtworksIndexPage /></Layout>} />
+      <Route path="/education/practice/compare/:slug" element={<Layout><CompareArtworksPage /></Layout>} />
+      
+      {/* Spot the Technique - 15 challenges */}
+      <Route path="/education/practice/spot-technique" element={<Layout><SpotTechniqueIndexPage /></Layout>} />
+      <Route path="/education/practice/spot-technique/:slug" element={<Layout><SpotTechniquePage /></Layout>} />
+      
+      {/* Step-by-Step Walkthroughs - 5 complete guides */}
+      <Route path="/education/practice/walkthroughs" element={<Layout><WalkthroughsIndexPage /></Layout>} />
+      <Route path="/education/practice/walkthroughs/:slug" element={<Layout><WalkthroughPage /></Layout>} />
+      
+      {/* Art by Mood - 8 mood collections */}
+      <Route path="/education/practice/mood" element={<Layout><ArtByMoodIndexPage /></Layout>} />
+      <Route path="/education/practice/mood/:slug" element={<Layout><ArtByMoodPage /></Layout>} />
+      
+      {/* COLLECTOR'S KNOWLEDGE (~16 pages) */}
+      <Route path="/education/collector" element={<Layout><CollectorHubPage /></Layout>} />
+      <Route path="/education/collector/:slug" element={<Layout><CollectorGuidePage /></Layout>} />
+      
+      {/* Quick Reference Cards - 6 cards */}
+      <Route path="/education/reference/:slug" element={<Layout><QuickReferencePage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

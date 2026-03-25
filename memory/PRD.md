@@ -162,6 +162,44 @@ Data Files:
 
 **GRAND TOTAL: 975+ PAGES** (805 + 170 beginner guides)
 
+### NEW: Practice & Interactive Learning Section (~80 pages - Dec 2025)
+**Purpose**: Interactive exercises to train art appreciation skills through guided practice.
+
+- ✅ **20 "Look at This Painting"** - Guided prompts for analyzing famous masterpieces (/education/practice/look-at/:slug)
+- ✅ **15 "Compare Two Artworks"** - Side-by-side analysis revealing insights (/education/practice/compare/:slug)
+- ✅ **15 "Spot the Technique"** - Visual challenges for chiaroscuro, sfumato, impasto, etc. (/education/practice/spot-technique/:slug)
+- ✅ **5 Step-by-Step Walkthroughs** - Complete guided tours of Starry Night, Mona Lisa, Guernica, Nighthawks, Persistence of Memory (/education/practice/walkthroughs/:slug)
+- ✅ **8 "Art by Mood"** - Peaceful, Energizing, Contemplative, Romantic, Melancholic, Wondrous, Empowering, Joyful (/education/practice/mood/:slug)
+
+Data Files: `/src/data/practiceGuides.js`, `/src/pages/PracticePages.js`
+
+### NEW: Collector's Knowledge Section (~22 pages - Dec 2025)
+**Purpose**: Practical wisdom for navigating the art world with confidence.
+
+**Collector Guides (10 In-Depth):**
+- ✅ How to Talk About Art at Galleries
+- ✅ Questions to Ask Before Buying Art
+- ✅ Understanding Art Pricing
+- ✅ Building Your First Collection
+- ✅ Caring for Your Art Collection
+- ✅ Navigating Art Fairs Like a Pro
+- ✅ Spotting Emerging Talent
+- ✅ Auctions Explained for Beginners
+- ✅ Buying Art Online Safely
+- ✅ Art as Investment: Reality Check
+
+**Quick Reference Cards (6):**
+- ✅ Art Movements Cheat Sheet (Timeline from Renaissance to Contemporary)
+- ✅ Color Psychology in Art (9 colors with meanings and examples)
+- ✅ Famous Artists Timeline (14 key artists placed in time)
+- ✅ Art Terms Pocket Guide (25 must-know terms)
+- ✅ Composition Rules at a Glance (10 composition principles)
+- ✅ Reading Brush Strokes (7 brushwork types and meanings)
+
+Data Files: `/src/data/collectorGuides.js`, `/src/pages/CollectorPages.js`
+
+**UPDATED GRAND TOTAL: ~1,075+ PAGES**
+
 Data Files:
 - `/src/data/pagesData.js` - Core page data (278 pages)
 - `/src/data/educationData.js` - Education section data (327 pages)
