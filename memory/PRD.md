@@ -145,9 +145,18 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 
 **Core Message**: "You don't need an art degree to understand paintings. These guides give you simple, practical tools to 'read' any artwork."
 
+**Visual Enhancement (Dec 2025)**: All beginner guide pages now include sourced artwork images from Unsplash/Pexels. Images mapped in `/src/data/artImages.js`:
+- `readArtImages` - Museum visitors and art appreciation scenes
+- `artistIntentImages` - Abstract, distorted, and expressive artworks  
+- `emotionImages` - Artworks expressing joy, sadness, fear, love, etc.
+- `symbolImages` - Water, fire, light, nature, flowers, skulls, etc.
+- `historySimpleImages` - Artwork representing each era (cave art to street art)
+- `famousPaintingsImages` - Famous painting references
+- `fiveQuestionsImages` - Portrait, landscape, abstract category examples
+
 Data Files:
 - `/src/data/beginnerGuides.js` - All beginner guide data (170 entries)
-- `/src/pages/BeginnerGuidePages.js` - All UI components
+- `/src/pages/BeginnerGuidePages.js` - All UI components with images
 
 **Core Message**: "Art is not merely instinct or natural talent—it's a profound discipline built upon centuries of accumulated knowledge."
 

@@ -11,6 +11,15 @@ import {
   artHistorySimple, 
   famousPaintingsSimple 
 } from '../data/beginnerGuides';
+import {
+  readArtImages,
+  artistIntentImages,
+  emotionImages,
+  symbolImages,
+  historySimpleImages,
+  famousPaintingsImages,
+  fiveQuestionsImages
+} from '../data/artImages';
 
 // ============================================
 // BEGINNER GUIDES HUB PAGE
@@ -534,6 +543,7 @@ export const FamousPaintingsSimpleIndexPage = () => (
 export const SimpleArtGuidePage = () => {
   const { slug } = useParams();
   const guide = simpleArtGuides.find(g => g.slug === slug) || simpleArtGuides[0];
+  const imageUrl = readArtImages[slug] || readArtImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`simple-guide-${slug}`}>
@@ -552,21 +562,27 @@ export const SimpleArtGuidePage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="prose prose-lg max-w-none">
-            <div className="bg-[#F5F5F0] p-8 mb-10 border-l-4 border-[#E5A93C]">
-              <p className="text-[#0F3057] font-heading text-xl italic mb-0">
-                "The goal isn't to sound smart in a museum. It's to see more than you did before."
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={guide.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <div className="bg-[#F5F5F0] p-8 border-l-4 border-[#E5A93C]">
+                <p className="text-[#0F3057] font-heading text-xl italic mb-0">
+                  "The goal isn't to sound smart in a museum. It's to see more than you did before."
+                </p>
+              </div>
+              <h2 className="font-heading text-2xl text-[#0F3057] mt-8">What This Guide Covers</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                This guide focuses on {guide.name.toLowerCase()}. It's designed for anyone who wants to 
+                engage more deeply with art but doesn't know where to start. No prior knowledge assumed.
               </p>
             </div>
-
-            <h2 className="font-heading text-2xl text-[#0F3057]">What This Guide Covers</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              This guide focuses on {guide.name.toLowerCase()}. It's designed for anyone who wants to 
-              engage more deeply with art but doesn't know where to start. No prior knowledge assumed.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">The Simple Approach</h2>
+          </div>
+          
+          <div className="prose prose-lg max-w-none">
+            <h2 className="font-heading text-2xl text-[#0F3057]">The Simple Approach</h2>
             <p className="text-[#5C636A] leading-relaxed">
               Art can seem intimidating because people make it complicated. But at its core, every painting 
               is a human being trying to communicate something to you. Your job is simply to receive that message.
@@ -614,6 +630,7 @@ export const SimpleArtGuidePage = () => {
 export const ArtistIntentionsPage = () => {
   const { slug } = useParams();
   const intent = artistIntentions.find(i => i.slug === slug) || artistIntentions[0];
+  const imageUrl = artistIntentImages[slug] || artistIntentImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`artist-intent-${slug}`}>
@@ -629,29 +646,35 @@ export const ArtistIntentionsPage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={intent.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h2 className="font-heading text-2xl text-[#0F3057]">The Question Everyone Asks</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                "{intent.question}" — This is one of the most common questions people have about art, 
+                and it's a great question. It shows you're engaging with the work, not just passively looking.
+              </p>
+              
+              <div className="bg-[#B64E33]/10 p-6 mt-8">
+                <h3 className="font-heading text-lg text-[#B64E33] mt-0">The Key Insight</h3>
+                <p className="text-[#5C636A] mb-0 text-sm">
+                  When something looks "wrong" in a painting by a trained artist, it's almost 
+                  always intentional.
+                </p>
+              </div>
+            </div>
+          </div>
+          
           <div className="prose prose-lg max-w-none">
-            <h2 className="font-heading text-2xl text-[#0F3057]">The Question Everyone Asks</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              "{intent.question}" — This is one of the most common questions people have about art, 
-              and it's a great question. It shows you're engaging with the work, not just passively looking.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">The Simple Answer</h2>
+            <h2 className="font-heading text-2xl text-[#0F3057]">The Simple Answer</h2>
             <p className="text-[#5C636A] leading-relaxed">
               Artists make choices that seem strange for a reason. Sometimes it's to express emotion that 
               "normal" representation can't capture. Sometimes it's to make you see something familiar in 
               a new way. Sometimes it's to challenge what art can be.
             </p>
-
-            <div className="bg-[#B64E33]/10 p-8 my-10">
-              <h3 className="font-heading text-xl text-[#B64E33] mt-0">The Key Insight</h3>
-              <p className="text-[#5C636A] mb-0">
-                When something looks "wrong" or "strange" in a painting by a trained artist, it's almost 
-                always intentional. The question isn't "why couldn't they do it right?" but "what were they 
-                trying to communicate by doing it this way?"
-              </p>
-            </div>
 
             <h2 className="font-heading text-2xl text-[#0F3057] mt-12">Examples to Consider</h2>
             <p className="text-[#5C636A] leading-relaxed">
@@ -688,6 +711,7 @@ export const ArtistIntentionsPage = () => {
 export const FiveQuestionsPage = () => {
   const { slug } = useParams();
   const questionSet = fiveQuestions.find(q => q.slug === slug) || fiveQuestions[0];
+  const imageUrl = fiveQuestionsImages[slug] || fiveQuestionsImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`five-questions-${slug}`}>
@@ -705,14 +729,29 @@ export const FiveQuestionsPage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={questionSet.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <p className="text-[#5C636A] text-lg leading-relaxed">
+                Standing in front of a {questionSet.type.toLowerCase()} and not sure what to think? 
+                These five questions will help you unlock its meaning.
+              </p>
+              
+              <div className="bg-[#2D5A43]/10 p-6 mt-8">
+                <h3 className="font-heading text-lg text-[#2D5A43] mt-0">How to Use These Questions</h3>
+                <p className="text-[#5C636A] mb-0 text-sm">
+                  Don't rush through them. Spend at least a minute on each question. Write down your thoughts 
+                  if it helps.
+                </p>
+              </div>
+            </div>
+          </div>
+          
           <div className="prose prose-lg max-w-none">
-            <p className="text-[#5C636A] text-lg leading-relaxed">
-              Standing in front of a {questionSet.type.toLowerCase()} and not sure what to think? 
-              These five questions will help you unlock its meaning.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">The 5 Questions</h2>
+            <h2 className="font-heading text-2xl text-[#0F3057]">The 5 Questions</h2>
             <div className="space-y-8 mt-8">
               {questionSet.questions.map((question, i) => (
                 <div key={i} className="flex gap-6 items-start">
@@ -725,14 +764,6 @@ export const FiveQuestionsPage = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="bg-[#2D5A43]/10 p-8 my-10">
-              <h3 className="font-heading text-xl text-[#2D5A43] mt-0">How to Use These Questions</h3>
-              <p className="text-[#5C636A] mb-0">
-                Don't rush through them. Spend at least a minute on each question. Write down your thoughts 
-                if it helps. The goal is to slow down and really engage with what you're seeing.
-              </p>
             </div>
 
             <h2 className="font-heading text-2xl text-[#0F3057] mt-12">Why This Works</h2>
@@ -763,6 +794,7 @@ export const FiveQuestionsPage = () => {
 export const EmotionsPage = () => {
   const { slug } = useParams();
   const emotion = emotionsInArt.find(e => e.slug === slug) || emotionsInArt[0];
+  const imageUrl = emotionImages[slug] || emotionImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`emotion-${slug}`}>
@@ -780,20 +812,27 @@ export const EmotionsPage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="prose prose-lg max-w-none">
-            <div className="bg-[#7C3A5A]/10 p-8 mb-10">
-              <h3 className="font-heading text-xl text-[#7C3A5A] mt-0">What to Look For</h3>
-              <p className="text-[#5C636A] text-lg mb-0">{emotion.clues}</p>
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={emotion.name} className="w-full h-full object-cover" />
             </div>
+            <div>
+              <div className="bg-[#7C3A5A]/10 p-8">
+                <h3 className="font-heading text-xl text-[#7C3A5A] mt-0">What to Look For</h3>
+                <p className="text-[#5C636A] text-lg mb-0">{emotion.clues}</p>
+              </div>
 
-            <h2 className="font-heading text-2xl text-[#0F3057]">Understanding {emotion.emotion}</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              Artists have developed a visual vocabulary for expressing {emotion.emotion.toLowerCase()}. 
-              Once you know what to look for, you'll start recognizing it everywhere.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">Visual Clues Explained</h2>
+              <h2 className="font-heading text-2xl text-[#0F3057] mt-8">Understanding {emotion.emotion}</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                Artists have developed a visual vocabulary for expressing {emotion.emotion.toLowerCase()}. 
+                Once you know what to look for, you'll start recognizing it everywhere.
+              </p>
+            </div>
+          </div>
+          
+          <div className="prose prose-lg max-w-none">
+            <h2 className="font-heading text-2xl text-[#0F3057]">Visual Clues Explained</h2>
             <p className="text-[#5C636A] leading-relaxed">
               The visual elements listed above aren't arbitrary — they're based on how humans naturally 
               associate certain visual qualities with emotional states. Bright colors feel different than 
@@ -830,6 +869,7 @@ export const EmotionsPage = () => {
 export const SymbolsPage = () => {
   const { slug } = useParams();
   const symbol = commonSymbols.find(s => s.slug === slug) || commonSymbols[0];
+  const imageUrl = symbolImages[slug] || symbolImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`symbol-${slug}`}>
@@ -845,21 +885,28 @@ export const SymbolsPage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="prose prose-lg max-w-none">
-            <h2 className="font-heading text-2xl text-[#0F3057]">The Symbol: {symbol.symbol}</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              Throughout art history, {symbol.symbol.toLowerCase()} has carried deep meaning. 
-              When you see it in a painting, the artist is often trying to communicate something 
-              beyond the literal.
-            </p>
-
-            <div className="bg-[#4A5568]/10 p-8 my-10">
-              <h3 className="font-heading text-xl text-[#4A5568] mt-0">Common Meanings</h3>
-              <p className="text-[#5C636A] text-lg mb-0">{symbol.meaning}</p>
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={symbol.name} className="w-full h-full object-cover" />
             </div>
+            <div>
+              <h2 className="font-heading text-2xl text-[#0F3057]">The Symbol: {symbol.symbol}</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                Throughout art history, {symbol.symbol.toLowerCase()} has carried deep meaning. 
+                When you see it in a painting, the artist is often trying to communicate something 
+                beyond the literal.
+              </p>
 
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">Why Symbols Matter</h2>
+              <div className="bg-[#4A5568]/10 p-6 mt-8">
+                <h3 className="font-heading text-lg text-[#4A5568] mt-0">Common Meanings</h3>
+                <p className="text-[#5C636A] mb-0">{symbol.meaning}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="prose prose-lg max-w-none">
+            <h2 className="font-heading text-2xl text-[#0F3057]">Why Symbols Matter</h2>
             <p className="text-[#5C636A] leading-relaxed">
               Before most people could read, art was how stories and ideas were communicated. 
               Artists developed a shared visual language — symbols that viewers would recognize. 
@@ -895,6 +942,7 @@ export const SymbolsPage = () => {
 export const ArtHistorySimplePage = () => {
   const { slug } = useParams();
   const era = artHistorySimple.find(e => e.slug === slug) || artHistorySimple[0];
+  const imageUrl = historySimpleImages[slug] || historySimpleImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`history-simple-${slug}`}>
@@ -913,21 +961,27 @@ export const ArtHistorySimplePage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="prose prose-lg max-w-none">
-            <div className="bg-[#744210]/10 p-8 mb-10">
-              <h3 className="font-heading text-xl text-[#744210] mt-0">The One Big Idea</h3>
-              <p className="text-[#5C636A] text-lg mb-0">{era.simple}</p>
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden">
+              <img src={imageUrl} alt={era.name} className="w-full h-full object-cover" />
             </div>
+            <div>
+              <div className="bg-[#744210]/10 p-8">
+                <h3 className="font-heading text-xl text-[#744210] mt-0">The One Big Idea</h3>
+                <p className="text-[#5C636A] text-lg mb-0">{era.simple}</p>
+              </div>
 
-            <h2 className="font-heading text-2xl text-[#0F3057]">What Was Happening</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              Every art era emerged from specific historical circumstances. Understanding what was 
-              happening in the world helps explain why artists made the choices they did. Art doesn't 
-              happen in a vacuum.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">What Made It Different</h2>
+              <h2 className="font-heading text-2xl text-[#0F3057] mt-8">What Was Happening</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                Every art era emerged from specific historical circumstances. Understanding what was 
+                happening in the world helps explain why artists made the choices they did.
+              </p>
+            </div>
+          </div>
+          
+          <div className="prose prose-lg max-w-none">
+            <h2 className="font-heading text-2xl text-[#0F3057]">What Made It Different</h2>
             <p className="text-[#5C636A] leading-relaxed">
               Each new era was a reaction to what came before. Artists either built on previous 
               traditions or rebelled against them. Knowing this progression helps you see how art 
@@ -969,6 +1023,7 @@ export const ArtHistorySimplePage = () => {
 export const FamousPaintingsSimplePage = () => {
   const { slug } = useParams();
   const painting = famousPaintingsSimple.find(p => p.slug === slug) || famousPaintingsSimple[0];
+  const imageUrl = famousPaintingsImages[slug] || famousPaintingsImages['default'];
   
   return (
     <main className="pt-20 min-h-screen bg-[#FDFDFB]" data-testid={`famous-simple-${slug}`}>
@@ -985,21 +1040,28 @@ export const FamousPaintingsSimplePage = () => {
       </section>
       
       <section className="py-16 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="prose prose-lg max-w-none">
-            <div className="bg-[#1A365D]/10 p-8 mb-10">
-              <h3 className="font-heading text-xl text-[#1A365D] mt-0">In One Sentence</h3>
-              <p className="text-[#5C636A] text-lg mb-0">{painting.simple}</p>
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            <div className="aspect-[4/3] bg-[#F5F5F0] overflow-hidden shadow-xl">
+              <img src={imageUrl} alt={painting.painting} className="w-full h-full object-cover" />
             </div>
+            <div>
+              <div className="bg-[#1A365D]/10 p-8">
+                <h3 className="font-heading text-xl text-[#1A365D] mt-0">In One Sentence</h3>
+                <p className="text-[#5C636A] text-lg mb-0">{painting.simple}</p>
+              </div>
 
-            <h2 className="font-heading text-2xl text-[#0F3057]">Why It's Famous</h2>
-            <p className="text-[#5C636A] leading-relaxed">
-              "{painting.painting}" by {painting.artist} isn't just famous because art experts say so. 
-              It resonated with people across generations because it captures something universal about 
-              human experience.
-            </p>
-
-            <h2 className="font-heading text-2xl text-[#0F3057] mt-12">What You're Really Looking At</h2>
+              <h2 className="font-heading text-2xl text-[#0F3057] mt-8">Why It's Famous</h2>
+              <p className="text-[#5C636A] leading-relaxed mt-4">
+                "{painting.painting}" by {painting.artist} isn't just famous because art experts say so. 
+                It resonated with people across generations because it captures something universal about 
+                human experience.
+              </p>
+            </div>
+          </div>
+          
+          <div className="prose prose-lg max-w-none">
+            <h2 className="font-heading text-2xl text-[#0F3057]">What You're Really Looking At</h2>
             <p className="text-[#5C636A] leading-relaxed">
               Beyond the subject matter, pay attention to how the artist chose to present it. The 
               composition, the colors, the brushwork — these technical choices are what make the 
