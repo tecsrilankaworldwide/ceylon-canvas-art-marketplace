@@ -51,6 +51,13 @@ import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesI
 import { FundamentalPage, MasterpiecePage, ArtHistoryPage, ArtTheoryPage, ArtistStudyPage, MuseumStudyPage, ArtCoursePage } from './pages/EducationPages';
 import { EducationHubPage, FundamentalsIndexPage, MasterpiecesIndexPage, ArtHistoryIndexPage, TheoryIndexPage, ArtistsStudyIndexPage, MuseumsIndexPage, CoursesIndexPage } from './pages/EducationIndexPages';
 import { VocabularyPage, CompositionStudyPage, CollectionStudyPage, ManifestoPage, VocabularyIndexPage, CompositionIndexPage, FamousCollectionsIndexPage, ManifestosIndexPage } from './pages/MoreEducationPages';
+import { 
+  BeginnerGuidesHubPage, 
+  SimpleArtGuidesIndexPage, ArtistIntentionsIndexPage, FiveQuestionsIndexPage, 
+  EmotionsInArtIndexPage, CommonSymbolsIndexPage, ArtHistorySimpleIndexPage, FamousPaintingsSimpleIndexPage,
+  SimpleArtGuidePage, ArtistIntentionsPage, FiveQuestionsPage, 
+  EmotionsPage, SymbolsPage, ArtHistorySimplePage, FamousPaintingsSimplePage 
+} from './pages/BeginnerGuidePages';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -211,6 +218,37 @@ function AppRoutes() {
       {/* Art Manifestos - 15 pages */}
       <Route path="/education/manifestos" element={<Layout><ManifestosIndexPage /></Layout>} />
       <Route path="/education/manifestos/:slug" element={<Layout><ManifestoPage /></Layout>} />
+      
+      {/* BEGINNER GUIDES - Art Appreciation Made Simple (~190 pages) */}
+      <Route path="/education/beginner" element={<Layout><BeginnerGuidesHubPage /></Layout>} />
+      
+      {/* How to Read Any Painting - 20 pages */}
+      <Route path="/education/beginner/read-art" element={<Layout><SimpleArtGuidesIndexPage /></Layout>} />
+      <Route path="/education/beginner/read-art/:slug" element={<Layout><SimpleArtGuidePage /></Layout>} />
+      
+      {/* What Artists Really Mean - 30 pages */}
+      <Route path="/education/beginner/artist-intent" element={<Layout><ArtistIntentionsIndexPage /></Layout>} />
+      <Route path="/education/beginner/artist-intent/:slug" element={<Layout><ArtistIntentionsPage /></Layout>} />
+      
+      {/* 5 Questions for Any Art - 20 pages */}
+      <Route path="/education/beginner/five-questions" element={<Layout><FiveQuestionsIndexPage /></Layout>} />
+      <Route path="/education/beginner/five-questions/:slug" element={<Layout><FiveQuestionsPage /></Layout>} />
+      
+      {/* Emotions in Art Decoded - 25 pages */}
+      <Route path="/education/beginner/emotions" element={<Layout><EmotionsInArtIndexPage /></Layout>} />
+      <Route path="/education/beginner/emotions/:slug" element={<Layout><EmotionsPage /></Layout>} />
+      
+      {/* Common Symbols Explained - 30 pages */}
+      <Route path="/education/beginner/symbols" element={<Layout><CommonSymbolsIndexPage /></Layout>} />
+      <Route path="/education/beginner/symbols/:slug" element={<Layout><SymbolsPage /></Layout>} />
+      
+      {/* Art History Made Simple - 20 pages */}
+      <Route path="/education/beginner/history-simple" element={<Layout><ArtHistorySimpleIndexPage /></Layout>} />
+      <Route path="/education/beginner/history-simple/:slug" element={<Layout><ArtHistorySimplePage /></Layout>} />
+      
+      {/* Famous Paintings Explained Simply - 25 pages */}
+      <Route path="/education/beginner/famous-simple" element={<Layout><FamousPaintingsSimpleIndexPage /></Layout>} />
+      <Route path="/education/beginner/famous-simple/:slug" element={<Layout><FamousPaintingsSimplePage /></Layout>} />
       
       {/* Auth Routes - No Layout */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />

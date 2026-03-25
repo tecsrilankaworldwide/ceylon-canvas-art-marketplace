@@ -131,14 +131,33 @@ Ceylon Canvas Art Marketplace - A marketplace for Sri Lankan traditional and con
 - ✅ **15 Art Manifestos** - Futurist, Dada, Surrealist (/education/manifestos/:slug)
 - ✅ **12 Index Pages**
 
+### NEW: Beginner Art Guides Section (170 pages - Dec 2025):
+**Purpose**: Simple, jargon-free guides for everyday art lovers who want to "read" paintings without needing an art degree.
+
+- ✅ **20 How to Read Any Painting** - Simple 5-step approach to understanding art (/education/beginner/read-art/:slug)
+- ✅ **30 What Artists Really Mean** - Why did they distort faces? Why so dark? (/education/beginner/artist-intent/:slug)
+- ✅ **20 5 Questions for Any Art Type** - Questions for portraits, landscapes, abstract, etc. (/education/beginner/five-questions/:slug)
+- ✅ **25 Emotions in Art Decoded** - Joy, sadness, fear, love - visual clues explained (/education/beginner/emotions/:slug)
+- ✅ **30 Common Symbols Explained** - Water, fire, light, birds, flowers - hidden meanings (/education/beginner/symbols/:slug)
+- ✅ **20 Art History Made Super Simple** - Every era in one sentence (/education/beginner/history-simple/:slug)
+- ✅ **25 Famous Paintings Explained Simply** - Mona Lisa, Starry Night in plain English (/education/beginner/famous-simple/:slug)
+- ✅ **8 Index Pages** - Hub page + 7 category index pages
+
+**Core Message**: "You don't need an art degree to understand paintings. These guides give you simple, practical tools to 'read' any artwork."
+
+Data Files:
+- `/src/data/beginnerGuides.js` - All beginner guide data (170 entries)
+- `/src/pages/BeginnerGuidePages.js` - All UI components
+
 **Core Message**: "Art is not merely instinct or natural talent—it's a profound discipline built upon centuries of accumulated knowledge."
 
-**GRAND TOTAL: 805+ PAGES**
+**GRAND TOTAL: 975+ PAGES** (805 + 170 beginner guides)
 
 Data Files:
 - `/src/data/pagesData.js` - Core page data (278 pages)
 - `/src/data/educationData.js` - Education section data (327 pages)
 - `/src/data/artImages.js` - Real artwork images
+- `/src/data/beginnerGuides.js` - Beginner art guides data (170 entries)
 
 ## Prioritized Backlog
 

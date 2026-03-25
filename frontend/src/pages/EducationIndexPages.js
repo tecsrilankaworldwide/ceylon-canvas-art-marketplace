@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb, BookMarked, Grid3X3, Library, FileText } from 'lucide-react';
+import { BookOpen, Image, Clock, Award, GraduationCap, Building2, Palette, Lightbulb, BookMarked, Grid3X3, Library, FileText, Eye, Heart } from 'lucide-react';
 import { artFundamentals, masterpieceAnalysis, artHistoryComprehensive, artTheoryDeep, artistsDeepStudy, museumStudies, artAppreciationCourses, artVocabulary, compositionStudies, famousCollections, artManifestos } from '../data/educationData';
+import { simpleArtGuides, artistIntentions, fiveQuestions, emotionsInArt, commonSymbols, artHistorySimple, famousPaintingsSimple } from '../data/beginnerGuides';
 import { masterpieceImages, artistImages, artImages } from '../data/artImages';
 
 // Main Education Hub
 export const EducationHubPage = () => {
+  const beginnerTotal = simpleArtGuides.length + artistIntentions.length + fiveQuestions.length + emotionsInArt.length + commonSymbols.length + artHistorySimple.length + famousPaintingsSimple.length;
+  
   const sections = [
     { name: 'Art Fundamentals', count: artFundamentals.length, path: '/education/fundamentals', icon: BookOpen, desc: 'Master the elements and principles' },
     { name: 'Masterpiece Analysis', count: masterpieceAnalysis.length, path: '/education/masterpieces', icon: Image, desc: 'Decode the world\'s greatest works' },
@@ -36,10 +39,72 @@ export const EducationHubPage = () => {
         </div>
       </section>
 
+      {/* NEW: Beginner Guides Featured Section */}
+      <section className="py-16 bg-gradient-to-br from-[#0F3057] via-[#1A365D] to-[#0F3057]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-block px-3 py-1 bg-[#E5A93C] text-[#0A1015] text-xs font-bold tracking-wider uppercase mb-4">
+                New for Art Lovers
+              </span>
+              <h2 className="font-heading text-3xl lg:text-4xl text-white mb-4">
+                Art Appreciation Made Simple
+              </h2>
+              <p className="text-white/70 text-lg leading-relaxed mb-6">
+                You don't need an art degree to understand paintings. Our new beginner guides give you 
+                practical tools to "read" any artwork — no jargon, no pretension, just real insights 
+                anyone can use.
+              </p>
+              <div className="flex flex-wrap gap-4 mb-8">
+                <div className="px-4 py-2 bg-white/10 backdrop-blur-sm">
+                  <span className="text-2xl font-heading text-[#E5A93C]">{beginnerTotal}</span>
+                  <span className="text-white/70 ml-2 text-sm">Simple Guides</span>
+                </div>
+                <div className="px-4 py-2 bg-white/10 backdrop-blur-sm">
+                  <span className="text-white/70 text-sm">5 min reads</span>
+                </div>
+                <div className="px-4 py-2 bg-white/10 backdrop-blur-sm">
+                  <span className="text-white/70 text-sm">Zero jargon</span>
+                </div>
+              </div>
+              <Link 
+                to="/education/beginner" 
+                className="inline-flex items-center gap-2 bg-[#E5A93C] text-[#0A1015] px-6 py-3 font-medium hover:bg-[#E5A93C]/90 transition-colors"
+              >
+                <Eye className="h-5 w-5" />
+                Start Reading Art Today
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Link to="/education/beginner/read-art" className="p-6 bg-white/10 hover:bg-white/20 transition-colors">
+                <Eye className="h-8 w-8 text-[#E5A93C] mb-3" />
+                <h3 className="text-white font-heading text-lg">How to Read Paintings</h3>
+                <p className="text-white/60 text-sm mt-1">{simpleArtGuides.length} guides</p>
+              </Link>
+              <Link to="/education/beginner/emotions" className="p-6 bg-white/10 hover:bg-white/20 transition-colors">
+                <Heart className="h-8 w-8 text-[#E5A93C] mb-3" />
+                <h3 className="text-white font-heading text-lg">Emotions in Art</h3>
+                <p className="text-white/60 text-sm mt-1">{emotionsInArt.length} guides</p>
+              </Link>
+              <Link to="/education/beginner/symbols" className="p-6 bg-white/10 hover:bg-white/20 transition-colors">
+                <Lightbulb className="h-8 w-8 text-[#E5A93C] mb-3" />
+                <h3 className="text-white font-heading text-lg">Common Symbols</h3>
+                <p className="text-white/60 text-sm mt-1">{commonSymbols.length} guides</p>
+              </Link>
+              <Link to="/education/beginner/famous-simple" className="p-6 bg-white/10 hover:bg-white/20 transition-colors">
+                <Image className="h-8 w-8 text-[#E5A93C] mb-3" />
+                <h3 className="text-white font-heading text-lg">Famous Paintings</h3>
+                <p className="text-white/60 text-sm mt-1">{famousPaintingsSimple.length} guides</p>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 lg:py-24 bg-[#F5F5F0]">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <h2 className="font-heading text-3xl text-[#0F3057] mb-4">Why Art Education Matters</h2>
-          <p className="text-[#5C636A] max-w-3xl mb-12">When you understand the principles behind great art, you don't just see a painting—you read it. You understand why Vermeer's light feels miraculous, why Picasso's distortions convey emotion, why a simple Rothko rectangle can move you to tears.</p>
+          <h2 className="font-heading text-3xl text-[#0F3057] mb-4">In-Depth Education</h2>
+          <p className="text-[#5C636A] max-w-3xl mb-12">For those who want to go deeper: comprehensive courses on art history, theory, technique, and more.</p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sections.map((section, i) => (
@@ -63,8 +128,8 @@ export const EducationHubPage = () => {
             <div className="p-8 bg-[#0F3057] text-white">
               <span className="text-[#E5A93C] text-sm uppercase tracking-wider">Beginner</span>
               <h3 className="font-heading text-2xl mt-4">New to Art?</h3>
-              <p className="text-white/70 mt-4">Start with the fundamentals. Learn the 7 elements of art, basic composition, and how to really look at a painting.</p>
-              <Link to="/education/fundamentals/what-is-art" className="inline-block mt-6 text-[#E5A93C] hover:underline">Begin here →</Link>
+              <p className="text-white/70 mt-4">Start with our simple guides. Learn to read paintings, understand symbols, and appreciate art without the jargon.</p>
+              <Link to="/education/beginner" className="inline-block mt-6 text-[#E5A93C] hover:underline">Begin here →</Link>
             </div>
             <div className="p-8 border border-[#E5E5DF]">
               <span className="text-[#B64E33] text-sm uppercase tracking-wider">Intermediate</span>
