@@ -14,9 +14,9 @@ import {
 import { NotificationCenter } from './NotificationCenter';
 import { CurrencySelector } from './CurrencySelector';
 
-// Ceylon Canvas Logo Component
+// Ceylon Canvas Logo Component - Elegant Brushstroke C
 const CeylonCanvasLogo = ({ size = 'default' }) => {
-  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/4867109deff9a1f5af6be758efc021e073af59b35261bf2efa2cc1c005851a9d.png";
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/3bbb49476bf767e8af805590c8a93329c3a53b80e3a3058a726d3d06a02b7c04.png";
   const sizes = {
     small: 'h-8 w-8',
     default: 'h-10 w-10',

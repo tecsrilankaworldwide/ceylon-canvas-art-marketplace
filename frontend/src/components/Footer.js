@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
 
-// Ceylon Canvas Logo for Footer (dark theme)
+// Ceylon Canvas Logo for Footer - Elegant Brushstroke C
 const CeylonCanvasLogoDark = () => {
-  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/d1a3c6ea800436ea22d0d254298a7517618686f71f9f3179bc3f906c135748a4.png";
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/3bbb49476bf767e8af805590c8a93329c3a53b80e3a3058a726d3d06a02b7c04.png";
   return (
     <img 
       src={logoUrl} 
