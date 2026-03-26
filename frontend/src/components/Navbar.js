@@ -65,6 +65,36 @@ export const Navbar = () => {
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger className="font-body text-sm font-medium text-[#1A1D20] link-underline cursor-pointer">
+                Learn
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/education">Education Hub</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/education/beginner">Beginner Guides</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/education/collector">Collector Knowledge</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/world-art">World Art Cities</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/art-stories">Art Stories</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/styles">Art Styles</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/education/paths">Learning Paths</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="font-body text-sm font-medium text-[#1A1D20] link-underline cursor-pointer">
                 Services
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-48">
