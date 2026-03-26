@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, User, Menu, X, Search, Heart, Palette, Shield, MessageCircle } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Search, Heart, Shield, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
   DropdownMenu,
@@ -13,6 +13,23 @@ import {
 } from '../components/ui/dropdown-menu';
 import { NotificationCenter } from './NotificationCenter';
 import { CurrencySelector } from './CurrencySelector';
+
+// Ceylon Canvas Logo Component
+const CeylonCanvasLogo = ({ size = 'default' }) => {
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/4867109deff9a1f5af6be758efc021e073af59b35261bf2efa2cc1c005851a9d.png";
+  const sizes = {
+    small: 'h-8 w-8',
+    default: 'h-10 w-10',
+    large: 'h-12 w-12'
+  };
+  return (
+    <img 
+      src={logoUrl} 
+      alt="Ceylon Canvas" 
+      className={`${sizes[size]} object-contain`}
+    />
+  );
+};
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout, isArtist, isAdmin } = useAuth();
@@ -42,7 +59,7 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3" data-testid="nav-logo">
-            <Palette className="h-8 w-8 text-[#0F3057]" />
+            <CeylonCanvasLogo />
             <div className="flex flex-col">
               <span className="font-heading text-xl font-semibold text-[#0F3057] tracking-tight">Ceylon Canvas</span>
               <span className="text-[10px] font-body tracking-[0.2em] uppercase text-[#5C636A]">Art Marketplace</span>

@@ -2022,6 +2022,36 @@ async def seed_data():
     
     return {"message": "Sample data seeded successfully", "artists": len(sample_artists), "artworks": len(sample_artworks)}
 
+# Force reseed endpoint - expands database to 40 artists + 50 artworks
+@api_router.post("/seed/expand")
+async def expand_seed_data():
+    """Expand database with 40 artists and 50 artworks (20 gallery + 30 auctions)"""
+    from seed_data import generate_artists, generate_artworks
+    
+    # Clear existing data
+    await db.artists.delete_many({})
+    await db.artworks.delete_many({})
+    
+    # Generate expanded data
+    artists = generate_artists()
+    artworks = generate_artworks(artists)
+    
+    # Insert artists
+    for artist in artists:
+        await db.artists.insert_one(artist)
+    
+    # Insert artworks
+    for artwork in artworks:
+        await db.artworks.insert_one(artwork)
+    
+    return {
+        "message": "Database expanded successfully", 
+        "artists": len(artists), 
+        "artworks": len(artworks),
+        "auctions": len([a for a in artworks if a["is_auction"]]),
+        "gallery": len([a for a in artworks if not a["is_auction"]])
+    }
+
 # ==================== FILE UPLOAD ROUTES ====================
 
 @api_router.post("/upload/image")

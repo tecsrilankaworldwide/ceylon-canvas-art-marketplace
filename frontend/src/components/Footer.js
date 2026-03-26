@@ -1,6 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Palette, Instagram, Twitter, Facebook, Mail } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
+
+// Ceylon Canvas Logo for Footer (dark theme)
+const CeylonCanvasLogoDark = () => {
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/d1a3c6ea800436ea22d0d254298a7517618686f71f9f3179bc3f906c135748a4.png";
+  return (
+    <img 
+      src={logoUrl} 
+      alt="Ceylon Canvas" 
+      className="h-10 w-10 object-contain"
+    />
+  );
+};
 
 export const Footer = () => {
   return (
@@ -10,7 +22,7 @@ export const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <Palette className="h-8 w-8 text-[#E5A93C]" />
+              <CeylonCanvasLogoDark />
               <div className="flex flex-col">
                 <span className="font-heading text-xl font-semibold text-white tracking-tight">Ceylon Canvas</span>
                 <span className="text-[10px] font-body tracking-[0.2em] uppercase text-[#E5A93C]">Art Marketplace</span>
