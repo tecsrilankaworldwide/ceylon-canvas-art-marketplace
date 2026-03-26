@@ -2,14 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
 
-// Ceylon Canvas Logo for Footer - Elegant Brushstroke C
+// Ceylon Canvas Logo for Footer - Antique Brass CC with Lotus
 const CeylonCanvasLogoDark = () => {
-  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/3bbb49476bf767e8af805590c8a93329c3a53b80e3a3058a726d3d06a02b7c04.png";
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/a152a79648d3052ef61cf0cefec6120574e5354bee1651458df389b98909377a.png";
   return (
     <img 
       src={logoUrl} 
       alt="Ceylon Canvas" 
-      className="h-10 w-10 object-contain"
+      className="h-14 w-14 object-contain"
     />
   );
 };

@@ -14,13 +14,13 @@ import {
 import { NotificationCenter } from './NotificationCenter';
 import { CurrencySelector } from './CurrencySelector';
 
-// Ceylon Canvas Logo Component - Elegant Brushstroke C
+// Ceylon Canvas Logo Component - Antique Brass CC with Lotus
 const CeylonCanvasLogo = ({ size = 'default' }) => {
-  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/3bbb49476bf767e8af805590c8a93329c3a53b80e3a3058a726d3d06a02b7c04.png";
+  const logoUrl = "https://static.prod-images.emergentagent.com/jobs/d89ac9f5-827b-4b7b-af63-873f102d6314/images/a152a79648d3052ef61cf0cefec6120574e5354bee1651458df389b98909377a.png";
   const sizes = {
-    small: 'h-8 w-8',
-    default: 'h-10 w-10',
-    large: 'h-12 w-12'
+    small: 'h-10 w-10',
+    default: 'h-14 w-14',
+    large: 'h-16 w-16'
   };
   return (
     <img 
