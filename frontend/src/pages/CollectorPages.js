@@ -182,20 +182,24 @@ export const MovementsCheatsheetPage = () => {
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-[#E5E5DF] hidden lg:block"></div>
             
             <div className="space-y-6">
-              {card.movements.map((movement, i) => (
-                <div key={i} className="relative lg:pl-20">
-                  <div className="hidden lg:block absolute left-6 top-6 w-4 h-4 bg-[#0F3057] border-4 border-[#E5A93C]"></div>
-                  <div className="bg-white p-6 border border-[#E5E5DF] hover:shadow-lg transition-all">
-                    <div className="flex flex-wrap items-center gap-4 mb-3">
-                      <h3 className="font-heading text-xl text-[#0F3057]">{movement.name}</h3>
-                      <span className="text-[#E5A93C] font-medium">{movement.years}</span>
-                      <span className="px-3 py-1 bg-[#0F3057] text-white text-sm">{movement.oneWord}</span>
+              {card.movements.map((movement, i) => {
+                const slug = movement.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-history';
+                return (
+                  <Link key={i} to={`/education/art-history/${slug}`} className="block relative lg:pl-20 group">
+                    <div className="hidden lg:block absolute left-6 top-6 w-4 h-4 bg-[#0F3057] border-4 border-[#E5A93C]"></div>
+                    <div className="bg-white p-6 border border-[#E5E5DF] hover:shadow-lg hover:border-[#E5A93C] transition-all cursor-pointer">
+                      <div className="flex flex-wrap items-center gap-4 mb-3">
+                        <h3 className="font-heading text-xl text-[#0F3057] group-hover:text-[#B64E33]">{movement.name}</h3>
+                        <span className="text-[#E5A93C] font-medium">{movement.years}</span>
+                        <span className="px-3 py-1 bg-[#0F3057] text-white text-sm">{movement.oneWord}</span>
+                      </div>
+                      <p className="text-[#5C636A]"><strong>Key Artist:</strong> {movement.keyArtist}</p>
+                      <p className="text-[#5C636A] mt-2"><strong>Spot It:</strong> {movement.spotIt}</p>
+                      <p className="text-[#E5A93C] text-sm mt-3 opacity-0 group-hover:opacity-100 transition-opacity">Click to learn more →</p>
                     </div>
-                    <p className="text-[#5C636A]"><strong>Key Artist:</strong> {movement.keyArtist}</p>
-                    <p className="text-[#5C636A] mt-2"><strong>Spot It:</strong> {movement.spotIt}</p>
-                  </div>
-                </div>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

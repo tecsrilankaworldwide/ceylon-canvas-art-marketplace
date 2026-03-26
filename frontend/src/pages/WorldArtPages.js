@@ -180,14 +180,53 @@ export const WorldArtCityPage = () => {
             <h2 className="font-heading text-2xl lg:text-3xl text-[#0F3057]">Must-See Destinations</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {city.mustSee.map((place, i) => (
-              <div key={i} className="bg-white border border-[#E5E5DF] p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 bg-[#E5A93C] text-white flex items-center justify-center font-bold text-sm">{i + 1}</span>
-                  <span className="font-medium text-[#0F3057]">{place}</span>
-                </div>
-              </div>
-            ))}
+            {city.mustSee.map((place, i) => {
+              // Map common museum names to their education slugs
+              const museumSlugs = {
+                'Louvre Museum': 'louvre-guide',
+                "Musée d'Orsay": 'musee-dorsay-guide',
+                'Centre Pompidou': 'centre-pompidou-guide',
+                "Musée de l'Orangerie": 'louvre-guide',
+                'Musée Rodin': 'louvre-guide',
+                'Metropolitan Museum': 'metropolitan-guide',
+                'MoMA': 'moma-guide',
+                'Guggenheim': 'guggenheim-guide',
+                'Whitney Museum': 'moma-guide',
+                'Frick Collection': 'metropolitan-guide',
+                'National Gallery': 'national-gallery-london',
+                'Tate Modern': 'tate-modern-guide',
+                'Tate Britain': 'tate-modern-guide',
+                'British Museum': 'british-museum-guide',
+                'Victoria and Albert': 'british-museum-guide',
+                'Uffizi Gallery': 'uffizi-guide',
+                'Accademia Gallery': 'uffizi-guide',
+                'Palazzo Pitti': 'uffizi-guide',
+                'Rijksmuseum': 'rijksmuseum-guide',
+                'Van Gogh Museum': 'rijksmuseum-guide',
+                'Museo del Prado': 'prado-guide',
+                'Reina Sofia': 'prado-guide',
+                'Vatican Museums': 'vatican-museums-guide',
+                'Kunsthistorisches Museum': 'kunsthistorisches-guide',
+                'Belvedere': 'kunsthistorisches-guide',
+                'Hermitage': 'hermitage-guide'
+              };
+              const slug = Object.keys(museumSlugs).find(key => place.includes(key));
+              const museumSlug = slug ? museumSlugs[slug] : 'virtual-museum-tours';
+              
+              return (
+                <Link 
+                  key={i} 
+                  to={`/education/museums/${museumSlug}`}
+                  className="bg-white border border-[#E5E5DF] p-6 hover:shadow-lg hover:border-[#E5A93C] transition-all group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 bg-[#E5A93C] text-white flex items-center justify-center font-bold text-sm">{i + 1}</span>
+                    <span className="font-medium text-[#0F3057] group-hover:text-[#B64E33]">{place}</span>
+                  </div>
+                  <p className="text-[#E5A93C] text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity">View museum guide →</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
