@@ -148,7 +148,7 @@ class ArtworkResponse(BaseModel):
     images: List[str] = []
     is_digital: bool = False
     is_auction: bool = False
-    price: float
+    price: Optional[float] = None
     current_bid: Optional[float] = None
     reserve_price: Optional[float] = None
     auction_end_date: Optional[str] = None
