@@ -181,13 +181,33 @@ export const FurnitureHubPage = () => {
 export const LocalMarketPage = () => {
   const { t } = useLanguage();
   
-  const localItems = [
-    { name: 'Mahogany Dining Table', nameSi: 'මහෝගනී ආහාර මේසය', price: 85000, priceLabel: 'Rs. 85,000', origin: 'Moratuwa' },
-    { name: 'Teak Almirah', nameSi: 'ටීක් අල්මාරිය', price: 125000, priceLabel: 'Rs. 125,000', origin: 'Galle' },
-    { name: 'Jackwood Bed Frame', nameSi: 'කොස් ලී ඇඳ රාමුව', price: 95000, priceLabel: 'Rs. 95,000', origin: 'Kandy' },
-    { name: 'Coconut Wood Chair Set', nameSi: 'පොල් ලී පුටු කට්ටලය', price: 45000, priceLabel: 'Rs. 45,000', origin: 'Kurunegala' },
-    { name: 'Ebony Coffee Table', nameSi: 'කළුවර කෝපි මේසය', price: 65000, priceLabel: 'Rs. 65,000', origin: 'Ratnapura' },
-    { name: 'Satinwood Wardrobe', nameSi: 'බුරුත ඇඳුම් අල්මාරිය', price: 175000, priceLabel: 'Rs. 175,000', origin: 'Matara' }
+  const categories = [
+    {
+      name: 'Contemporary Collection',
+      nameSi: 'සමකාලීන එකතුව',
+      nameTa: 'சமகால தொகுப்பு',
+      desc: 'Modern designs for the new generation. Sleek, minimal, trendy.',
+      color: 'bg-[#2D5A43]'
+    },
+    {
+      name: 'Antique Replica Collection',
+      nameSi: 'පුරාණ අනුරූප එකතුව',
+      nameTa: 'பழங்கால பிரதி தொகுப்பு',
+      desc: 'Masterfully crafted reproductions. Indistinguishable from originals.',
+      color: 'bg-[#8B4513]'
+    }
+  ];
+
+  const contemporaryItems = [
+    { name: 'Modern Teak Dining Set', nameSi: 'නවීන ටීක් ආහාර කට්ටලය', price: 145000, priceLabel: 'Rs. 145,000', style: 'Minimalist' },
+    { name: 'Scandinavian Coffee Table', nameSi: 'ස්කැන්ඩිනේවියානු කෝපි මේසය', price: 45000, priceLabel: 'Rs. 45,000', style: 'Nordic' },
+    { name: 'Industrial TV Console', nameSi: 'කාර්මික TV කොන්සෝලය', price: 65000, priceLabel: 'Rs. 65,000', style: 'Urban' },
+  ];
+
+  const antiqueReplicaItems = [
+    { name: 'Dutch Colonial Cabinet (Replica)', nameSi: 'ලන්දේසි යටත් විජිත අල්මාරිය (අනුරූපය)', price: 185000, priceLabel: 'Rs. 185,000', style: 'Colonial Era' },
+    { name: 'Victorian Writing Desk (Replica)', nameSi: 'වික්ටෝරියානු ලිවීමේ මේසය (අනුරූපය)', price: 125000, priceLabel: 'Rs. 125,000', style: '19th Century' },
+    { name: 'British Raj Planter Chair (Replica)', nameSi: 'බ්‍රිතාන්‍ය රාජ් වගා පුටුව (අනුරූපය)', price: 55000, priceLabel: 'Rs. 55,000', style: 'Heritage' },
   ];
 
   return (
@@ -202,32 +222,106 @@ export const LocalMarketPage = () => {
           <p className="font-heading text-2xl text-white/80 mb-2">දේශීය වෙළඳපොළ</p>
           <p className="font-heading text-xl text-white/60 mb-6">உள்ளூர் சந்தை</p>
           <p className="font-body text-lg text-white/70 max-w-2xl">
-            Handcrafted furniture from Sri Lankan artisans. Quality pieces at local prices for Sri Lankan homes.
+            Quality furniture for Sri Lankan homes. From contemporary designs for the new generation to masterfully crafted antique replicas.
           </p>
         </div>
       </section>
 
-      <section className="py-20">
+      {/* Contemporary Collection */}
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-2 h-12 bg-[#2D5A43]"></div>
+            <div>
+              <h2 className="font-heading text-2xl lg:text-3xl text-[#0F3057]">Contemporary Collection</h2>
+              <p className="text-[#5C636A]">Modern designs for the new generation</p>
+            </div>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {localItems.map((item, i) => (
+            {contemporaryItems.map((item, i) => (
               <div key={i} className="group cursor-pointer">
-                <div className="aspect-[4/3] overflow-hidden bg-[#F5F5F0] mb-4">
+                <div className="aspect-[4/3] overflow-hidden bg-[#F5F5F0] mb-4 relative">
                   <img 
-                    src={furnitureImages.classic[i % furnitureImages.classic.length]} 
+                    src={furnitureImages.contemporary[i % furnitureImages.contemporary.length]} 
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  <span className="absolute top-4 left-4 bg-[#2D5A43] text-white px-3 py-1 text-xs">{item.style}</span>
                 </div>
-                <h3 className="font-heading text-lg text-[#0F3057] group-hover:text-[#B64E33] transition-colors">{item.name}</h3>
+                <h3 className="font-heading text-lg text-[#0F3057] group-hover:text-[#2D5A43] transition-colors">{item.name}</h3>
                 <p className="text-[#5C636A] text-sm">{item.nameSi}</p>
-                <p className="text-[#5C636A] text-sm">Origin: {item.origin}</p>
-                <p className="text-[#B64E33] font-bold text-xl mt-2">{item.priceLabel}</p>
-                <Button className="mt-3 bg-[#B64E33] text-white rounded-none w-full hover:bg-[#8B3A27]">
+                <p className="text-[#2D5A43] font-bold text-xl mt-2">{item.priceLabel}</p>
+                <Button className="mt-3 bg-[#2D5A43] text-white rounded-none w-full hover:bg-[#1F4332]">
                   Inquire Now
                 </Button>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Antique Replica Collection */}
+      <section className="py-16 bg-[#F5F5F0]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-2 h-12 bg-[#8B4513]"></div>
+            <div>
+              <h2 className="font-heading text-2xl lg:text-3xl text-[#0F3057]">Antique Replica Collection</h2>
+              <p className="text-[#5C636A]">Masterfully crafted reproductions - Indistinguishable from originals</p>
+            </div>
+          </div>
+          <p className="text-[#5C636A] mb-8 max-w-2xl">
+            Our skilled craftsmen recreate heritage furniture with exact precision. Same wood types, same techniques, same timeless beauty - but brand new and built to last generations.
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            {antiqueReplicaItems.map((item, i) => (
+              <div key={i} className="group cursor-pointer">
+                <div className="aspect-[4/3] overflow-hidden bg-white mb-4 relative">
+                  <img 
+                    src={furnitureImages.antique[i % furnitureImages.antique.length]} 
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span className="absolute top-4 left-4 bg-[#8B4513] text-white px-3 py-1 text-xs">{item.style}</span>
+                  <span className="absolute top-4 right-4 bg-[#E5A93C] text-[#0A1015] px-2 py-1 text-xs font-medium">REPLICA</span>
+                </div>
+                <h3 className="font-heading text-lg text-[#0F3057] group-hover:text-[#8B4513] transition-colors">{item.name}</h3>
+                <p className="text-[#5C636A] text-sm">{item.nameSi}</p>
+                <p className="text-[#8B4513] font-bold text-xl mt-2">{item.priceLabel}</p>
+                <Button className="mt-3 bg-[#8B4513] text-white rounded-none w-full hover:bg-[#6B3410]">
+                  Inquire Now
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Replicas */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
+          <h2 className="font-heading text-2xl text-[#0F3057] mb-8">Why Choose Our Antique Replicas?</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="p-6">
+              <div className="text-3xl mb-3">🪵</div>
+              <h3 className="font-medium text-[#0F3057] mb-2">Same Materials</h3>
+              <p className="text-sm text-[#5C636A]">Authentic teak, mahogany, satinwood from Sri Lanka</p>
+            </div>
+            <div className="p-6">
+              <div className="text-3xl mb-3">🔨</div>
+              <h3 className="font-medium text-[#0F3057] mb-2">Traditional Techniques</h3>
+              <p className="text-sm text-[#5C636A]">Hand-carved by master craftsmen using heritage methods</p>
+            </div>
+            <div className="p-6">
+              <div className="text-3xl mb-3">✨</div>
+              <h3 className="font-medium text-[#0F3057] mb-2">Indistinguishable</h3>
+              <p className="text-sm text-[#5C636A]">Expert aging techniques for authentic vintage appearance</p>
+            </div>
+            <div className="p-6">
+              <div className="text-3xl mb-3">💪</div>
+              <h3 className="font-medium text-[#0F3057] mb-2">Built to Last</h3>
+              <p className="text-sm text-[#5C636A]">New construction means decades of durability</p>
+            </div>
           </div>
         </div>
       </section>
