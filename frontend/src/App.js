@@ -46,7 +46,7 @@ import HelpTopicPage from './pages/HelpTopicPage';
 import LegalIndexPage from './pages/LegalIndexPage';
 import LegalPage from './pages/LegalPage';
 import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
-import { FurnitureHubPage, ClassicFurniturePage, AntiqueFurniturePage, ContemporaryFurniturePage } from './pages/FurniturePages';
+import { FurnitureHubPage, ClassicFurniturePage, AntiqueFurniturePage, ContemporaryFurniturePage, LocalMarketPage, ExportMarketPage } from './pages/FurniturePages';
 import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
 import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfilePage, GalleryPartnerPage, ArtMaterialPage, CareerResourcePage } from './pages/DynamicPages';
 import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
@@ -150,6 +150,8 @@ function AppRoutes() {
       <Route path="/furniture/classic" element={<Layout><ClassicFurniturePage /></Layout>} />
       <Route path="/furniture/antique" element={<Layout><AntiqueFurniturePage /></Layout>} />
       <Route path="/furniture/contemporary" element={<Layout><ContemporaryFurniturePage /></Layout>} />
+      <Route path="/furniture/local" element={<Layout><LocalMarketPage /></Layout>} />
+      <Route path="/furniture/export" element={<Layout><ExportMarketPage /></Layout>} />
       
       {/* Regions & Destinations - 40 pages */}
       <Route path="/regions" element={<Layout><RegionsIndexPage /></Layout>} />
