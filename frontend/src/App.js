@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { WebSocketProvider } from './context/WebSocketContext';
+import { LanguageProvider } from './context/LanguageContext';
 import '@/App.css';
 
 // Components
@@ -45,6 +46,7 @@ import HelpTopicPage from './pages/HelpTopicPage';
 import LegalIndexPage from './pages/LegalIndexPage';
 import LegalPage from './pages/LegalPage';
 import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
+import { FurnitureHubPage, ClassicFurniturePage, AntiqueFurniturePage, ContemporaryFurniturePage } from './pages/FurniturePages';
 import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
 import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfilePage, GalleryPartnerPage, ArtMaterialPage, CareerResourcePage } from './pages/DynamicPages';
 import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
@@ -142,6 +144,12 @@ function AppRoutes() {
       {/* Art Styles - 50 pages */}
       <Route path="/styles" element={<Layout><StylesIndexPage /></Layout>} />
       <Route path="/styles/:slug" element={<Layout><StylePage /></Layout>} />
+      
+      {/* Furniture - Classic, Antique, Contemporary */}
+      <Route path="/furniture" element={<Layout><FurnitureHubPage /></Layout>} />
+      <Route path="/furniture/classic" element={<Layout><ClassicFurniturePage /></Layout>} />
+      <Route path="/furniture/antique" element={<Layout><AntiqueFurniturePage /></Layout>} />
+      <Route path="/furniture/contemporary" element={<Layout><ContemporaryFurniturePage /></Layout>} />
       
       {/* Regions & Destinations - 40 pages */}
       <Route path="/regions" element={<Layout><RegionsIndexPage /></Layout>} />
@@ -387,20 +395,22 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <CurrencyProvider>
-          <CartProvider>
-            <WebSocketProvider>
-              <div className="App">
-                {/* Grain Texture Overlay */}
-                <div className="grain-overlay" />
-                <AppRoutes />
-                <Toaster position="top-right" richColors />
-              </div>
-            </WebSocketProvider>
-          </CartProvider>
-        </CurrencyProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <WebSocketProvider>
+                <div className="App">
+                  {/* Grain Texture Overlay */}
+                  <div className="grain-overlay" />
+                  <AppRoutes />
+                  <Toaster position="top-right" richColors />
+                </div>
+              </WebSocketProvider>
+            </CartProvider>
+          </CurrencyProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

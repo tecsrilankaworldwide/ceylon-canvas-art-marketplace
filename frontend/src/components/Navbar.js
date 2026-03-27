@@ -13,6 +13,8 @@ import {
 } from '../components/ui/dropdown-menu';
 import { NotificationCenter } from './NotificationCenter';
 import { CurrencySelector } from './CurrencySelector';
+import { LanguageSelector } from './LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 // Ceylon Canvas Logo Component - Antique Brass CC with Lotus
 const CeylonCanvasLogo = ({ size = 'default' }) => {
@@ -130,10 +132,33 @@ export const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="font-body text-sm font-medium text-[#1A1D20] link-underline cursor-pointer">
+                Furniture
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/furniture">All Furniture</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/furniture/classic">Classic</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/furniture/antique">Antique</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/furniture/contemporary">Contemporary</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
+            {/* Language Selector */}
+            <LanguageSelector />
+            
             {/* Currency Selector */}
             <CurrencySelector />
 

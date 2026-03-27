@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Facebook, Mail } from 'lucide-react';
+import { LanguageSelector } from './LanguageSelector';
 
 // Ceylon Canvas Logo for Footer - Antique Brass CC with Lotus
 const CeylonCanvasLogoDark = () => {
@@ -104,7 +105,8 @@ export const Footer = () => {
             <p className="font-body text-xs text-[rgba(253,253,251,0.5)]">
               © {new Date().getFullYear()} Ceylon Canvas Art Marketplace. All rights reserved.
             </p>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
+              <LanguageSelector variant="footer" />
               <Link to="/legal/terms-of-service" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Terms</Link>
               <Link to="/legal/privacy-policy" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Privacy</Link>
               <Link to="/legal" className="font-body text-xs text-[rgba(253,253,251,0.5)] hover:text-white transition-colors">Legal</Link>
