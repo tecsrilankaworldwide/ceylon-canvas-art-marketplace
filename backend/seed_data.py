@@ -167,20 +167,32 @@ def generate_artworks(artists):
 def generate_furniture():
     """Generate furniture items for all regions: Local, Asian, European, American"""
     
-    furniture_images = [
-        "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/116910/pexels-photo-116910.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/1148955/pexels-photo-1148955.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/2343467/pexels-photo-2343467.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/2440471/pexels-photo-2440471.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=400"
+    # Better categorized furniture images from Unsplash/Pexels (Royalty-free)
+    antique_images = [
+        "https://images.unsplash.com/photo-1758817034484-088389dd72f2?w=400",
+        "https://images.unsplash.com/photo-1715160761399-c9fb4d2a5f77?w=400",
+        "https://images.unsplash.com/photo-1738229740116-657bccb0de32?w=400",
+        "https://images.pexels.com/photos/18048414/pexels-photo-18048414.jpeg?w=400",
+        "https://images.pexels.com/photos/18614683/pexels-photo-18614683.jpeg?w=400",
     ]
+    
+    contemporary_images = [
+        "https://images.unsplash.com/photo-1705326701287-346fc37a2c86?w=400",
+        "https://images.unsplash.com/photo-1640109229792-a26a0ee366ff?w=400",
+        "https://images.unsplash.com/photo-1668365011614-9c4a49a0e89d?w=400",
+        "https://images.pexels.com/photos/34811449/pexels-photo-34811449.jpeg?w=400",
+        "https://images.pexels.com/photos/34538288/pexels-photo-34538288.jpeg?w=400",
+    ]
+    
+    handcrafted_images = [
+        "https://images.pexels.com/photos/5608070/pexels-photo-5608070.jpeg?w=400",
+        "https://images.pexels.com/photos/18947373/pexels-photo-18947373.jpeg?w=400",
+        "https://images.unsplash.com/photo-1774005376537-260c4276b33c?w=400",
+        "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?w=400",
+        "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?w=400",
+    ]
+    
+    furniture_images = antique_images + contemporary_images + handcrafted_images
     
     # Categories and their items
     furniture_data = {
