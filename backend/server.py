@@ -2907,6 +2907,39 @@ async def admin_delete_artwork(artwork_id: str, admin: dict = Depends(get_admin_
     await db.bids.delete_many({"artwork_id": artwork_id})
     return {"message": "Artwork deleted"}
 
+@api_router.post("/admin/artworks")
+async def admin_create_artwork(artwork_data: ArtworkCreate, admin: dict = Depends(get_admin_user)):
+    """Create an artwork (admin only)."""
+    artwork_id = str(uuid.uuid4())
+    artwork = {
+        "id": artwork_id,
+        "artist_id": "admin",
+        "artist_name": "Ceylon Canvas",
+        **artwork_data.model_dump(),
+        "current_bid": artwork_data.price if artwork_data.is_auction else None,
+        "bid_count": 0,
+        "views": 0,
+        "is_available": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.artworks.insert_one(artwork)
+    return {k: v for k, v in artwork.items() if k != "_id"}
+
+@api_router.put("/admin/artworks/{artwork_id}")
+async def admin_update_artwork(artwork_id: str, artwork_data: dict, admin: dict = Depends(get_admin_user)):
+    """Update an artwork (admin only)."""
+    artwork = await db.artworks.find_one({"id": artwork_id})
+    if not artwork:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    
+    # Remove None values and _id if present
+    update_data = {k: v for k, v in artwork_data.items() if v is not None and k != "_id" and k != "id"}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.artworks.update_one({"id": artwork_id}, {"$set": update_data})
+    updated = await db.artworks.find_one({"id": artwork_id}, {"_id": 0})
+    return updated
+
 @api_router.get("/admin/artists")
 async def get_admin_artists(
     skip: int = 0,

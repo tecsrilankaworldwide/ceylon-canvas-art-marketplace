@@ -29,6 +29,7 @@ import AboutPage from './pages/AboutPage';
 import ArtworkFormPage from './pages/ArtworkFormPage';
 import ArtistAnalyticsPage from './pages/ArtistAnalyticsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminPanel from './pages/AdminPanel';
 import MessagesPage from './pages/MessagesPage';
 import InvestmentGuidePage from './pages/InvestmentGuidePage';
 import PrivateServicesPage from './pages/PrivateServicesPage';
@@ -377,6 +378,7 @@ function AppRoutes() {
           <Layout><AdminDashboardPage /></Layout>
         </ProtectedRoute>
       } />
+      <Route path="/admin/panel" element={<AdminPanel />} />
       <Route path="/messages" element={
         <ProtectedRoute>
           <Layout showFooter={false}><MessagesPage /></Layout>
