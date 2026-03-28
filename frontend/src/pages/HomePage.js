@@ -17,9 +17,6 @@ const HomePage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Seed data first if needed
-        await seedData().catch(() => {});
-        
         const [featured, activeAuctions, artistsList, categoriesData, statsData] = await Promise.all([
           getFeaturedArtworks(6),
           getActiveAuctions(4),
