@@ -38,12 +38,12 @@ def generate_artists():
     ]
     
     cover_images = [
-        "https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?w=800",
-        "https://images.unsplash.com/photo-1766801848077-31bd1900efcc?w=800",
-        "https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg?w=800",
-        "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800",
-        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800",
-        "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800"
+        "https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?w=400",
+        "https://images.unsplash.com/photo-1766801848077-31bd1900efcc?w=400",
+        "https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg?w=400",
+        "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400",
+        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400",
+        "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400"
     ]
     
     artists = []
@@ -168,18 +168,18 @@ def generate_furniture():
     """Generate furniture items for all regions: Local, Asian, European, American"""
     
     furniture_images = [
-        "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/116910/pexels-photo-116910.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1148955/pexels-photo-1148955.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/2343467/pexels-photo-2343467.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/2440471/pexels-photo-2440471.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/116910/pexels-photo-116910.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/1148955/pexels-photo-1148955.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/2343467/pexels-photo-2343467.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/2440471/pexels-photo-2440471.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=400"
     ]
     
     # Categories and their items

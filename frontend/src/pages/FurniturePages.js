@@ -287,7 +287,7 @@ const FurnitureCard = ({ item }) => {
     <Link to={`/furniture/${item.id}`} className="group" data-testid={`furniture-card-${item.id}`}>
       <div className="aspect-[4/3] overflow-hidden bg-[#F5F5F0] mb-4 relative">
         <img 
-          src={item.images?.[0] || 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&w=600'} 
+          src={item.images?.[0] || 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&w=400'} 
           alt={item.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -597,7 +597,7 @@ export const FurnitureDetailPage = () => {
           <div>
             <div className="aspect-[4/3] overflow-hidden bg-[#F5F5F0]">
               <img 
-                src={furniture.images?.[0] || 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&w=800'} 
+                src={furniture.images?.[0] || 'https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&w=400'} 
                 alt={furniture.title}
                 className="w-full h-full object-cover"
               />

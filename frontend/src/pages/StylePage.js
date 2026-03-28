@@ -7,28 +7,28 @@ import { artStyles } from '../data/pagesData';
 // Art style images from Pexels/Unsplash
 const styleImages = {
   'impressionism': [
-    'https://images.pexels.com/photos/1266808/pexels-photo-1266808.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/1579708/pexels-photo-1579708.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/2911544/pexels-photo-2911544.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/2824173/pexels-photo-2824173.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/3094218/pexels-photo-3094218.jpeg?auto=compress&w=600'
+    'https://images.pexels.com/photos/1266808/pexels-photo-1266808.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/1579708/pexels-photo-1579708.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/2911544/pexels-photo-2911544.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/2824173/pexels-photo-2824173.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/3094218/pexels-photo-3094218.jpeg?auto=compress&w=400'
   ],
   'abstract-expressionism': [
-    'https://images.pexels.com/photos/1585325/pexels-photo-1585325.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/2693212/pexels-photo-2693212.png?auto=compress&w=600',
-    'https://images.pexels.com/photos/1568607/pexels-photo-1568607.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/2156881/pexels-photo-2156881.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/1616403/pexels-photo-1616403.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/1194420/pexels-photo-1194420.jpeg?auto=compress&w=600'
+    'https://images.pexels.com/photos/1585325/pexels-photo-1585325.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/2693212/pexels-photo-2693212.png?auto=compress&w=400',
+    'https://images.pexels.com/photos/1568607/pexels-photo-1568607.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/2156881/pexels-photo-2156881.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/1616403/pexels-photo-1616403.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/1194420/pexels-photo-1194420.jpeg?auto=compress&w=400'
   ],
   'default': [
-    'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/2824173/pexels-photo-2824173.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/3094218/pexels-photo-3094218.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/3246665/pexels-photo-3246665.png?auto=compress&w=600',
-    'https://images.pexels.com/photos/3059658/pexels-photo-3059658.jpeg?auto=compress&w=600',
-    'https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg?auto=compress&w=600'
+    'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/2824173/pexels-photo-2824173.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/3094218/pexels-photo-3094218.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/3246665/pexels-photo-3246665.png?auto=compress&w=400',
+    'https://images.pexels.com/photos/3059658/pexels-photo-3059658.jpeg?auto=compress&w=400',
+    'https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg?auto=compress&w=400'
   ]
 };
 

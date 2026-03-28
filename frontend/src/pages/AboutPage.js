@@ -114,7 +114,7 @@ const AboutPage = () => {
             </div>
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1720945489924-19b707539b3a?w=800"
+                src="https://images.unsplash.com/photo-1720945489924-19b707539b3a?w=400"
                 alt="Sri Lankan Art"
                 className="w-full rounded-sm"
               />

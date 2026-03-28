@@ -42,9 +42,9 @@ const HomePage = () => {
   const categoryImages = {
     painting: 'https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg',
     sculpture: 'https://images.pexels.com/photos/12047518/pexels-photo-12047518.jpeg',
-    digital: 'https://images.unsplash.com/photo-1766801848077-31bd1900efcc?w=800',
+    digital: 'https://images.unsplash.com/photo-1766801848077-31bd1900efcc?w=400',
     photography: 'https://images.pexels.com/photos/2097218/pexels-photo-2097218.jpeg',
-    traditional: 'https://images.unsplash.com/photo-1720945489924-19b707539b3a?w=800'
+    traditional: 'https://images.unsplash.com/photo-1720945489924-19b707539b3a?w=400'
   };
 
   return (
