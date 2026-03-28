@@ -167,32 +167,54 @@ def generate_artworks(artists):
 def generate_furniture():
     """Generate furniture items for all regions: Local, Asian, European, American"""
     
-    # Better categorized furniture images from Unsplash/Pexels (Royalty-free)
-    antique_images = [
-        "https://images.unsplash.com/photo-1758817034484-088389dd72f2?w=400",
-        "https://images.unsplash.com/photo-1715160761399-c9fb4d2a5f77?w=400",
-        "https://images.unsplash.com/photo-1738229740116-657bccb0de32?w=400",
-        "https://images.pexels.com/photos/18048414/pexels-photo-18048414.jpeg?w=400",
-        "https://images.pexels.com/photos/18614683/pexels-photo-18614683.jpeg?w=400",
+    # Authentic furniture images by category (Unsplash/Pexels - Royalty-free)
+    
+    # Japanese/Asian furniture
+    asian_images = [
+        "https://images.unsplash.com/photo-1664005575921-d0dfc7ab9f49?w=400",  # Japanese bench
+        "https://images.unsplash.com/photo-1760259476944-62cc7103a804?w=400",  # Asian antiques
+        "https://images.pexels.com/photos/33472153/pexels-photo-33472153.jpeg?w=400",  # Chinese furniture
+        "https://images.pexels.com/photos/13829629/pexels-photo-13829629.jpeg?w=400",  # Chinese cabinet
+        "https://images.unsplash.com/photo-1687676626545-4e13739e826e?w=400",  # Chinese rosewood
     ]
     
+    # European/French antique furniture
+    european_images = [
+        "https://images.unsplash.com/photo-1666276523796-90329b78ea4a?w=400",  # French fancy room
+        "https://images.unsplash.com/photo-1577892209303-4b1352c6162a?w=400",  # French chair
+        "https://images.unsplash.com/photo-1705591937098-dfd5b4ef1dbc?w=400",  # French living room
+        "https://images.unsplash.com/photo-1752108037856-47c91b82d7f5?w=400",  # Elegant room
+        "https://images.pexels.com/photos/8135247/pexels-photo-8135247.jpeg?w=400",  # White armoire
+        "https://images.pexels.com/photos/6830012/pexels-photo-6830012.jpeg?w=400",  # Antique showroom
+    ]
+    
+    # American/Mid-century modern furniture
+    american_images = [
+        "https://images.unsplash.com/photo-1577176434922-803273eba97a?w=400",  # Mid-century set
+        "https://images.unsplash.com/photo-1729603483131-22a1af22b486?w=400",  # Vintage credenza
+        "https://images.unsplash.com/photo-1742404450287-60c4cbb838e4?w=400",  # Cozy armchair
+        "https://images.unsplash.com/photo-1586580330552-0e0d2938275c?w=400",  # Round table
+    ]
+    
+    # Contemporary/Scandinavian furniture
     contemporary_images = [
-        "https://images.unsplash.com/photo-1705326701287-346fc37a2c86?w=400",
-        "https://images.unsplash.com/photo-1640109229792-a26a0ee366ff?w=400",
-        "https://images.unsplash.com/photo-1668365011614-9c4a49a0e89d?w=400",
-        "https://images.pexels.com/photos/34811449/pexels-photo-34811449.jpeg?w=400",
-        "https://images.pexels.com/photos/34538288/pexels-photo-34538288.jpeg?w=400",
+        "https://images.unsplash.com/photo-1772442363851-738a548f6c5c?w=400",  # Dining set
+        "https://images.unsplash.com/photo-1723748972084-4124765e0a55?w=400",  # Living room fireplace
+        "https://images.unsplash.com/photo-1771888703723-01d85da1dae1?w=400",  # Minimalist room
+        "https://images.pexels.com/photos/13073982/pexels-photo-13073982.jpeg?w=400",  # Modern living room
+        "https://images.pexels.com/photos/5870/purple-white-design-decoration.jpg?w=400",  # Modern sideboard
     ]
     
-    handcrafted_images = [
-        "https://images.pexels.com/photos/5608070/pexels-photo-5608070.jpeg?w=400",
-        "https://images.pexels.com/photos/18947373/pexels-photo-18947373.jpeg?w=400",
-        "https://images.unsplash.com/photo-1774005376537-260c4276b33c?w=400",
+    # Local Sri Lankan style
+    local_images = [
         "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?w=400",
         "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?w=400",
+        "https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?w=400",
+        "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?w=400",
+        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=400",
     ]
     
-    furniture_images = antique_images + contemporary_images + handcrafted_images
+    furniture_images = local_images + asian_images + european_images + american_images + contemporary_images
     
     # Categories and their items
     furniture_data = {
