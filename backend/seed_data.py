@@ -162,3 +162,163 @@ def generate_artworks(artists):
         artworks.append(artwork)
     
     return artworks
+
+
+def generate_furniture():
+    """Generate furniture items for all regions: Local, Asian, European, American"""
+    
+    furniture_images = [
+        "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2079249/pexels-photo-2079249.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/116910/pexels-photo-116910.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1148955/pexels-photo-1148955.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2343467/pexels-photo-2343467.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2440471/pexels-photo-2440471.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/3935333/pexels-photo-3935333.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ]
+    
+    # Categories and their items
+    furniture_data = {
+        "local": {
+            "antique": [
+                {"title": "Colonial Era Almirah", "material": "Teak Wood", "origin": "Sri Lanka", "year": 1920, "price": 2500},
+                {"title": "Dutch Period Writing Desk", "material": "Ebony Wood", "origin": "Sri Lanka", "year": 1880, "price": 4500},
+                {"title": "Kandyan Traditional Chest", "material": "Jackfruit Wood", "origin": "Sri Lanka", "year": 1910, "price": 1800},
+                {"title": "British Colonial Rocking Chair", "material": "Mahogany", "origin": "Sri Lanka", "year": 1935, "price": 950},
+                {"title": "Vintage Ceylon Tea Cabinet", "material": "Rosewood", "origin": "Sri Lanka", "year": 1945, "price": 1200},
+            ],
+            "contemporary": [
+                {"title": "Modern Colombo Coffee Table", "material": "Teak & Glass", "origin": "Sri Lanka", "year": 2024, "price": 450},
+                {"title": "Minimalist Dining Set", "material": "Rubber Wood", "origin": "Sri Lanka", "year": 2024, "price": 1200},
+                {"title": "Urban Living Sofa Set", "material": "Teak & Fabric", "origin": "Sri Lanka", "year": 2024, "price": 2800},
+                {"title": "Contemporary Bookshelf", "material": "MDF & Teak", "origin": "Sri Lanka", "year": 2024, "price": 380},
+                {"title": "Modern TV Console", "material": "Engineered Wood", "origin": "Sri Lanka", "year": 2024, "price": 520},
+            ],
+            "handcrafted_unique": [
+                {"title": "Hand-Carved Elephant Table", "material": "Teak Wood", "origin": "Sri Lanka", "year": 2023, "price": 1800},
+                {"title": "Artisan Peacock Chair", "material": "Cane & Rattan", "origin": "Sri Lanka", "year": 2023, "price": 650},
+                {"title": "Traditional Mask Display Cabinet", "material": "Jackfruit Wood", "origin": "Sri Lanka", "year": 2024, "price": 920},
+            ],
+        },
+        "asian": [
+            {"title": "Japanese Tansu Chest", "material": "Paulownia Wood", "origin": "Japan", "year": 1960, "price": 3200, "category": "antique"},
+            {"title": "Chinese Rosewood Cabinet", "material": "Hongmu Rosewood", "origin": "China", "year": 1890, "price": 8500, "category": "antique"},
+            {"title": "Korean Wedding Chest", "material": "Elm Wood & Brass", "origin": "South Korea", "year": 1920, "price": 2800, "category": "antique"},
+            {"title": "Thai Temple Altar Table", "material": "Teak with Gold Leaf", "origin": "Thailand", "year": 1950, "price": 4200, "category": "antique"},
+            {"title": "Indian Carved Daybed", "material": "Sheesham Wood", "origin": "India", "year": 1940, "price": 3500, "category": "antique"},
+            {"title": "Balinese Console Table", "material": "Recycled Teak", "origin": "Indonesia", "year": 2023, "price": 1200, "category": "contemporary"},
+            {"title": "Vietnamese Bamboo Shelf", "material": "Bamboo", "origin": "Vietnam", "year": 2024, "price": 450, "category": "contemporary"},
+            {"title": "Modern Asian Fusion Dining Table", "material": "Acacia Wood", "origin": "Malaysia", "year": 2024, "price": 1800, "category": "contemporary"},
+            {"title": "Zen Garden Meditation Bench", "material": "Cedar Wood", "origin": "Japan", "year": 2024, "price": 680, "category": "handcrafted_unique"},
+            {"title": "Dragon Carved Room Divider", "material": "Camphor Wood", "origin": "China", "year": 2023, "price": 2400, "category": "handcrafted_unique"},
+        ],
+        "european": [
+            {"title": "French Louis XV Armoire", "material": "Oak Wood", "origin": "France", "year": 1880, "price": 12000, "category": "antique"},
+            {"title": "Victorian Mahogany Sideboard", "material": "Mahogany", "origin": "United Kingdom", "year": 1870, "price": 5500, "category": "antique"},
+            {"title": "Italian Renaissance Cabinet", "material": "Walnut", "origin": "Italy", "year": 1920, "price": 7800, "category": "antique"},
+            {"title": "German Biedermeier Secretary Desk", "material": "Cherry Wood", "origin": "Germany", "year": 1840, "price": 9200, "category": "antique"},
+            {"title": "Dutch Colonial Chest of Drawers", "material": "Oak & Ebony", "origin": "Netherlands", "year": 1890, "price": 4800, "category": "antique"},
+            {"title": "Scandinavian Modern Bookcase", "material": "White Oak", "origin": "Denmark", "year": 2024, "price": 2200, "category": "contemporary"},
+            {"title": "Italian Leather Sofa Set", "material": "Leather & Chrome", "origin": "Italy", "year": 2024, "price": 5500, "category": "contemporary"},
+            {"title": "Swedish Minimalist Dining Table", "material": "Ash Wood", "origin": "Sweden", "year": 2024, "price": 1800, "category": "contemporary"},
+            {"title": "Spanish Wrought Iron Console", "material": "Iron & Marble", "origin": "Spain", "year": 2023, "price": 1400, "category": "handcrafted_unique"},
+            {"title": "Portuguese Azulejo Tile Table", "material": "Ceramic & Wood", "origin": "Portugal", "year": 2024, "price": 980, "category": "handcrafted_unique"},
+        ],
+        "american": [
+            {"title": "American Colonial Highboy", "material": "Cherry Wood", "origin": "USA", "year": 1920, "price": 6500, "category": "antique"},
+            {"title": "Shaker Style Rocking Chair", "material": "Maple Wood", "origin": "USA", "year": 1890, "price": 2200, "category": "antique"},
+            {"title": "Mission Style Oak Bookcase", "material": "Quarter-sawn Oak", "origin": "USA", "year": 1910, "price": 3800, "category": "antique"},
+            {"title": "Art Deco Vanity Dresser", "material": "Walnut & Mirror", "origin": "USA", "year": 1935, "price": 2800, "category": "antique"},
+            {"title": "Mid-Century Modern Credenza", "material": "Teak Veneer", "origin": "USA", "year": 1960, "price": 4200, "category": "antique"},
+            {"title": "California Modern Platform Bed", "material": "Walnut", "origin": "USA", "year": 2024, "price": 2400, "category": "contemporary"},
+            {"title": "Brooklyn Industrial Coffee Table", "material": "Reclaimed Wood & Steel", "origin": "USA", "year": 2024, "price": 850, "category": "contemporary"},
+            {"title": "Austin Live Edge Dining Table", "material": "Black Walnut", "origin": "USA", "year": 2024, "price": 3200, "category": "contemporary"},
+            {"title": "Mexican Carved Bench", "material": "Mesquite Wood", "origin": "Mexico", "year": 2023, "price": 1100, "category": "handcrafted_unique"},
+            {"title": "Canadian Rustic Log Cabinet", "material": "Pine Wood", "origin": "Canada", "year": 2024, "price": 1600, "category": "handcrafted_unique"},
+        ]
+    }
+    
+    furniture_types = {
+        "Teak Wood": "wooden", "Ebony Wood": "wooden", "Jackfruit Wood": "wooden", "Mahogany": "wooden",
+        "Rosewood": "wooden", "Teak & Glass": "wooden", "Rubber Wood": "wooden", "MDF & Teak": "wooden",
+        "Engineered Wood": "wooden", "Paulownia Wood": "wooden", "Hongmu Rosewood": "wooden",
+        "Elm Wood & Brass": "brass_metal", "Sheesham Wood": "wooden", "Recycled Teak": "wooden",
+        "Bamboo": "cane_rattan", "Acacia Wood": "wooden", "Cedar Wood": "wooden", "Camphor Wood": "wooden",
+        "Oak Wood": "wooden", "Walnut": "wooden", "Cherry Wood": "wooden", "Oak & Ebony": "wooden",
+        "White Oak": "wooden", "Leather & Chrome": "wooden", "Ash Wood": "wooden",
+        "Iron & Marble": "brass_metal", "Ceramic & Wood": "carved_decorative", "Maple Wood": "wooden",
+        "Quarter-sawn Oak": "wooden", "Walnut & Mirror": "wooden", "Teak Veneer": "wooden",
+        "Reclaimed Wood & Steel": "brass_metal", "Black Walnut": "wooden", "Mesquite Wood": "carved_decorative",
+        "Pine Wood": "wooden", "Cane & Rattan": "cane_rattan", "Teak & Fabric": "wooden",
+        "Teak with Gold Leaf": "carved_decorative"
+    }
+    
+    conditions = ["excellent", "excellent", "excellent", "good", "good", "fair"]
+    
+    furniture_items = []
+    item_index = 0
+    
+    # Process local furniture
+    for category, items in furniture_data["local"].items():
+        for item in items:
+            furniture_item = {
+                "id": str(uuid.uuid4()),
+                "title": item["title"],
+                "description": f"Exquisite {category.replace('_', ' ')} piece from Sri Lanka. {item['title']} crafted from {item['material']}. Perfect for local homes seeking authentic Sri Lankan craftsmanship.",
+                "category": category,
+                "furniture_type": furniture_types.get(item["material"], "wooden"),
+                "region": "local",
+                "origin": item["origin"],
+                "material": item["material"],
+                "dimensions": f"{120 + (item_index * 5)}cm x {60 + (item_index * 3)}cm x {80 + (item_index * 2)}cm",
+                "weight": f"{25 + (item_index * 2)} kg",
+                "year_made": item["year"],
+                "condition": conditions[item_index % len(conditions)],
+                "price": item["price"],
+                "is_negotiable": item["price"] > 1000,
+                "images": [furniture_images[item_index % len(furniture_images)]],
+                "tags": ["sri-lanka", "local", category, item["material"].lower().split()[0]],
+                "is_available": True,
+                "is_featured": item_index < 5,
+                "views": 50 + (item_index * 15),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": None
+            }
+            furniture_items.append(furniture_item)
+            item_index += 1
+    
+    # Process export regions
+    for region in ["asian", "european", "american"]:
+        for item in furniture_data[region]:
+            furniture_item = {
+                "id": str(uuid.uuid4()),
+                "title": item["title"],
+                "description": f"Premium export-quality {item['category'].replace('_', ' ')} furniture from {item['origin']}. This {item['title']} is crafted from finest {item['material']}. Ideal for {region.title()} markets with international shipping available.",
+                "category": item["category"],
+                "furniture_type": furniture_types.get(item["material"], "wooden"),
+                "region": region,
+                "origin": item["origin"],
+                "material": item["material"],
+                "dimensions": f"{130 + (item_index * 4)}cm x {65 + (item_index * 2)}cm x {85 + (item_index * 3)}cm",
+                "weight": f"{30 + (item_index * 3)} kg",
+                "year_made": item["year"],
+                "condition": conditions[item_index % len(conditions)],
+                "price": item["price"],
+                "is_negotiable": item["price"] > 2000,
+                "images": [furniture_images[item_index % len(furniture_images)]],
+                "tags": [region, "export", item["category"], item["origin"].lower().replace(" ", "-")],
+                "is_available": True,
+                "is_featured": item_index % 5 == 0,
+                "views": 80 + (item_index * 12),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": None
+            }
+            furniture_items.append(furniture_item)
+            item_index += 1
+    
+    return furniture_items

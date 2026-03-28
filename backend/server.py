@@ -372,6 +372,67 @@ class EmailAutomationTrigger(BaseModel):
 class CartAbandonmentCheck(BaseModel):
     hours_threshold: int = 24
 
+# ==================== FURNITURE MODELS ====================
+
+class FurnitureCreate(BaseModel):
+    title: str
+    description: str
+    category: str  # antique, contemporary, export_quality, handcrafted_unique
+    furniture_type: str  # wooden, brass_metal, cane_rattan, carved_decorative
+    region: str  # local, asian, european, american
+    origin: str  # Country of origin
+    material: str
+    dimensions: str
+    weight: Optional[str] = None
+    year_made: Optional[int] = None
+    condition: str = "excellent"  # excellent, good, fair, requires_restoration
+    price: float
+    is_negotiable: bool = False
+    images: List[str] = []
+    tags: List[str] = []
+
+class FurnitureResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    category: str
+    furniture_type: str
+    region: str
+    origin: str
+    material: str
+    dimensions: str
+    weight: Optional[str] = None
+    year_made: Optional[int] = None
+    condition: str
+    price: float
+    is_negotiable: bool = False
+    images: List[str] = []
+    tags: List[str] = []
+    is_available: bool = True
+    is_featured: bool = False
+    views: int = 0
+    created_at: str
+    updated_at: Optional[str] = None
+
+class FurnitureUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    furniture_type: Optional[str] = None
+    region: Optional[str] = None
+    origin: Optional[str] = None
+    material: Optional[str] = None
+    dimensions: Optional[str] = None
+    weight: Optional[str] = None
+    year_made: Optional[int] = None
+    condition: Optional[str] = None
+    price: Optional[float] = None
+    is_negotiable: Optional[bool] = None
+    images: Optional[List[str]] = None
+    tags: Optional[List[str]] = None
+    is_available: Optional[bool] = None
+    is_featured: Optional[bool] = None
+
 # ==================== WEBSOCKET CONNECTION MANAGER ====================
 
 class ConnectionManager:
@@ -3753,6 +3814,250 @@ async def get_automation_stats(admin: dict = Depends(get_admin_user)):
             "successful_referrals": referral_stats.get("successful", 0)
         }
     }
+
+# ==================== FURNITURE ENDPOINTS ====================
+
+@api_router.get("/furniture", response_model=List[FurnitureResponse])
+async def get_furniture(
+    skip: int = 0,
+    limit: int = 20,
+    category: Optional[str] = None,
+    furniture_type: Optional[str] = None,
+    region: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    condition: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc"
+):
+    """Get all furniture with filters."""
+    query = {"is_available": True}
+    
+    if category:
+        query["category"] = category
+    if furniture_type:
+        query["furniture_type"] = furniture_type
+    if region:
+        query["region"] = region
+    if condition:
+        query["condition"] = condition
+    if min_price is not None:
+        query["price"] = {"$gte": min_price}
+    if max_price is not None:
+        if "price" in query:
+            query["price"]["$lte"] = max_price
+        else:
+            query["price"] = {"$lte": max_price}
+    if search:
+        query["$or"] = [
+            {"title": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}},
+            {"material": {"$regex": search, "$options": "i"}},
+            {"tags": {"$in": [search.lower()]}}
+        ]
+    
+    sort_direction = -1 if sort_order == "desc" else 1
+    furniture = await db.furniture.find(query, {"_id": 0}).sort(sort_by, sort_direction).skip(skip).limit(limit).to_list(limit)
+    
+    return furniture
+
+@api_router.get("/furniture/featured", response_model=List[FurnitureResponse])
+async def get_featured_furniture(limit: int = 8):
+    """Get featured furniture items."""
+    furniture = await db.furniture.find({"is_available": True, "is_featured": True}, {"_id": 0}).sort("views", -1).limit(limit).to_list(limit)
+    return furniture
+
+@api_router.get("/furniture/categories")
+async def get_furniture_categories():
+    """Get furniture category counts."""
+    pipeline = [
+        {"$match": {"is_available": True}},
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    categories = await db.furniture.aggregate(pipeline).to_list(10)
+    return [{"category": c["_id"], "count": c["count"]} for c in categories]
+
+@api_router.get("/furniture/regions")
+async def get_furniture_regions():
+    """Get furniture by region with counts."""
+    pipeline = [
+        {"$match": {"is_available": True}},
+        {"$group": {"_id": "$region", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    regions = await db.furniture.aggregate(pipeline).to_list(10)
+    return [{"region": r["_id"], "count": r["count"]} for r in regions]
+
+@api_router.get("/furniture/local", response_model=List[FurnitureResponse])
+async def get_local_furniture(
+    skip: int = 0,
+    limit: int = 20,
+    category: Optional[str] = None,
+    furniture_type: Optional[str] = None
+):
+    """Get furniture for local Sri Lankan market."""
+    query = {"is_available": True, "region": "local"}
+    if category:
+        query["category"] = category
+    if furniture_type:
+        query["furniture_type"] = furniture_type
+    
+    furniture = await db.furniture.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return furniture
+
+@api_router.get("/furniture/export/{region}", response_model=List[FurnitureResponse])
+async def get_export_furniture(
+    region: str,
+    skip: int = 0,
+    limit: int = 20,
+    category: Optional[str] = None,
+    furniture_type: Optional[str] = None
+):
+    """Get export furniture by region (asian, european, american)."""
+    if region not in ["asian", "european", "american"]:
+        raise HTTPException(status_code=400, detail="Invalid region. Must be: asian, european, or american")
+    
+    query = {"is_available": True, "region": region}
+    if category:
+        query["category"] = category
+    if furniture_type:
+        query["furniture_type"] = furniture_type
+    
+    furniture = await db.furniture.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return furniture
+
+@api_router.get("/furniture/{furniture_id}", response_model=FurnitureResponse)
+async def get_furniture_by_id(furniture_id: str):
+    """Get a single furniture item by ID."""
+    furniture = await db.furniture.find_one({"id": furniture_id}, {"_id": 0})
+    if not furniture:
+        raise HTTPException(status_code=404, detail="Furniture not found")
+    
+    # Increment views
+    await db.furniture.update_one({"id": furniture_id}, {"$inc": {"views": 1}})
+    furniture["views"] = furniture.get("views", 0) + 1
+    
+    return furniture
+
+@api_router.post("/furniture", response_model=FurnitureResponse)
+async def create_furniture(
+    furniture_data: FurnitureCreate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Create a new furniture item (admin only)."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    payload = decode_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    
+    if not user or not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    furniture = {
+        "id": str(uuid.uuid4()),
+        **furniture_data.model_dump(),
+        "is_available": True,
+        "is_featured": False,
+        "views": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": None
+    }
+    
+    await db.furniture.insert_one(furniture)
+    return {k: v for k, v in furniture.items() if k != "_id"}
+
+@api_router.put("/furniture/{furniture_id}", response_model=FurnitureResponse)
+async def update_furniture(
+    furniture_id: str,
+    furniture_data: FurnitureUpdate,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Update a furniture item (admin only)."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    payload = decode_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    
+    if not user or not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    existing = await db.furniture.find_one({"id": furniture_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Furniture not found")
+    
+    update_data = {k: v for k, v in furniture_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.furniture.update_one({"id": furniture_id}, {"$set": update_data})
+    
+    updated = await db.furniture.find_one({"id": furniture_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/furniture/{furniture_id}")
+async def delete_furniture(
+    furniture_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Delete a furniture item (admin only)."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    payload = decode_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    
+    if not user or not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.furniture.delete_one({"id": furniture_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Furniture not found")
+    
+    return {"message": "Furniture deleted successfully"}
+
+@api_router.post("/furniture/{furniture_id}/feature")
+async def toggle_furniture_featured(
+    furniture_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Toggle furniture featured status (admin only)."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    payload = decode_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+    
+    if not user or not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    furniture = await db.furniture.find_one({"id": furniture_id}, {"_id": 0})
+    if not furniture:
+        raise HTTPException(status_code=404, detail="Furniture not found")
+    
+    new_featured = not furniture.get("is_featured", False)
+    await db.furniture.update_one({"id": furniture_id}, {"$set": {"is_featured": new_featured}})
+    
+    return {"message": f"Furniture {'featured' if new_featured else 'unfeatured'} successfully", "is_featured": new_featured}
+
+@api_router.post("/seed/furniture")
+async def seed_furniture():
+    """Seed furniture data for all regions."""
+    from seed_data import generate_furniture
+    
+    # Clear existing furniture
+    await db.furniture.delete_many({})
+    
+    # Generate furniture data
+    furniture_items = generate_furniture()
+    
+    # Insert furniture
+    for item in furniture_items:
+        await db.furniture.insert_one(item)
+    
+    return {"message": "Furniture seeded successfully", "count": len(furniture_items)}
 
 # ==================== MAIN ====================
 

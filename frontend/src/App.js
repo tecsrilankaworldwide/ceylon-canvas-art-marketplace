@@ -46,7 +46,7 @@ import HelpTopicPage from './pages/HelpTopicPage';
 import LegalIndexPage from './pages/LegalIndexPage';
 import LegalPage from './pages/LegalPage';
 import ArtistSpotlightPage from './pages/ArtistSpotlightPage';
-import { FurnitureHubPage, ClassicFurniturePage, AntiqueFurniturePage, ContemporaryFurniturePage, LocalMarketPage, ExportMarketPage } from './pages/FurniturePages';
+import { FurnitureHubPage, LocalMarketPage, ExportMarketPage, AllFurniturePage, FurnitureCategoryPage, FurnitureDetailPage } from './pages/FurniturePages';
 import { StylesIndexPage, RegionsIndexPage, CollectionsIndexPage, ArtistSpotlightsIndexPage } from './pages/IndexPages';
 import { EventPage, TechniquePage, ArtPeriodPage, PriceGuidePage, CollectorProfilePage, GalleryPartnerPage, ArtMaterialPage, CareerResourcePage } from './pages/DynamicPages';
 import { EventsIndexPage, TechniquesIndexPage, ArtPeriodsIndexPage, PriceGuidesIndexPage, CollectorProfilesIndexPage, GalleryPartnersIndexPage, ArtMaterialsIndexPage, CareerResourcesIndexPage } from './pages/MoreIndexPages';
@@ -145,13 +145,13 @@ function AppRoutes() {
       <Route path="/styles" element={<Layout><StylesIndexPage /></Layout>} />
       <Route path="/styles/:slug" element={<Layout><StylePage /></Layout>} />
       
-      {/* Furniture - Classic, Antique, Contemporary */}
+      {/* Furniture - Categories & Regional Markets */}
       <Route path="/furniture" element={<Layout><FurnitureHubPage /></Layout>} />
-      <Route path="/furniture/classic" element={<Layout><ClassicFurniturePage /></Layout>} />
-      <Route path="/furniture/antique" element={<Layout><AntiqueFurniturePage /></Layout>} />
-      <Route path="/furniture/contemporary" element={<Layout><ContemporaryFurniturePage /></Layout>} />
+      <Route path="/furniture/all" element={<Layout><AllFurniturePage /></Layout>} />
       <Route path="/furniture/local" element={<Layout><LocalMarketPage /></Layout>} />
-      <Route path="/furniture/export" element={<Layout><ExportMarketPage /></Layout>} />
+      <Route path="/furniture/export/:region" element={<Layout><ExportMarketPage /></Layout>} />
+      <Route path="/furniture/category/:category" element={<Layout><FurnitureCategoryPage /></Layout>} />
+      <Route path="/furniture/:id" element={<Layout><FurnitureDetailPage /></Layout>} />
       
       {/* Regions & Destinations - 40 pages */}
       <Route path="/regions" element={<Layout><RegionsIndexPage /></Layout>} />
