@@ -56,33 +56,14 @@ services:
     container_name: ceylon-frontend
     restart: always
     ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - ceylon-network
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: ceylon-nginx
-    restart: always
-    ports:
       - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - certbot_data:/var/www/certbot:ro
     depends_on:
-      - frontend
       - backend
     networks:
       - ceylon-network
 
 volumes:
   mongodb_data:
-  certbot_data:
 
 networks:
   ceylon-network:
