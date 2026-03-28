@@ -205,6 +205,18 @@ def generate_furniture():
         "https://images.pexels.com/photos/5870/purple-white-design-decoration.jpg?w=400",  # Modern sideboard
     ]
     
+    # Sleek iron/metal bent contemporary furniture
+    iron_metal_images = [
+        "https://images.unsplash.com/photo-1639299940869-4addd5e19727?w=400",  # Sleek metal bench
+        "https://images.unsplash.com/photo-1537384901770-4dc15e7ae013?w=400",  # Gray metal armchair
+        "https://images.unsplash.com/photo-1612022636405-d10f630fe7aa?w=400",  # Stainless steel chair
+        "https://images.unsplash.com/photo-1763705860375-b118c271815c?w=400",  # Round metal tables
+        "https://images.pexels.com/photos/29248907/pexels-photo-29248907.jpeg?w=400",  # Minimalist metal set
+        "https://images.pexels.com/photos/31155441/pexels-photo-31155441.jpeg?w=400",  # Wrought iron patio
+        "https://images.pexels.com/photos/21036382/pexels-photo-21036382.jpeg?w=400",  # Vintage iron set
+        "https://images.unsplash.com/photo-1729446886782-12732a683a1e?w=400",  # Modern metal table
+    ]
+    
     # Local Sri Lankan style
     local_images = [
         "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?w=400",
@@ -214,7 +226,7 @@ def generate_furniture():
         "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?w=400",
     ]
     
-    furniture_images = local_images + asian_images + european_images + american_images + contemporary_images
+    furniture_images = local_images + asian_images + european_images + american_images + contemporary_images + iron_metal_images
     
     # Categories and their items
     furniture_data = {
